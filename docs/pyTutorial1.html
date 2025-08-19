@@ -1,0 +1,3188 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.527">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>EPS7008-UFSC - Tutorial 1 - Pandas</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">EPS7008-UFSC</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-tutoriais-python" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Tutoriais Python</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-tutoriais-python">    
+        <li>
+    <a class="dropdown-item" href="./pyTutorialPython.html">
+ <span class="dropdown-text">Tutorial de Instalação do Python</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./pyTutorial1.html">
+ <span class="dropdown-text">Tutorial 1 - Pandas</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./pyTutorial2.html">
+ <span class="dropdown-text">Tutorial 2 - Pandas</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./pyTutorial3.html">
+ <span class="dropdown-text">Tutorial 3 - Matplotlib</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./pyTutorial4.html">
+ <span class="dropdown-text">Tutorial 4 - Seaborn e GeoPandas</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./pyTutorial5.html">
+ <span class="dropdown-text">Tutorial 5 - Quarto Dashboards em Python</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./pyTutorial5b.html">
+ <span class="dropdown-text">Tutorial 5b - Mapas Interativos</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./pyTutorial5c.html">
+ <span class="dropdown-text">Tutorial 5c - Dashboards Interativos</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./pyTutorial6.html">
+ <span class="dropdown-text">Tutorial 6 - Métodos não supervisionados</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./pyTutorial7.html">
+ <span class="dropdown-text">Tutorial 7 - Métodos de Regressão</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./pyTutorial8.html">
+ <span class="dropdown-text">Tutorial 8 - Métodos de Classificação</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-tutoriais-r" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Tutoriais R</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-tutoriais-r">    
+        <li>
+    <a class="dropdown-item" href="./Tutorial0.html">
+ <span class="dropdown-text">Tutorial 0 - Conhecendo o R</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./Tutorial1.html">
+ <span class="dropdown-text">Tutorial 1 - Tidyverse</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./Tutorial2.html">
+ <span class="dropdown-text">Tutorial 2 - Ggplot2 e Tidyverse</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./Tutorial_av_ggplot.html">
+ <span class="dropdown-text">Tutorial 3a - Ggplot Avançado</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./Tutorial3b.html">
+ <span class="dropdown-text">Tutorial 3b - Quarto Dashboards</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./Tutorial4.html">
+ <span class="dropdown-text">Tutorial 4 - Métodos Não Supervisionados</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./Tutorial5regtidymodels.html">
+ <span class="dropdown-text">Tutorial 5 - Métodos de Regressão e Classificação em R</span></a>
+  </li>  
+    </ul>
+  </li>
+</ul>
+          </div> <!-- /navcollapse -->
+          <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#criando-um-dataframe" id="toc-criando-um-dataframe" class="nav-link active" data-scroll-target="#criando-um-dataframe">Criando um dataframe</a></li>
+  <li><a href="#carregando-os-dados" id="toc-carregando-os-dados" class="nav-link" data-scroll-target="#carregando-os-dados">Carregando os dados</a></li>
+  <li><a href="#selecionando-colunas" id="toc-selecionando-colunas" class="nav-link" data-scroll-target="#selecionando-colunas">Selecionando colunas</a></li>
+  <li><a href="#ordenando-os-dados" id="toc-ordenando-os-dados" class="nav-link" data-scroll-target="#ordenando-os-dados">Ordenando os dados</a></li>
+  <li><a href="#filtrando-linhas" id="toc-filtrando-linhas" class="nav-link" data-scroll-target="#filtrando-linhas">Filtrando Linhas</a></li>
+  <li><a href="#agrupando-dados-por-categorias" id="toc-agrupando-dados-por-categorias" class="nav-link" data-scroll-target="#agrupando-dados-por-categorias">Agrupando dados por categorias</a></li>
+  <li><a href="#modificando-ou-criando-novas-colunas" id="toc-modificando-ou-criando-novas-colunas" class="nav-link" data-scroll-target="#modificando-ou-criando-novas-colunas">Modificando ou criando novas colunas</a></li>
+  <li><a href="#juntando-dois-ou-mais-df" id="toc-juntando-dois-ou-mais-df" class="nav-link" data-scroll-target="#juntando-dois-ou-mais-df">Juntando dois ou mais df</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Tutorial 1 - Pandas</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>O Pandas é uma biblioteca Python fundamental para análise de dados. Ela fornece estruturas de dados eficientes e ferramentas para manipulação, limpeza e análise de dados.</p>
+<div id="8e10c173" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<p>Você pode baixar os dados aqui.</p><ul><li><a href="pydata1//imdb_series.xlsx" download="">imdb_series.xlsx</a></li><li><a href="pydata1//netflix_series_limpo.xlsx" download="">netflix_series_limpo.xlsx</a></li></ul>
+</div>
+</div>
+<div id="5cd24e07" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="criando-um-dataframe" class="level1">
+<h1>Criando um dataframe</h1>
+<div id="133317c3" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> {<span class="st">'name'</span>: [<span class="st">'Alice'</span>, <span class="st">'Bob'</span>, <span class="st">'Charlie'</span>, <span class="st">'Alice'</span>, <span class="st">'David'</span>, <span class="st">'Bob'</span>,<span class="st">'Camille'</span>],</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>        <span class="st">'age'</span>: [<span class="dv">25</span>, <span class="dv">30</span>, <span class="dv">35</span>, <span class="dv">25</span>, <span class="dv">40</span>, <span class="dv">30</span>,<span class="dv">20</span>],</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">'title'</span>:[<span class="st">'Sherlock'</span>,<span class="st">'The Walking Dead'</span>,<span class="st">'Dark'</span>,</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">'Friends'</span>,<span class="st">'Orange Is the New Black'</span>,</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">'The Walking Dead'</span>,<span class="st">'Narcos'</span>]}</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.DataFrame(data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="55ec3ca2" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>      name  age                    title
+0    Alice   25                 Sherlock
+1      Bob   30         The Walking Dead
+2  Charlie   35                     Dark
+3    Alice   25                  Friends
+4    David   40  Orange Is the New Black
+5      Bob   30         The Walking Dead
+6  Camille   20                   Narcos</code></pre>
+</div>
+</div>
+</section>
+<section id="carregando-os-dados" class="level1">
+<h1>Carregando os dados</h1>
+<div id="b4c1b91c" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>netflix <span class="op">=</span> pd.read_excel(<span class="st">"data1/netflix_series_limpo.xlsx"</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>imdb <span class="op">=</span> pd.read_excel(<span class="st">"data1/imdb_series.xlsx"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="ba01db0e" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(netflix.head)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;bound method NDFrame.head of      series_title     season               episode       Date
+0            Away   Season 1                  Home 2020-10-06
+1            Away   Season 1                Spektr 2020-10-06
+2            Away   Season 1           Vital Signs 2020-10-05
+3            Away   Season 1        Goodnight Mars 2020-10-05
+4            Away   Season 1        A Little Faith 2020-10-05
+..            ...        ...                   ...        ...
+918  Orphan Black   Season 1     Natural Selection 2015-08-21
+919   Bates Motel   Season 2   The Immutable Truth 2015-08-15
+920   Bates Motel   Season 2               The Box 2015-08-15
+921   Bates Motel   Season 2              Meltdown 2015-08-14
+922   Bates Motel   Season 2     Presumed Innocent 2015-08-13
+
+[923 rows x 4 columns]&gt;</code></pre>
+</div>
+</div>
+<p>Também podemos ver rapidamente a estrutura de cada dataset, utilizando a função dtypes e describe().</p>
+<div id="1184059b" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>netflix.describe()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="7">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Date</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">count</td>
+<td>923</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">mean</td>
+<td>2018-05-29 23:58:26.392199424</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">min</td>
+<td>2015-08-13 00:00:00</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">25%</td>
+<td>2017-01-06 00:00:00</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">50%</td>
+<td>2018-09-10 00:00:00</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">75%</td>
+<td>2019-07-30 00:00:00</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">max</td>
+<td>2020-10-06 00:00:00</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="b2d95c63" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>netflix.dtypes</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="8">
+<pre><code>series_title            object
+season                  object
+episode                 object
+Date            datetime64[ns]
+dtype: object</code></pre>
+</div>
+</div>
+<p>Vamos converter a coluna <code>season</code> em variável categórica.</p>
+<div id="2e5d75b7" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>netflix[<span class="st">'season'</span>].astype(<span class="st">'category'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="9">
+<pre><code>0       Season 1
+1       Season 1
+2       Season 1
+3       Season 1
+4       Season 1
+         ...    
+918     Season 1
+919     Season 2
+920     Season 2
+921     Season 2
+922     Season 2
+Name: season, Length: 923, dtype: category
+Categories (32, object): [' 1ª temporada', ' Back in Business', ' Berry Bitty Adventures', ' Chapter Eight', ..., ' Turma da Mônica', ' Volume 1', ' Volume 2', ' Welcome to Ever After High']</code></pre>
+</div>
+</div>
+<p>Podemos ver as dimensões do nosso dataframe:</p>
+<div id="f972a636" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>netflix.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="10">
+<pre><code>(923, 4)</code></pre>
+</div>
+</div>
+</section>
+<section id="selecionando-colunas" class="level1">
+<h1>Selecionando colunas</h1>
+<p>Para selecionar colunas utilizamos a forma <code>df[['coluna']]</code> onde df é o nome do dataframe e ‘coluna’ é o nome da coluna ou colunas que queremos selecionar.</p>
+<div id="ace15fbf" class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>netflix[[<span class="st">'series_title'</span>,<span class="st">'season'</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="11">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">series_title</th>
+<th data-quarto-table-cell-role="th">season</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>Away</td>
+<td>Season 1</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>Away</td>
+<td>Season 1</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>Away</td>
+<td>Season 1</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>Away</td>
+<td>Season 1</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>Away</td>
+<td>Season 1</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">918</td>
+<td>Orphan Black</td>
+<td>Season 1</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">919</td>
+<td>Bates Motel</td>
+<td>Season 2</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">920</td>
+<td>Bates Motel</td>
+<td>Season 2</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">921</td>
+<td>Bates Motel</td>
+<td>Season 2</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">922</td>
+<td>Bates Motel</td>
+<td>Season 2</td>
+</tr>
+</tbody>
+</table>
+
+<p>923 rows × 2 columns</p>
+</div>
+</div>
+</div>
+</section>
+<section id="ordenando-os-dados" class="level1">
+<h1>Ordenando os dados</h1>
+<p>Para ordenar as linhas, podemos utilizar a função <code>sort_values()</code> de forma a termos, por exemplo, uma lista de maior a menor de um determinado valor. Vamos usar o dataframe <code>imdb</code> para exemplificar, ordenando as linhas por ordem crescente de <code>UserRating</code>:</p>
+<div id="b5f57935" class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>imdb.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="12">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">series_name</th>
+<th data-quarto-table-cell-role="th">Episode</th>
+<th data-quarto-table-cell-role="th">series_ep</th>
+<th data-quarto-table-cell-role="th">season</th>
+<th data-quarto-table-cell-role="th">season_ep</th>
+<th data-quarto-table-cell-role="th">url</th>
+<th data-quarto-table-cell-role="th">UserRating</th>
+<th data-quarto-table-cell-role="th">UserVotes</th>
+<th data-quarto-table-cell-role="th">r1</th>
+<th data-quarto-table-cell-role="th">r2</th>
+<th data-quarto-table-cell-role="th">r3</th>
+<th data-quarto-table-cell-role="th">r4</th>
+<th data-quarto-table-cell-role="th">r5</th>
+<th data-quarto-table-cell-role="th">r6</th>
+<th data-quarto-table-cell-role="th">r7</th>
+<th data-quarto-table-cell-role="th">r8</th>
+<th data-quarto-table-cell-role="th">r9</th>
+<th data-quarto-table-cell-role="th">r10</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>13 Reasons Why</td>
+<td>Tape 1, Side A</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>http://www.imdb.com/title/tt5174246/?ref_=ttep...</td>
+<td>8.3</td>
+<td>7016</td>
+<td>0.055445</td>
+<td>0.004418</td>
+<td>0.004704</td>
+<td>0.005844</td>
+<td>0.014681</td>
+<td>0.032640</td>
+<td>0.105188</td>
+<td>0.237030</td>
+<td>0.246579</td>
+<td>0.293472</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>13 Reasons Why</td>
+<td>Tape 1, Side B</td>
+<td>2</td>
+<td>1</td>
+<td>2</td>
+<td>http://www.imdb.com/title/tt5174248/?ref_=ttep...</td>
+<td>8.0</td>
+<td>5859</td>
+<td>0.056665</td>
+<td>0.004438</td>
+<td>0.005803</td>
+<td>0.008022</td>
+<td>0.016726</td>
+<td>0.045400</td>
+<td>0.138420</td>
+<td>0.311145</td>
+<td>0.171872</td>
+<td>0.241509</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>13 Reasons Why</td>
+<td>Tape 2, Side A</td>
+<td>3</td>
+<td>1</td>
+<td>3</td>
+<td>http://www.imdb.com/title/tt5174250/?ref_=ttep...</td>
+<td>7.9</td>
+<td>5509</td>
+<td>0.058813</td>
+<td>0.003993</td>
+<td>0.005627</td>
+<td>0.009984</td>
+<td>0.022509</td>
+<td>0.051734</td>
+<td>0.160828</td>
+<td>0.302414</td>
+<td>0.140860</td>
+<td>0.243238</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>13 Reasons Why</td>
+<td>Tape 2, Side B</td>
+<td>4</td>
+<td>1</td>
+<td>4</td>
+<td>http://www.imdb.com/title/tt5174252/?ref_=ttep...</td>
+<td>8.1</td>
+<td>5309</td>
+<td>0.063477</td>
+<td>0.003956</td>
+<td>0.005086</td>
+<td>0.007911</td>
+<td>0.019213</td>
+<td>0.045960</td>
+<td>0.129215</td>
+<td>0.298550</td>
+<td>0.171219</td>
+<td>0.255415</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>13 Reasons Why</td>
+<td>Tape 3, Side A</td>
+<td>5</td>
+<td>1</td>
+<td>5</td>
+<td>http://www.imdb.com/title/tt5174254/?ref_=ttep...</td>
+<td>8.2</td>
+<td>5252</td>
+<td>0.066832</td>
+<td>0.002666</td>
+<td>0.004570</td>
+<td>0.008378</td>
+<td>0.018850</td>
+<td>0.037129</td>
+<td>0.114242</td>
+<td>0.257997</td>
+<td>0.203542</td>
+<td>0.285796</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="b188b764" class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>imdb <span class="op">=</span> imdb.sort_values(<span class="st">'UserRating'</span>,</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>                ascending<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Agora vamos ver como ficou:</p>
+<div id="acddea77" class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>imdb[[<span class="st">'series_name'</span>,<span class="st">'UserRating'</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="14">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">series_name</th>
+<th data-quarto-table-cell-role="th">UserRating</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2359</td>
+<td>Lúcifer</td>
+<td>9.8</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">134</td>
+<td>Dark</td>
+<td>9.7</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1404</td>
+<td>The Walking Dead</td>
+<td>9.7</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1183</td>
+<td>Friends</td>
+<td>9.7</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2371</td>
+<td>Lúcifer</td>
+<td>9.7</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">773</td>
+<td>Pânico: A Série de TV</td>
+<td>5.5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">774</td>
+<td>Pânico: A Série de TV</td>
+<td>5.2</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1908</td>
+<td>Dracula</td>
+<td>5.2</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">42</td>
+<td>13 Reasons Why</td>
+<td>5.2</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">137</td>
+<td>Dracula</td>
+<td>5.2</td>
+</tr>
+</tbody>
+</table>
+
+<p>2597 rows × 2 columns</p>
+</div>
+</div>
+</div>
+</section>
+<section id="filtrando-linhas" class="level1">
+<h1>Filtrando Linhas</h1>
+<p>Podemos filtrar linhas utilizando o método <code>df.query()</code> onde df é o nome do dataframe.</p>
+<div id="c40bde15" class="cell" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>imdb.query(<span class="st">'UserVotes &gt; 10000'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="15">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">series_name</th>
+<th data-quarto-table-cell-role="th">Episode</th>
+<th data-quarto-table-cell-role="th">series_ep</th>
+<th data-quarto-table-cell-role="th">season</th>
+<th data-quarto-table-cell-role="th">season_ep</th>
+<th data-quarto-table-cell-role="th">url</th>
+<th data-quarto-table-cell-role="th">UserRating</th>
+<th data-quarto-table-cell-role="th">UserVotes</th>
+<th data-quarto-table-cell-role="th">r1</th>
+<th data-quarto-table-cell-role="th">r2</th>
+<th data-quarto-table-cell-role="th">r3</th>
+<th data-quarto-table-cell-role="th">r4</th>
+<th data-quarto-table-cell-role="th">r5</th>
+<th data-quarto-table-cell-role="th">r6</th>
+<th data-quarto-table-cell-role="th">r7</th>
+<th data-quarto-table-cell-role="th">r8</th>
+<th data-quarto-table-cell-role="th">r9</th>
+<th data-quarto-table-cell-role="th">r10</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2359</td>
+<td>Lúcifer</td>
+<td>A Devil of My Word</td>
+<td>55</td>
+<td>3</td>
+<td>24</td>
+<td>http://www.imdb.com/title/tt8253126/?ref_=ttep...</td>
+<td>9.8</td>
+<td>10712</td>
+<td>0.021004</td>
+<td>0.001587</td>
+<td>0.000840</td>
+<td>0.000747</td>
+<td>0.002054</td>
+<td>0.002801</td>
+<td>0.007468</td>
+<td>0.018764</td>
+<td>0.063107</td>
+<td>0.881628</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">134</td>
+<td>Dark</td>
+<td>The Paradise</td>
+<td>26</td>
+<td>3</td>
+<td>8</td>
+<td>http://www.imdb.com/title/tt12557704/?ref_=tte...</td>
+<td>9.7</td>
+<td>17468</td>
+<td>0.020151</td>
+<td>0.002633</td>
+<td>0.003263</td>
+<td>0.002805</td>
+<td>0.004351</td>
+<td>0.006698</td>
+<td>0.012308</td>
+<td>0.022556</td>
+<td>0.059824</td>
+<td>0.865411</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1404</td>
+<td>The Walking Dead</td>
+<td>No Way Out</td>
+<td>57</td>
+<td>6</td>
+<td>9</td>
+<td>http://www.imdb.com/title/tt4575388/?ref_=ttep...</td>
+<td>9.7</td>
+<td>24358</td>
+<td>0.027424</td>
+<td>0.003490</td>
+<td>0.002094</td>
+<td>0.002669</td>
+<td>0.005665</td>
+<td>0.007390</td>
+<td>0.015519</td>
+<td>0.033008</td>
+<td>0.101979</td>
+<td>0.800764</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1371</td>
+<td>The Walking Dead</td>
+<td>Too Far Gone</td>
+<td>24</td>
+<td>4</td>
+<td>8</td>
+<td>http://www.imdb.com/title/tt2948638/?ref_=ttep...</td>
+<td>9.7</td>
+<td>22061</td>
+<td>0.044876</td>
+<td>0.002584</td>
+<td>0.001541</td>
+<td>0.001496</td>
+<td>0.004624</td>
+<td>0.006029</td>
+<td>0.013100</td>
+<td>0.039255</td>
+<td>0.126286</td>
+<td>0.760210</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">985</td>
+<td>The Walking Dead</td>
+<td>No Way Out</td>
+<td>57</td>
+<td>6</td>
+<td>9</td>
+<td>http://www.imdb.com/title/tt4575388/?ref_=ttep...</td>
+<td>9.7</td>
+<td>24358</td>
+<td>0.027424</td>
+<td>0.003490</td>
+<td>0.002094</td>
+<td>0.002669</td>
+<td>0.005665</td>
+<td>0.007390</td>
+<td>0.015519</td>
+<td>0.033008</td>
+<td>0.101979</td>
+<td>0.800764</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1411</td>
+<td>The Walking Dead</td>
+<td>Last Day on Earth</td>
+<td>64</td>
+<td>6</td>
+<td>16</td>
+<td>http://www.imdb.com/title/tt4589574/?ref_=ttep...</td>
+<td>6.6</td>
+<td>26981</td>
+<td>0.263667</td>
+<td>0.036878</td>
+<td>0.037285</td>
+<td>0.037211</td>
+<td>0.052259</td>
+<td>0.049590</td>
+<td>0.068826</td>
+<td>0.090693</td>
+<td>0.104221</td>
+<td>0.259368</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">992</td>
+<td>The Walking Dead</td>
+<td>Last Day on Earth</td>
+<td>64</td>
+<td>6</td>
+<td>16</td>
+<td>http://www.imdb.com/title/tt4589574/?ref_=ttep...</td>
+<td>6.6</td>
+<td>26981</td>
+<td>0.263667</td>
+<td>0.036878</td>
+<td>0.037285</td>
+<td>0.037211</td>
+<td>0.052259</td>
+<td>0.049590</td>
+<td>0.068826</td>
+<td>0.090693</td>
+<td>0.104221</td>
+<td>0.259368</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1337</td>
+<td>Stranger Things</td>
+<td>Chapter Seven: The Lost Sister</td>
+<td>15</td>
+<td>2</td>
+<td>7</td>
+<td>http://www.imdb.com/title/tt6020810/?ref_=ttep...</td>
+<td>6.1</td>
+<td>21371</td>
+<td>0.166955</td>
+<td>0.045716</td>
+<td>0.047869</td>
+<td>0.059239</td>
+<td>0.100791</td>
+<td>0.118198</td>
+<td>0.157784</td>
+<td>0.116794</td>
+<td>0.058958</td>
+<td>0.127696</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1417</td>
+<td>The Walking Dead</td>
+<td>Swear</td>
+<td>70</td>
+<td>7</td>
+<td>6</td>
+<td>http://www.imdb.com/title/tt5207734/?ref_=ttep...</td>
+<td>5.6</td>
+<td>11971</td>
+<td>0.197978</td>
+<td>0.042686</td>
+<td>0.047615</td>
+<td>0.060647</td>
+<td>0.102164</td>
+<td>0.140506</td>
+<td>0.133823</td>
+<td>0.087127</td>
+<td>0.037591</td>
+<td>0.149862</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">998</td>
+<td>The Walking Dead</td>
+<td>Swear</td>
+<td>70</td>
+<td>7</td>
+<td>6</td>
+<td>http://www.imdb.com/title/tt5207734/?ref_=ttep...</td>
+<td>5.6</td>
+<td>11971</td>
+<td>0.197978</td>
+<td>0.042686</td>
+<td>0.047615</td>
+<td>0.060647</td>
+<td>0.102164</td>
+<td>0.140506</td>
+<td>0.133823</td>
+<td>0.087127</td>
+<td>0.037591</td>
+<td>0.149862</td>
+</tr>
+</tbody>
+</table>
+
+<p>124 rows × 18 columns</p>
+</div>
+</div>
+</div>
+<p>Se quisermos combinar filtrado de linhas com seleção de colunas:</p>
+<div id="a1630efb" class="cell" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>imdb_10 <span class="op">=</span> imdb.query(<span class="st">'UserVotes &gt; 10000'</span>)[[<span class="st">'series_name'</span>,<span class="st">'Episode'</span>,<span class="st">'UserRating'</span>,<span class="st">'UserVotes'</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="d062c4b3" class="cell" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>imdb_10.head(<span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="17">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">series_name</th>
+<th data-quarto-table-cell-role="th">Episode</th>
+<th data-quarto-table-cell-role="th">UserRating</th>
+<th data-quarto-table-cell-role="th">UserVotes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2359</td>
+<td>Lúcifer</td>
+<td>A Devil of My Word</td>
+<td>9.8</td>
+<td>10712</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">134</td>
+<td>Dark</td>
+<td>The Paradise</td>
+<td>9.7</td>
+<td>17468</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1404</td>
+<td>The Walking Dead</td>
+<td>No Way Out</td>
+<td>9.7</td>
+<td>24358</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1371</td>
+<td>The Walking Dead</td>
+<td>Too Far Gone</td>
+<td>9.7</td>
+<td>22061</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">985</td>
+<td>The Walking Dead</td>
+<td>No Way Out</td>
+<td>9.7</td>
+<td>24358</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1314</td>
+<td>Sherlock</td>
+<td>The Reichenbach Fall</td>
+<td>9.7</td>
+<td>33904</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1307</td>
+<td>Friends</td>
+<td>The Last One</td>
+<td>9.7</td>
+<td>11634</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">952</td>
+<td>The Walking Dead</td>
+<td>Too Far Gone</td>
+<td>9.7</td>
+<td>22061</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">961</td>
+<td>The Walking Dead</td>
+<td>No Sanctuary</td>
+<td>9.6</td>
+<td>23608</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">133</td>
+<td>Dark</td>
+<td>Between the Time</td>
+<td>9.6</td>
+<td>13301</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="e67db1fb" class="cell" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>imdb_10.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="18">
+<pre><code>(124, 4)</code></pre>
+</div>
+</div>
+<p>vamos identificar se há duplicados.</p>
+<div id="6f182bc9" class="cell" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>duplicates <span class="op">=</span> imdb_10.duplicated()</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(duplicates)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>2359    False
+134     False
+1404    False
+1371    False
+985      True
+        ...  
+1411    False
+992      True
+1337    False
+1417    False
+998      True
+Length: 124, dtype: bool</code></pre>
+</div>
+</div>
+<p>Notamos que existem duplicados, portanto precisamos removê-los utilizando o método <code>drop_duplicates()</code>.</p>
+<div id="392122d6" class="cell" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>imdb_10 <span class="op">=</span> imdb_10.drop_duplicates(subset<span class="op">=</span>[<span class="st">'Episode'</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Vamos ver quantas linhas temos agora.</p>
+<div id="1bede9e6" class="cell" data-execution_count="21">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>imdb_10.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="21">
+<pre><code>(91, 4)</code></pre>
+</div>
+</div>
+<p>também podemos filtrar por strings. Por exemplo, vamos filtrar pelo seriado “Dark”:</p>
+<div id="e7a006d4" class="cell" data-execution_count="22">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>imdb[<span class="st">'series_name'</span>].isin([<span class="st">'Dark'</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="22">
+<pre><code>2359    False
+134      True
+1404    False
+1183    False
+2371    False
+        ...  
+773     False
+774     False
+1908    False
+42      False
+137     False
+Name: series_name, Length: 2597, dtype: bool</code></pre>
+</div>
+</div>
+<p>Vemos que o código acima retorna uma série com valores lógicos (True-False) para cada linha. Para efetivamente ver o resultado do seriado Dark devemos:</p>
+<div id="3f92bc33" class="cell" data-execution_count="23">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>imdb[imdb[<span class="st">'series_name'</span>].isin([<span class="st">'Dark'</span>])]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="23">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">series_name</th>
+<th data-quarto-table-cell-role="th">Episode</th>
+<th data-quarto-table-cell-role="th">series_ep</th>
+<th data-quarto-table-cell-role="th">season</th>
+<th data-quarto-table-cell-role="th">season_ep</th>
+<th data-quarto-table-cell-role="th">url</th>
+<th data-quarto-table-cell-role="th">UserRating</th>
+<th data-quarto-table-cell-role="th">UserVotes</th>
+<th data-quarto-table-cell-role="th">r1</th>
+<th data-quarto-table-cell-role="th">r2</th>
+<th data-quarto-table-cell-role="th">r3</th>
+<th data-quarto-table-cell-role="th">r4</th>
+<th data-quarto-table-cell-role="th">r5</th>
+<th data-quarto-table-cell-role="th">r6</th>
+<th data-quarto-table-cell-role="th">r7</th>
+<th data-quarto-table-cell-role="th">r8</th>
+<th data-quarto-table-cell-role="th">r9</th>
+<th data-quarto-table-cell-role="th">r10</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">134</td>
+<td>Dark</td>
+<td>The Paradise</td>
+<td>26</td>
+<td>3</td>
+<td>8</td>
+<td>http://www.imdb.com/title/tt12557704/?ref_=tte...</td>
+<td>9.7</td>
+<td>17468</td>
+<td>0.020151</td>
+<td>0.002633</td>
+<td>0.003263</td>
+<td>0.002805</td>
+<td>0.004351</td>
+<td>0.006698</td>
+<td>0.012308</td>
+<td>0.022556</td>
+<td>0.059824</td>
+<td>0.865411</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">133</td>
+<td>Dark</td>
+<td>Between the Time</td>
+<td>25</td>
+<td>3</td>
+<td>7</td>
+<td>http://www.imdb.com/title/tt12557700/?ref_=tte...</td>
+<td>9.6</td>
+<td>13301</td>
+<td>0.020374</td>
+<td>0.001880</td>
+<td>0.002556</td>
+<td>0.002707</td>
+<td>0.004285</td>
+<td>0.006842</td>
+<td>0.014811</td>
+<td>0.031577</td>
+<td>0.073904</td>
+<td>0.841065</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">124</td>
+<td>Dark</td>
+<td>An Endless Cycle</td>
+<td>16</td>
+<td>2</td>
+<td>6</td>
+<td>http://www.imdb.com/title/tt10454734/?ref_=tte...</td>
+<td>9.6</td>
+<td>11149</td>
+<td>0.007983</td>
+<td>0.000807</td>
+<td>0.001256</td>
+<td>0.001435</td>
+<td>0.001884</td>
+<td>0.005292</td>
+<td>0.016055</td>
+<td>0.045834</td>
+<td>0.124765</td>
+<td>0.794690</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">131</td>
+<td>Dark</td>
+<td>Life and Death</td>
+<td>23</td>
+<td>3</td>
+<td>5</td>
+<td>http://www.imdb.com/title/tt12557688/?ref_=tte...</td>
+<td>9.5</td>
+<td>10359</td>
+<td>0.021238</td>
+<td>0.001834</td>
+<td>0.002510</td>
+<td>0.002993</td>
+<td>0.005502</td>
+<td>0.010908</td>
+<td>0.020948</td>
+<td>0.044985</td>
+<td>0.123661</td>
+<td>0.765421</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">126</td>
+<td>Dark</td>
+<td>Endings and Beginnings</td>
+<td>18</td>
+<td>2</td>
+<td>8</td>
+<td>http://www.imdb.com/title/tt10457654/?ref_=tte...</td>
+<td>9.5</td>
+<td>11379</td>
+<td>0.012040</td>
+<td>0.002109</td>
+<td>0.001846</td>
+<td>0.002373</td>
+<td>0.004482</td>
+<td>0.009667</td>
+<td>0.020301</td>
+<td>0.045698</td>
+<td>0.123473</td>
+<td>0.778012</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">122</td>
+<td>Dark</td>
+<td>The Travelers</td>
+<td>14</td>
+<td>2</td>
+<td>4</td>
+<td>http://www.imdb.com/title/tt10454726/?ref_=tte...</td>
+<td>9.5</td>
+<td>9968</td>
+<td>0.007925</td>
+<td>0.000903</td>
+<td>0.001204</td>
+<td>0.001505</td>
+<td>0.002307</td>
+<td>0.006120</td>
+<td>0.019161</td>
+<td>0.056180</td>
+<td>0.166132</td>
+<td>0.738563</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">123</td>
+<td>Dark</td>
+<td>Lost and Found</td>
+<td>15</td>
+<td>2</td>
+<td>5</td>
+<td>http://www.imdb.com/title/tt10454732/?ref_=tte...</td>
+<td>9.4</td>
+<td>9210</td>
+<td>0.007600</td>
+<td>0.000869</td>
+<td>0.001303</td>
+<td>0.001629</td>
+<td>0.002606</td>
+<td>0.007166</td>
+<td>0.023127</td>
+<td>0.075570</td>
+<td>0.197720</td>
+<td>0.682410</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">125</td>
+<td>Dark</td>
+<td>The White Devil</td>
+<td>17</td>
+<td>2</td>
+<td>7</td>
+<td>http://www.imdb.com/title/tt10457652/?ref_=tte...</td>
+<td>9.3</td>
+<td>9050</td>
+<td>0.008066</td>
+<td>0.001657</td>
+<td>0.001878</td>
+<td>0.001768</td>
+<td>0.003757</td>
+<td>0.009392</td>
+<td>0.026851</td>
+<td>0.083315</td>
+<td>0.204972</td>
+<td>0.658343</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">132</td>
+<td>Dark</td>
+<td>Light and Shadow</td>
+<td>24</td>
+<td>3</td>
+<td>6</td>
+<td>http://www.imdb.com/title/tt12557694/?ref_=tte...</td>
+<td>9.3</td>
+<td>10060</td>
+<td>0.024453</td>
+<td>0.001889</td>
+<td>0.002783</td>
+<td>0.004175</td>
+<td>0.006362</td>
+<td>0.010934</td>
+<td>0.025547</td>
+<td>0.063221</td>
+<td>0.127137</td>
+<td>0.733499</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">116</td>
+<td>Dark</td>
+<td>As You Sow, so You Shall Reap</td>
+<td>8</td>
+<td>1</td>
+<td>8</td>
+<td>http://www.imdb.com/title/tt7313316/?ref_=ttep...</td>
+<td>9.2</td>
+<td>9294</td>
+<td>0.007209</td>
+<td>0.001076</td>
+<td>0.000753</td>
+<td>0.001829</td>
+<td>0.003443</td>
+<td>0.011298</td>
+<td>0.030773</td>
+<td>0.101033</td>
+<td>0.257586</td>
+<td>0.585001</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">118</td>
+<td>Dark</td>
+<td>Alpha and Omega</td>
+<td>10</td>
+<td>1</td>
+<td>10</td>
+<td>http://www.imdb.com/title/tt7313322/?ref_=ttep...</td>
+<td>9.2</td>
+<td>9758</td>
+<td>0.010248</td>
+<td>0.001947</td>
+<td>0.001230</td>
+<td>0.003279</td>
+<td>0.005944</td>
+<td>0.011273</td>
+<td>0.032589</td>
+<td>0.086801</td>
+<td>0.229248</td>
+<td>0.617442</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">121</td>
+<td>Dark</td>
+<td>Ghosts</td>
+<td>13</td>
+<td>2</td>
+<td>3</td>
+<td>http://www.imdb.com/title/tt10454722/?ref_=tte...</td>
+<td>9.2</td>
+<td>9138</td>
+<td>0.007004</td>
+<td>0.000766</td>
+<td>0.001970</td>
+<td>0.002079</td>
+<td>0.004487</td>
+<td>0.008645</td>
+<td>0.030422</td>
+<td>0.100897</td>
+<td>0.226855</td>
+<td>0.616875</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">114</td>
+<td>Dark</td>
+<td>Sic Mundus Creatus Est</td>
+<td>6</td>
+<td>1</td>
+<td>6</td>
+<td>http://www.imdb.com/title/tt7313312/?ref_=ttep...</td>
+<td>9.1</td>
+<td>9434</td>
+<td>0.006996</td>
+<td>0.000742</td>
+<td>0.001272</td>
+<td>0.001272</td>
+<td>0.004240</td>
+<td>0.014204</td>
+<td>0.035616</td>
+<td>0.115222</td>
+<td>0.264151</td>
+<td>0.556286</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">130</td>
+<td>Dark</td>
+<td>The Origin</td>
+<td>22</td>
+<td>3</td>
+<td>4</td>
+<td>http://www.imdb.com/title/tt12557686/?ref_=tte...</td>
+<td>9.1</td>
+<td>9529</td>
+<td>0.022248</td>
+<td>0.003883</td>
+<td>0.004722</td>
+<td>0.004198</td>
+<td>0.006611</td>
+<td>0.013118</td>
+<td>0.033582</td>
+<td>0.082695</td>
+<td>0.163816</td>
+<td>0.665128</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">113</td>
+<td>Dark</td>
+<td>Truths</td>
+<td>5</td>
+<td>1</td>
+<td>5</td>
+<td>http://www.imdb.com/title/tt7313308/?ref_=ttep...</td>
+<td>9.0</td>
+<td>9563</td>
+<td>0.005751</td>
+<td>0.000837</td>
+<td>0.001046</td>
+<td>0.002301</td>
+<td>0.004183</td>
+<td>0.014744</td>
+<td>0.045070</td>
+<td>0.134790</td>
+<td>0.278992</td>
+<td>0.512287</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">120</td>
+<td>Dark</td>
+<td>Dark Matter</td>
+<td>12</td>
+<td>2</td>
+<td>2</td>
+<td>http://www.imdb.com/title/tt10454716/?ref_=tte...</td>
+<td>9.0</td>
+<td>9221</td>
+<td>0.006941</td>
+<td>0.001084</td>
+<td>0.001193</td>
+<td>0.002603</td>
+<td>0.003579</td>
+<td>0.010303</td>
+<td>0.034920</td>
+<td>0.122655</td>
+<td>0.247479</td>
+<td>0.569244</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">127</td>
+<td>Dark</td>
+<td>Deja-vu</td>
+<td>19</td>
+<td>3</td>
+<td>1</td>
+<td>http://www.imdb.com/title/tt10414808/?ref_=tte...</td>
+<td>9.0</td>
+<td>10609</td>
+<td>0.022622</td>
+<td>0.003205</td>
+<td>0.003959</td>
+<td>0.004430</td>
+<td>0.006221</td>
+<td>0.014704</td>
+<td>0.039872</td>
+<td>0.098407</td>
+<td>0.202658</td>
+<td>0.603921</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">129</td>
+<td>Dark</td>
+<td>Adam and Eva</td>
+<td>21</td>
+<td>3</td>
+<td>3</td>
+<td>http://www.imdb.com/title/tt12557682/?ref_=tte...</td>
+<td>8.9</td>
+<td>9364</td>
+<td>0.022747</td>
+<td>0.002777</td>
+<td>0.004806</td>
+<td>0.004058</td>
+<td>0.008330</td>
+<td>0.016339</td>
+<td>0.040474</td>
+<td>0.109141</td>
+<td>0.194682</td>
+<td>0.596647</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">128</td>
+<td>Dark</td>
+<td>The Survivors</td>
+<td>20</td>
+<td>3</td>
+<td>2</td>
+<td>http://www.imdb.com/title/tt12557670/?ref_=tte...</td>
+<td>8.9</td>
+<td>9666</td>
+<td>0.022967</td>
+<td>0.003311</td>
+<td>0.004138</td>
+<td>0.004552</td>
+<td>0.006104</td>
+<td>0.017381</td>
+<td>0.045520</td>
+<td>0.119284</td>
+<td>0.202773</td>
+<td>0.573971</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">119</td>
+<td>Dark</td>
+<td>Beginnings and Endings</td>
+<td>11</td>
+<td>2</td>
+<td>1</td>
+<td>http://www.imdb.com/title/tt7787482/?ref_=ttep...</td>
+<td>8.9</td>
+<td>9969</td>
+<td>0.007122</td>
+<td>0.001505</td>
+<td>0.001404</td>
+<td>0.003611</td>
+<td>0.004213</td>
+<td>0.013442</td>
+<td>0.049955</td>
+<td>0.154780</td>
+<td>0.238239</td>
+<td>0.525730</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">115</td>
+<td>Dark</td>
+<td>Crossroads</td>
+<td>7</td>
+<td>1</td>
+<td>7</td>
+<td>http://www.imdb.com/title/tt7305824/?ref_=ttep...</td>
+<td>8.8</td>
+<td>8725</td>
+<td>0.005845</td>
+<td>0.001261</td>
+<td>0.001032</td>
+<td>0.002636</td>
+<td>0.005501</td>
+<td>0.015931</td>
+<td>0.051920</td>
+<td>0.194269</td>
+<td>0.275186</td>
+<td>0.446418</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">117</td>
+<td>Dark</td>
+<td>Everything Is Now</td>
+<td>9</td>
+<td>1</td>
+<td>9</td>
+<td>http://www.imdb.com/title/tt7313320/?ref_=ttep...</td>
+<td>8.8</td>
+<td>8599</td>
+<td>0.006978</td>
+<td>0.001744</td>
+<td>0.001512</td>
+<td>0.001279</td>
+<td>0.006280</td>
+<td>0.018025</td>
+<td>0.055472</td>
+<td>0.185719</td>
+<td>0.260147</td>
+<td>0.462845</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">111</td>
+<td>Dark</td>
+<td>Past and Present</td>
+<td>3</td>
+<td>1</td>
+<td>3</td>
+<td>http://www.imdb.com/title/tt7305820/?ref_=ttep...</td>
+<td>8.7</td>
+<td>9585</td>
+<td>0.006051</td>
+<td>0.001148</td>
+<td>0.001669</td>
+<td>0.002608</td>
+<td>0.006886</td>
+<td>0.023996</td>
+<td>0.067710</td>
+<td>0.208242</td>
+<td>0.255921</td>
+<td>0.425769</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">109</td>
+<td>Dark</td>
+<td>Secrets</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>http://www.imdb.com/title/tt6305578/?ref_=ttep...</td>
+<td>8.3</td>
+<td>11242</td>
+<td>0.007917</td>
+<td>0.001245</td>
+<td>0.003202</td>
+<td>0.003914</td>
+<td>0.011564</td>
+<td>0.030422</td>
+<td>0.106298</td>
+<td>0.274239</td>
+<td>0.194094</td>
+<td>0.367105</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">112</td>
+<td>Dark</td>
+<td>Double Lives</td>
+<td>4</td>
+<td>1</td>
+<td>4</td>
+<td>http://www.imdb.com/title/tt7305818/?ref_=ttep...</td>
+<td>8.3</td>
+<td>9088</td>
+<td>0.005722</td>
+<td>0.001761</td>
+<td>0.001540</td>
+<td>0.003631</td>
+<td>0.009793</td>
+<td>0.029820</td>
+<td>0.102993</td>
+<td>0.281690</td>
+<td>0.180238</td>
+<td>0.382812</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">110</td>
+<td>Dark</td>
+<td>Lies</td>
+<td>2</td>
+<td>1</td>
+<td>2</td>
+<td>http://www.imdb.com/title/tt7305776/?ref_=ttep...</td>
+<td>8.2</td>
+<td>9903</td>
+<td>0.006160</td>
+<td>0.001616</td>
+<td>0.003130</td>
+<td>0.002827</td>
+<td>0.011108</td>
+<td>0.034939</td>
+<td>0.119661</td>
+<td>0.293547</td>
+<td>0.165303</td>
+<td>0.361709</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>vamos guardar este dataframe com o nome <code>darkdf</code>:</p>
+<div id="a097fac5" class="cell" data-execution_count="24">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>darkdf <span class="op">=</span> imdb[imdb[<span class="st">'series_name'</span>].isin([<span class="st">'Dark'</span>])]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="agrupando-dados-por-categorias" class="level1">
+<h1>Agrupando dados por categorias</h1>
+<p>Vamos agrupar os dados de <code>imdb</code> e calcular algumas informações: a contagem de capítulos por seriado, a média do <code>UserRating</code> por seriado e a soma total dos votos.</p>
+<div id="0b0a9cd4" class="cell" data-execution_count="25">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>imdb_summary <span class="op">=</span> imdb.groupby([<span class="st">'series_name'</span>]).agg({<span class="st">'series_name'</span>:<span class="st">"count"</span>,<span class="st">'UserRating'</span>:<span class="st">'mean'</span>,<span class="st">'UserVotes'</span>:<span class="st">'sum'</span>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="f776fc0e" class="cell" data-execution_count="26">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>imdb_summary</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="26">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">series_name</th>
+<th data-quarto-table-cell-role="th">UserRating</th>
+<th data-quarto-table-cell-role="th">UserVotes</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">series_name</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">13 Reasons Why</td>
+<td>49</td>
+<td>7.248980</td>
+<td>151452</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Arquivo X</td>
+<td>356</td>
+<td>7.988202</td>
+<td>969628</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Away</td>
+<td>10</td>
+<td>7.080000</td>
+<td>5388</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Como Defender um Assassino</td>
+<td>180</td>
+<td>8.568889</td>
+<td>228352</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Dark</td>
+<td>26</td>
+<td>9.076923</td>
+<td>264631</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Dracula</td>
+<td>6</td>
+<td>6.966667</td>
+<td>28858</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Era Uma Vez</td>
+<td>312</td>
+<td>8.266026</td>
+<td>397332</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Friends</td>
+<td>235</td>
+<td>8.451915</td>
+<td>853287</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Greenleaf</td>
+<td>60</td>
+<td>7.586667</td>
+<td>2777</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Grimm: Contos de Terror</td>
+<td>123</td>
+<td>8.435772</td>
+<td>104967</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Hemlock Grove</td>
+<td>33</td>
+<td>7.490909</td>
+<td>12538</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">La Casa de Papel</td>
+<td>31</td>
+<td>8.209677</td>
+<td>161782</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Lúcifer</td>
+<td>75</td>
+<td>8.744000</td>
+<td>298412</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Motel Bates</td>
+<td>50</td>
+<td>8.592000</td>
+<td>78773</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Narcos</td>
+<td>30</td>
+<td>8.760000</td>
+<td>122160</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">O Bom Lugar</td>
+<td>50</td>
+<td>8.272000</td>
+<td>98562</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Orange Is the New Black</td>
+<td>91</td>
+<td>8.172527</td>
+<td>156565</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Orphan Black</td>
+<td>50</td>
+<td>8.528000</td>
+<td>60532</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Os Originais</td>
+<td>184</td>
+<td>8.828261</td>
+<td>179686</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Pânico: A Série de TV</td>
+<td>29</td>
+<td>7.537931</td>
+<td>28078</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Ratched</td>
+<td>8</td>
+<td>7.812500</td>
+<td>8234</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Sherlock</td>
+<td>15</td>
+<td>8.800000</td>
+<td>373114</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Sleepy Hollow</td>
+<td>62</td>
+<td>7.680645</td>
+<td>33079</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Sobrenatural</td>
+<td>211</td>
+<td>8.389573</td>
+<td>499046</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Stranger Things</td>
+<td>25</td>
+<td>8.676000</td>
+<td>391288</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">The Walking Dead</td>
+<td>288</td>
+<td>8.006944</td>
+<td>2394586</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">The Witcher</td>
+<td>8</td>
+<td>8.487500</td>
+<td>122656</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>Podemos fazer o mesmo para o dataframe <code>darkdf</code>:</p>
+<div id="d3bdee82" class="cell" data-execution_count="27">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>darkdf_grouped <span class="op">=</span> darkdf.groupby([<span class="st">'series_name'</span>]).count()</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>darkdf_grouped</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="27">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Episode</th>
+<th data-quarto-table-cell-role="th">series_ep</th>
+<th data-quarto-table-cell-role="th">season</th>
+<th data-quarto-table-cell-role="th">season_ep</th>
+<th data-quarto-table-cell-role="th">url</th>
+<th data-quarto-table-cell-role="th">UserRating</th>
+<th data-quarto-table-cell-role="th">UserVotes</th>
+<th data-quarto-table-cell-role="th">r1</th>
+<th data-quarto-table-cell-role="th">r2</th>
+<th data-quarto-table-cell-role="th">r3</th>
+<th data-quarto-table-cell-role="th">r4</th>
+<th data-quarto-table-cell-role="th">r5</th>
+<th data-quarto-table-cell-role="th">r6</th>
+<th data-quarto-table-cell-role="th">r7</th>
+<th data-quarto-table-cell-role="th">r8</th>
+<th data-quarto-table-cell-role="th">r9</th>
+<th data-quarto-table-cell-role="th">r10</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">series_name</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Dark</td>
+<td>26</td>
+<td>26</td>
+<td>26</td>
+<td>26</td>
+<td>26</td>
+<td>26</td>
+<td>26</td>
+<td>26</td>
+<td>26</td>
+<td>26</td>
+<td>26</td>
+<td>26</td>
+<td>26</td>
+<td>26</td>
+<td>26</td>
+<td>26</td>
+<td>26</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>Uma boa prática é retornar o nome da coluna, neste caso <code>series_name</code> para uma nova coluna, e desta forma, deixar o <code>index</code> novamente numérico, para isto utilizamos a função <code>reset_index</code>.</p>
+<div id="15c2f11a" class="cell" data-execution_count="28">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>darkdf_grouped.reset_index()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="28">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">series_name</th>
+<th data-quarto-table-cell-role="th">Episode</th>
+<th data-quarto-table-cell-role="th">series_ep</th>
+<th data-quarto-table-cell-role="th">season</th>
+<th data-quarto-table-cell-role="th">season_ep</th>
+<th data-quarto-table-cell-role="th">url</th>
+<th data-quarto-table-cell-role="th">UserRating</th>
+<th data-quarto-table-cell-role="th">UserVotes</th>
+<th data-quarto-table-cell-role="th">r1</th>
+<th data-quarto-table-cell-role="th">r2</th>
+<th data-quarto-table-cell-role="th">r3</th>
+<th data-quarto-table-cell-role="th">r4</th>
+<th data-quarto-table-cell-role="th">r5</th>
+<th data-quarto-table-cell-role="th">r6</th>
+<th data-quarto-table-cell-role="th">r7</th>
+<th data-quarto-table-cell-role="th">r8</th>
+<th data-quarto-table-cell-role="th">r9</th>
+<th data-quarto-table-cell-role="th">r10</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>Dark</td>
+<td>26</td>
+<td>26</td>
+<td>26</td>
+<td>26</td>
+<td>26</td>
+<td>26</td>
+<td>26</td>
+<td>26</td>
+<td>26</td>
+<td>26</td>
+<td>26</td>
+<td>26</td>
+<td>26</td>
+<td>26</td>
+<td>26</td>
+<td>26</td>
+<td>26</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>Vamos fazer o mesmo para o <code>imdb_summary</code>:</p>
+<div id="018ffee9" class="cell" data-execution_count="29">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>imdb_summary2 <span class="op">=</span> imdb_summary.rename(columns<span class="op">=</span>{<span class="st">'series_name'</span>:<span class="st">'Episodes'</span>})</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>imdb_summary2.reset_index(inplace<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>imdb_summary2.head(<span class="dv">7</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="29">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">series_name</th>
+<th data-quarto-table-cell-role="th">Episodes</th>
+<th data-quarto-table-cell-role="th">UserRating</th>
+<th data-quarto-table-cell-role="th">UserVotes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>13 Reasons Why</td>
+<td>49</td>
+<td>7.248980</td>
+<td>151452</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>Arquivo X</td>
+<td>356</td>
+<td>7.988202</td>
+<td>969628</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>Away</td>
+<td>10</td>
+<td>7.080000</td>
+<td>5388</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>Como Defender um Assassino</td>
+<td>180</td>
+<td>8.568889</td>
+<td>228352</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>Dark</td>
+<td>26</td>
+<td>9.076923</td>
+<td>264631</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">5</td>
+<td>Dracula</td>
+<td>6</td>
+<td>6.966667</td>
+<td>28858</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">6</td>
+<td>Era Uma Vez</td>
+<td>312</td>
+<td>8.266026</td>
+<td>397332</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+<section id="modificando-ou-criando-novas-colunas" class="level1">
+<h1>Modificando ou criando novas colunas</h1>
+<p>Similar à função mutate() no R, podemos usar o método <code>df.assign</code> em Python.</p>
+<div id="aa88a1ec" class="cell" data-execution_count="30">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>imdb_rtotal <span class="op">=</span> imdb.assign(r_total<span class="op">=</span>imdb[<span class="st">'r1'</span>]<span class="op">+</span>imdb[<span class="st">'r2'</span>]<span class="op">+</span>imdb[<span class="st">'r3'</span>]<span class="op">+</span>imdb[<span class="st">'r4'</span>]<span class="op">+</span>imdb[<span class="st">'r5'</span>]<span class="op">+</span>imdb[<span class="st">'r6'</span>]<span class="op">+</span>imdb[<span class="st">'r7'</span>]<span class="op">+</span>imdb[<span class="st">'r8'</span>]<span class="op">+</span>imdb[<span class="st">'r9'</span>]<span class="op">+</span>imdb[<span class="st">'r10'</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Agora podemos selecionar apenas as colunas que nos interessam.</p>
+<div id="f9b98878" class="cell" data-execution_count="31">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>imdb_rtotal[[<span class="st">'series_name'</span>,<span class="st">'Episode'</span>,<span class="st">'r_total'</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="31">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">series_name</th>
+<th data-quarto-table-cell-role="th">Episode</th>
+<th data-quarto-table-cell-role="th">r_total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2359</td>
+<td>Lúcifer</td>
+<td>A Devil of My Word</td>
+<td>1.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">134</td>
+<td>Dark</td>
+<td>The Paradise</td>
+<td>1.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1404</td>
+<td>The Walking Dead</td>
+<td>No Way Out</td>
+<td>1.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1183</td>
+<td>Friends</td>
+<td>The One Where Everybody Finds Out</td>
+<td>1.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2371</td>
+<td>Lúcifer</td>
+<td>Who's da New King of Hell?</td>
+<td>1.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">773</td>
+<td>Pânico: A Série de TV</td>
+<td>Blindspots</td>
+<td>1.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">774</td>
+<td>Pânico: A Série de TV</td>
+<td>Endgame</td>
+<td>1.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1908</td>
+<td>Dracula</td>
+<td>The Dark Compass</td>
+<td>1.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">42</td>
+<td>13 Reasons Why</td>
+<td>Senior Camping Trip</td>
+<td>1.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">137</td>
+<td>Dracula</td>
+<td>The Dark Compass</td>
+<td>1.0</td>
+</tr>
+</tbody>
+</table>
+
+<p>2597 rows × 3 columns</p>
+</div>
+</div>
+</div>
+<p>também podemos criar novas colunas utilizando outra notação, vamos assumir que queremos criar uma nova coluna no dataframe <code>imdb_summary</code> :</p>
+<div id="8352481b" class="cell" data-execution_count="32">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>imdb_summary2[<span class="st">'VotesPerEpisode'</span>]<span class="op">=</span>imdb_summary2[<span class="st">'UserVotes'</span>]<span class="op">/</span>imdb_summary2[<span class="st">'Episodes'</span>]</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>imdb_summary2.head(<span class="dv">8</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="32">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">series_name</th>
+<th data-quarto-table-cell-role="th">Episodes</th>
+<th data-quarto-table-cell-role="th">UserRating</th>
+<th data-quarto-table-cell-role="th">UserVotes</th>
+<th data-quarto-table-cell-role="th">VotesPerEpisode</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>13 Reasons Why</td>
+<td>49</td>
+<td>7.248980</td>
+<td>151452</td>
+<td>3090.857143</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>Arquivo X</td>
+<td>356</td>
+<td>7.988202</td>
+<td>969628</td>
+<td>2723.674157</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>Away</td>
+<td>10</td>
+<td>7.080000</td>
+<td>5388</td>
+<td>538.800000</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>Como Defender um Assassino</td>
+<td>180</td>
+<td>8.568889</td>
+<td>228352</td>
+<td>1268.622222</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>Dark</td>
+<td>26</td>
+<td>9.076923</td>
+<td>264631</td>
+<td>10178.115385</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">5</td>
+<td>Dracula</td>
+<td>6</td>
+<td>6.966667</td>
+<td>28858</td>
+<td>4809.666667</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">6</td>
+<td>Era Uma Vez</td>
+<td>312</td>
+<td>8.266026</td>
+<td>397332</td>
+<td>1273.500000</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">7</td>
+<td>Friends</td>
+<td>235</td>
+<td>8.451915</td>
+<td>853287</td>
+<td>3631.008511</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>e agora vamos ordenar pela nova coluna <code>VotesPerEpisode</code> e arredondar para dois decimais:</p>
+<div id="3bf94445" class="cell" data-execution_count="33">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>imdb_summary2.sort_values(<span class="st">'VotesPerEpisode'</span>,</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>                ascending<span class="op">=</span><span class="va">False</span>).<span class="bu">round</span>(decimals<span class="op">=</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="33">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">series_name</th>
+<th data-quarto-table-cell-role="th">Episodes</th>
+<th data-quarto-table-cell-role="th">UserRating</th>
+<th data-quarto-table-cell-role="th">UserVotes</th>
+<th data-quarto-table-cell-role="th">VotesPerEpisode</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">21</td>
+<td>Sherlock</td>
+<td>15</td>
+<td>8.80</td>
+<td>373114</td>
+<td>24874.27</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">24</td>
+<td>Stranger Things</td>
+<td>25</td>
+<td>8.68</td>
+<td>391288</td>
+<td>15651.52</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">26</td>
+<td>The Witcher</td>
+<td>8</td>
+<td>8.49</td>
+<td>122656</td>
+<td>15332.00</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">4</td>
+<td>Dark</td>
+<td>26</td>
+<td>9.08</td>
+<td>264631</td>
+<td>10178.12</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">25</td>
+<td>The Walking Dead</td>
+<td>288</td>
+<td>8.01</td>
+<td>2394586</td>
+<td>8314.53</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">11</td>
+<td>La Casa de Papel</td>
+<td>31</td>
+<td>8.21</td>
+<td>161782</td>
+<td>5218.77</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">5</td>
+<td>Dracula</td>
+<td>6</td>
+<td>6.97</td>
+<td>28858</td>
+<td>4809.67</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">14</td>
+<td>Narcos</td>
+<td>30</td>
+<td>8.76</td>
+<td>122160</td>
+<td>4072.00</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">12</td>
+<td>Lúcifer</td>
+<td>75</td>
+<td>8.74</td>
+<td>298412</td>
+<td>3978.83</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">7</td>
+<td>Friends</td>
+<td>235</td>
+<td>8.45</td>
+<td>853287</td>
+<td>3631.01</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>13 Reasons Why</td>
+<td>49</td>
+<td>7.25</td>
+<td>151452</td>
+<td>3090.86</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>Arquivo X</td>
+<td>356</td>
+<td>7.99</td>
+<td>969628</td>
+<td>2723.67</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">23</td>
+<td>Sobrenatural</td>
+<td>211</td>
+<td>8.39</td>
+<td>499046</td>
+<td>2365.15</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">15</td>
+<td>O Bom Lugar</td>
+<td>50</td>
+<td>8.27</td>
+<td>98562</td>
+<td>1971.24</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">16</td>
+<td>Orange Is the New Black</td>
+<td>91</td>
+<td>8.17</td>
+<td>156565</td>
+<td>1720.49</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">13</td>
+<td>Motel Bates</td>
+<td>50</td>
+<td>8.59</td>
+<td>78773</td>
+<td>1575.46</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">6</td>
+<td>Era Uma Vez</td>
+<td>312</td>
+<td>8.27</td>
+<td>397332</td>
+<td>1273.50</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>Como Defender um Assassino</td>
+<td>180</td>
+<td>8.57</td>
+<td>228352</td>
+<td>1268.62</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">17</td>
+<td>Orphan Black</td>
+<td>50</td>
+<td>8.53</td>
+<td>60532</td>
+<td>1210.64</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">20</td>
+<td>Ratched</td>
+<td>8</td>
+<td>7.81</td>
+<td>8234</td>
+<td>1029.25</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">18</td>
+<td>Os Originais</td>
+<td>184</td>
+<td>8.83</td>
+<td>179686</td>
+<td>976.55</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">19</td>
+<td>Pânico: A Série de TV</td>
+<td>29</td>
+<td>7.54</td>
+<td>28078</td>
+<td>968.21</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">9</td>
+<td>Grimm: Contos de Terror</td>
+<td>123</td>
+<td>8.44</td>
+<td>104967</td>
+<td>853.39</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2</td>
+<td>Away</td>
+<td>10</td>
+<td>7.08</td>
+<td>5388</td>
+<td>538.80</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">22</td>
+<td>Sleepy Hollow</td>
+<td>62</td>
+<td>7.68</td>
+<td>33079</td>
+<td>533.53</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">10</td>
+<td>Hemlock Grove</td>
+<td>33</td>
+<td>7.49</td>
+<td>12538</td>
+<td>379.94</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">8</td>
+<td>Greenleaf</td>
+<td>60</td>
+<td>7.59</td>
+<td>2777</td>
+<td>46.28</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+<section id="juntando-dois-ou-mais-df" class="level1">
+<h1>Juntando dois ou mais df</h1>
+<p><code>merge</code> une dois DataFrames (<code>df1</code> e <code>df2</code>) com base em colunas especificadas (on, left_on, right_on). O tipo de junção (<code>how</code>) define como as tabelas serão combinadas:</p>
+<ul>
+<li><code>'inner'</code>: Mantém apenas as linhas onde há correspondência nas colunas de junção (interseção).</li>
+<li><code>'left'</code>: Mantém todas as linhas do DataFrame esquerdo (<code>df1</code>) e as correspondentes do direito (<code>df2</code>).</li>
+<li><code>'right'</code>: Mantém todas as linhas do DataFrame direito (<code>df2</code>) e as correspondentes do esquerdo (<code>df1</code>).</li>
+<li><code>'outer'</code>: Mantém todas as linhas de ambos os DataFrames, preenchendo com NaN onde não há correspondência (união).</li>
+</ul>
+<p>Use <code>left_on</code> e <code>right_on</code> quando as colunas de junção têm nomes diferentes nos DataFrames. Vamos a usar o pequeno <code>df</code> que foi criado no início deste tutorial para verificar o funcionamento do <code>merge</code>.</p>
+<div id="cde0912a" class="cell" data-execution_count="34">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="34">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">name</th>
+<th data-quarto-table-cell-role="th">age</th>
+<th data-quarto-table-cell-role="th">title</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>Alice</td>
+<td>25</td>
+<td>Sherlock</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>Bob</td>
+<td>30</td>
+<td>The Walking Dead</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>Charlie</td>
+<td>35</td>
+<td>Dark</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>Alice</td>
+<td>25</td>
+<td>Friends</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>David</td>
+<td>40</td>
+<td>Orange Is the New Black</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">5</td>
+<td>Bob</td>
+<td>30</td>
+<td>The Walking Dead</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">6</td>
+<td>Camille</td>
+<td>20</td>
+<td>Narcos</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>e vamos criar um pequeno <code>df</code> com dados do Netflix:</p>
+<div id="17162d59" class="cell" data-execution_count="35">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>netflix_5 <span class="op">=</span> {<span class="st">'season'</span>: [<span class="st">'Season 1'</span>, <span class="st">'Season 2'</span>, <span class="st">'Season 3'</span>, <span class="st">'Season 4'</span>, <span class="st">'Season 5'</span>, <span class="st">'Part 1'</span>,<span class="st">'Part 2'</span>],</span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>        <span class="st">'title'</span>: [<span class="st">'Sherlock'</span>, <span class="st">'The Walking Dead'</span>, <span class="st">'Dark'</span>, <span class="st">'Friends'</span>, <span class="st">'Orange Is the New Black'</span>, <span class="st">'The Walking Dead'</span>,<span class="st">'Narcos'</span>]}</span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>netflix_5_df <span class="op">=</span> pd.DataFrame(netflix_5)</span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>netflix_5_df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="35">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">season</th>
+<th data-quarto-table-cell-role="th">title</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>Season 1</td>
+<td>Sherlock</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>Season 2</td>
+<td>The Walking Dead</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>Season 3</td>
+<td>Dark</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>Season 4</td>
+<td>Friends</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>Season 5</td>
+<td>Orange Is the New Black</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">5</td>
+<td>Part 1</td>
+<td>The Walking Dead</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">6</td>
+<td>Part 2</td>
+<td>Narcos</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>Vamos realizar o <code>merge</code>:</p>
+<div id="dc241e64" class="cell" data-execution_count="36">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>netflix_5_df.merge(df, on<span class="op">=</span><span class="st">'title'</span>, how<span class="op">=</span><span class="st">'left'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="36">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">season</th>
+<th data-quarto-table-cell-role="th">title</th>
+<th data-quarto-table-cell-role="th">name</th>
+<th data-quarto-table-cell-role="th">age</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>Season 1</td>
+<td>Sherlock</td>
+<td>Alice</td>
+<td>25</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>Season 2</td>
+<td>The Walking Dead</td>
+<td>Bob</td>
+<td>30</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>Season 2</td>
+<td>The Walking Dead</td>
+<td>Bob</td>
+<td>30</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>Season 3</td>
+<td>Dark</td>
+<td>Charlie</td>
+<td>35</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>Season 4</td>
+<td>Friends</td>
+<td>Alice</td>
+<td>25</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">5</td>
+<td>Season 5</td>
+<td>Orange Is the New Black</td>
+<td>David</td>
+<td>40</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">6</td>
+<td>Part 1</td>
+<td>The Walking Dead</td>
+<td>Bob</td>
+<td>30</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">7</td>
+<td>Part 1</td>
+<td>The Walking Dead</td>
+<td>Bob</td>
+<td>30</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">8</td>
+<td>Part 2</td>
+<td>Narcos</td>
+<td>Camille</td>
+<td>20</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      return note.innerHTML;
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
