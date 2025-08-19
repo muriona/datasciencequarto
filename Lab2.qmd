@@ -1,0 +1,112 @@
+---
+title: "Lab 2 - Dashboards em R"
+#subtitle: "New York"
+execute: 
+  eval: false
+  echo: true
+---
+
+## Sobre o dataset
+
+O dataset utiliza as informações de anúncios do Airbnb e informações sobre restaurantes e crimes de rua na cidade de Nova Iorque em 2018 e 2019. Os dados podem ser localizados em <http://insideairbnb.com/>, <https://www.kaggle.com/datasets/popoandrew/restaurant-week-2018> e em <https://www.kaggle.com/code/adamschroeder/crime-in-new-york-city/>. Você pode carregá-los a partir da pasta anexa.
+
+## O que faremos
+
+Imagine que você está realizando uma consultoria de dados para uma agência de viagens. O interesse do cliente é conhecer melhor as opções de hospedagem alternativo e restaurantes em bairros mais seguros na cidade de NY.
+
+O mercado-alvo são viajantes que visitam NY por lazer e o cliente deseja conhecer melhor as diferenças existentes entre os bairros, levando em consideração por exemplo as avaliações dos Airbnbs e dos restaurantes, bem como os preços praticados e pouco risco de crimes além de estimativas de custos totais aproximados de moradia e alimentação para uma viagem de 7 dias em média.
+
+Utilize seus conhecimentos de tidyverse e ggplot para realizar análises e visualizações interessantes.
+
+## Instruções
+
+Uma vez que você tenha escolhidos as melhores visualizações, deverá criar um dashboard utilizando o pacote `flexdashboard` e subi-lo à plataforma [shinyapps.io](https://www.shinyapps.io/). O link deverá ser compartilhado com o Professor junto com o arquivo `.Rmd` do dashboard via moodle. Nota: o arquivo `.Rmd` deve ser exatamente o mesmo que gerou o dashboard, em outras palavras, ele deverá rodar também localmente.
+
+Para poder configurar o shinyapps.io deve seguir as instruções [nesta página](https://docs.posit.co/shinyapps.io/getting-started.html#working-with-shiny-for-r).
+
+## Opções para o *Sidebar*
+
+### Criar uma coluna sidebar usando o comando: \`## Column{data-width=200 .sidebar}\` {.sidebar data-width="200"}
+
+```{r}
+
+#| eval: false
+
+# Menu desplegável
+
+
+selectInput("nome",
+            label = "Selecione ...",
+            choices = c(____),
+            selected = ____)
+
+# Slider
+
+sliderInput("nome2",
+            label = "Escolha ....",
+            min = "___", max = "____", value = "___", step = '___', 
+            dragRange = TRUE)
+
+# Data
+
+dateInput(inputid = "data1", 
+          label = "____", 
+          value = "YYYY-MM-DD", #informar a data
+          format = "mm/dd/yy",
+          language = "pt")
+
+# Intervalo de datas - produzirá um objeto com dois valores
+
+dateRangeInput("data2", label = "______",
+                 start  = "_____", #informar a data de início
+                 end    = "_____", #informar a data de finalização
+                 format = "mm/dd/yy",
+                 language = "pt",
+                 separator = " - ")
+```
+
+## Opções para o corpo
+
+```{r}
+
+#| eval: false
+
+# KPIs
+
+renderValueBox({
+
+valueBox(prettyNum(______, big.mark = ','), 
+         icon = 'fa-ship', caption = "_____",
+         color="#9b5de5")
+}
+)
+
+# Requer library(plotly)
+
+renderPlotly({  
+df <- _____
+ggplotly(df)
+  })
+
+# Gauges - velocímetros
+
+renderGauge({
+  df <- _____
+  gauge(____, min = ___, max = ___, symbol = '%', gaugeSectors(
+    success = c(____, ___), warning = c(____, ___ ), danger = c(____, ___)
+  ))
+})
+
+
+# Tabelas
+
+renderTable({  
+df %>% 
+  mutate(____) %>% 
+  filter(_____) %>% 
+  group_by(____) %>% 
+  count() %>% 
+  arrange(desc(n)) 
+})
+
+```

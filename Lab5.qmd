@@ -1,0 +1,228 @@
+---
+title: "Lab 5 - Tidymodels - Regressão"
+subtitle: "Previsão do preço de produtos da IKEA"
+---
+
+```{r}
+#| label: setup
+#| include: false
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, cache = TRUE)
+```
+
+# Carregando os dados
+
+Este webinar usará dados do Ikea, uma loja de móveis com filiais em várias partes do mundo.
+
+O próposito é prever o preço dos móveis vendidos na IKEA a partir de várias características destes produtos como a categoria e o tamanho do móvel, conforme [aqui](https://github.com/rfordatascience/tidytuesday/blob/master/data/2020/2020-11-03/readme.md).
+
+Vamos carregar os dados e ver as primeiras linhas
+
+```{r}
+library(tidyverse)
+
+ikea <- read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-11-03/ikea.csv")
+
+head(ikea)
+```
+
+# Limpeza dos dados
+
+Também vamos fazer uma revisão geral dos dados
+
+```{r}
+library(skimr)
+
+skim(ikea)
+```
+
+Conforme visto no output do `skim()` há várias colunas em formato de "character" e uma coluna com nome `X1` que apenas é um id de cada linha. Precisamos limpar o dataset para deixá-lo mais adequado ao modelo de machine learning.
+
+```{r}
+ikea_df <- ikea %>% 
+  select(-1,-2, -link, -short_description, -old_price,
+         -sellable_online) %>% 
+  mutate_if(is.character, as.factor)
+```
+
+# Análise exploratória de dados - EDA
+
+```{r}
+ikea_df %>%
+  select(price, depth:width) %>%
+  pivot_longer(depth:width, names_to = "dim") %>%
+  ggplot(aes(value, price, color = dim)) +
+  geom_point(alpha = 0.4, show.legend = FALSE) +
+  geom_smooth(method = "lm", se = FALSE)+
+  scale_y_log10() +
+  facet_wrap(~dim, scales = "free_x") +
+  labs(x = NULL)
+```
+
+Vamos deixar o preço com log(10)
+
+```{r}
+ikea_df <- ikea_df %>% 
+  mutate(price=log10(price),
+         category=fct_lump(category, prop = 0.05),
+         designer=fct_lump(designer, prop=0.05),
+         name=fct_lump(name, prop=0.02))
+
+skim(ikea_df)
+```
+
+Vamos fazer a análise das correlações
+
+```{r}
+library(GGally)
+
+ikea_df %>%
+  select(
+    price, other_colors, depth, height, width,
+    category, designer, name
+  ) %>%
+  ggpairs()
+```
+
+# Modelagem supervisionada usando Tidymodels
+
+O pacote `tidymodels` é uma evolução do `caret` e procura facilitar a construção de modelos de machine learning, seguindo um padrão que independe do modelo a ser construído (regressão linear, árvores de decisão, etc.).
+
+Vamos dividir o dataset em treino e teste:
+
+```{r}
+library(tidymodels)
+
+set.seed(1234)
+ikea_split <- initial_split(ikea_df, strata=price)
+
+ikea_train <- training(ikea_split)
+ikea_test <- testing(ikea_split)
+
+```
+
+Para aprimorar a robustez das nossas estimações, iremos usar um procedimento denominado k-fold cross validation ou validação cruzada.
+
+```{r}
+
+ikea_fold <- vfold_cv(ikea_train)
+
+```
+
+A recipe que iremos usar servirá para todos os modelos.
+
+```{r}
+#| label: recipes
+
+ikea_rec <- recipe(price ~ ., data = ikea_train) %>%
+  step_dummy(all_nominal()) %>%
+  step_impute_knn(depth, height, width)
+
+ikea_wf <- workflow() %>% 
+  add_recipe(ikea_rec)
+```
+
+Vamos treinar um modelo de Regressão Linear (usando `lm`), logo um de Árvore de Decisão (usando `rpart`) e finalmente um de Random Forest (usando `ranger`).
+
+```{r}
+#| label: spec
+
+lm_spec <- linear_reg() %>% 
+  set_engine("lm")
+
+tree_spec <- decision_tree() %>%
+  set_engine("rpart") %>%
+  set_mode("regression")
+
+rf_spec <- rand_forest(trees=1000) %>% 
+  set_engine("ranger") %>% 
+  set_mode("regression")
+```
+
+Segue os resultados do modelo da Regressão Linear:
+
+```{r}
+doParallel::registerDoParallel()
+
+lm_rs <- ikea_wf %>% 
+  add_model(lm_spec) %>% 
+  fit_resamples(resamples=ikea_fold,
+                metrics=metric_set(rmse, rsq, mae),
+                control=control_resamples(save_pred=TRUE))
+
+collect_metrics(lm_rs)
+
+```
+
+Os resultados da árvore de decisão:
+
+```{r}
+tree_rs <- ikea_wf %>% 
+  add_model(tree_spec) %>% 
+  fit_resamples(resamples=ikea_fold,
+                metrics=metric_set(rmse, rsq, mae),
+                control=control_resamples(save_pred=TRUE))
+
+collect_metrics(tree_rs)
+```
+
+Os resultados do Random Forest:
+
+```{r}
+rf_rs <- ikea_wf %>% 
+  add_model(rf_spec) %>% 
+  fit_resamples(resamples=ikea_fold,
+                metrics=metric_set(rmse, rsq, mae),
+                control=control_resamples(save_pred=TRUE))
+
+collect_metrics(rf_rs)
+```
+
+Juntando os três resultados e comparando:
+
+```{r}
+collect_metrics(lm_rs) %>% mutate(modelo="lm") %>% rbind(collect_metrics(tree_rs) %>% mutate(modelo="tree")) %>% rbind(collect_metrics(rf_rs) %>% mutate(modelo="rf")) %>% 
+  ggplot(aes(modelo, mean, fill=modelo))+
+  geom_col() +
+  facet_wrap(vars(.metric
+                  ), scales = "free_y")+
+  scale_fill_viridis_d()+
+  theme(axis.title.y = element_blank(),
+        axis.title.x = element_blank(),
+        legend.position = "none")
+```
+
+Iremos escolher o modelo de Random Forest (menor MAE, menor RMSE e maior R2)
+
+```{r}
+modelo_final <- ikea_wf %>% 
+  add_model(rf_spec) %>% 
+  last_fit(ikea_split)
+
+collect_metrics(modelo_final,
+                metrics = metric_set(rsq, rmse, mae))
+```
+
+Por fim, se compararmos os valores estimados e os valores reais:
+
+```{r}
+collect_predictions(modelo_final) %>%
+  ggplot(aes(price, .pred)) +
+  geom_abline(lty = 2, color = "gray50") +
+  geom_point(alpha = 0.5, color = "#e32d91") +
+  coord_fixed()
+```
+
+Por fim, podemos usar uma função da library(vip) para identificar os atributos mais importantes.
+
+```{r}
+library(vip)
+
+imp_spec <- rf_spec %>%
+  set_engine("ranger", importance = "permutation")
+
+ikea_wf %>% 
+  add_model(imp_spec) %>%
+  fit(ikea_train) %>%
+  pull_workflow_fit() %>%
+  vip(aesthetics = list(alpha = 0.8, fill = "midnightblue"))
+```

@@ -1,0 +1,252 @@
+---
+title: "Tutorial 2 - Pandas"
+subtitle: "Usando Pandas com Movielens"
+jupyter: python3
+---
+
+Agora vamos realizar algumas análises mais interessantes.
+
+```{python}
+#| echo: false
+
+import os
+from IPython.display import HTML
+
+def create_downloadable_dir_listing(directory, message="You can download the data here."):
+    file_list = os.listdir(directory)
+    html_content = f"<p>{message}</p><ul>"
+    for file in file_list:
+        html_content += f'<li><a href="{directory}/{file}" download>{file}</a></li>'
+    html_content += "</ul>"
+    return HTML(html_content) 
+
+# Example usage
+create_downloadable_dir_listing("pydata2/", message="Você pode baixar os dados aqui.")
+```
+
+```{python}
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+```
+
+# Lendo os dados
+
+```{python}
+users = pd.read_csv('pydata2/users.csv')
+
+users.head()
+
+```
+
+```{python}
+users.info()
+```
+
+```{python}
+movies = pd.read_csv('pydata2/movies.csv')
+movies.head()
+```
+
+```{python}
+movies.info()
+```
+
+```{python}
+ratings = pd.read_csv('pydata2/ratings.csv')
+ratings.head()
+```
+
+```{python}
+ratings.info()
+```
+
+# Juntando os dados
+
+```{python}
+movie_ratings = pd.merge(movies, ratings, how='right')
+lens = pd.merge(movie_ratings, users)
+lens.head()
+```
+
+```{python}
+lens.info()
+```
+
+# Análise Exploratória de Dados
+
+### Quais são os 25 filmes mais avaliados?
+
+```{python}
+
+best = lens.groupby('title').count().reset_index()[['title','movie_id']].rename(columns={'movie_id':'count'}).sort_values('count',
+                ascending=False)
+                
+best.head(25)
+```
+
+Outra forma de fazer o mesmo (porém, neste caso retorna uma Pandas `series`:
+
+```{python}
+best2 = lens.title.value_counts()[:25]
+best2
+```
+
+### Quais são os filmes com as maiores notas?
+
+```{python}
+
+movie_stats = lens.groupby('title').agg({'occupation':'count',
+'rating':'mean','age':'mean'}).sort_values('rating', ascending=False).rename(columns={'occupation':'count','age':'mean_age'}).round(decimals=2)
+
+movie_stats
+```
+
+Os filmes acima são avaliados tão raramente, que nem podemos qualificá-los como top filmes. Que tal apenas olharmos os filmes que foram avaliados pelo menos 100 vezes.
+
+```{python}
+movie_stats.query('count >= 100')
+```
+
+outra forma de fazer o mesmo:
+
+```{python}
+atleast_100 = movie_stats['count'] >= 100
+
+atleast_100_movies = movie_stats[atleast_100]
+
+atleast_100_movies
+```
+
+### Como se distribuem as idades?
+
+Vamos criar um gráfico mostrando a distribuição das idades.
+
+`pandas` tem um integração nativa com a biblioteca `matplotlib` que permite a plotagem de Series/DataFrames ficarem mais fáceis ainda. Neste caso apenas chamamos o método histo na coluna que queremos produzir o histograma. Nós podemos também chamar o `matplotlib.pyplot` para customizar o nosso gráfico um pouco. (sempre lembrar de rotular seus eixos!)
+
+```{python}
+users.age.hist(bins=30)
+# Add title and labels
+plt.title('Distribuição das idades')
+plt.xlabel('Idades')
+plt.ylabel('Frequencia')
+
+# Show the plot
+plt.show()
+```
+
+Eu não acho muito legal comparar nossas idades individuais, portanto vamos binarizar nossos usuários em groupos por idade usando o `pd.cut`.
+
+```{python}
+labels = ['0-9', '10-19', '20-29', '30-39', '40-49', '50-59', '60-69', '70-79']
+lens['age_group'] = pd.cut(lens.age, range(0, 81, 10), right=False, labels=labels)
+
+lens[['title','age','age_group']]
+```
+
+Vimos que há uma valor 'NaN' no título, vamos conferior melhor:
+
+```{python}
+lens.isna().sum()
+```
+
+Vamos eliminar os 'NaN':
+
+```{python}
+lens = lens.dropna(subset=['title'])
+lens
+```
+
+Vamos verificar a contagem e o rating médio por cada faixa etária:
+
+```{python}
+lens_age = lens.groupby('age_group').agg({'rating': 'mean', 'title':'count'})
+
+lens_age
+```
+
+Jovens usuários tendem ser mais críticos que os outros grupos por faixa etária.
+
+E vamos fazer um gráfico com estas informações.
+
+```{python}
+
+plt.bar(lens_age.index,lens_age['rating'])
+plt.title("Rating médio por faixa etária")
+plt.show()
+```
+
+Vamos olhar apenas para os 50 filmes mais avaliados e ver como eles são vistos por cada grupo.
+
+```{python}
+best50 = atleast_100_movies.head(50)
+best50.info()
+```
+
+```{python}
+best50.head(5)
+```
+
+```{python}
+lens50 = lens.set_index('title')
+lens50.info()
+```
+
+```{python}
+by_age = lens50.loc[best50.index]
+
+by_age.reset_index()
+
+
+```
+
+```{python}
+by_age.groupby(['title','age_group']).agg({'rating': 'mean'})
+```
+
+### Quais são os filmes que mulheres e homens mais se diferem em gostos ?
+
+```{python}
+lens.index
+```
+
+```{python}
+pivoted = lens.pivot_table(index=['title'], 
+                           columns=['sex'], 
+                           values='rating', 
+                           fill_value=0)
+                           
+pivoted.head(5)
+```
+
+Vamos calcular a diferença entre as notas de homens e mulheres:
+
+```{python}
+pivoted['diff']=pivoted.M - pivoted.F
+
+pivoted.head(5)
+```
+
+```{python}
+disagreements = pivoted[pivoted.index.isin(best50.index)]['diff']
+```
+
+```{python}
+disagreements_sorted = disagreements.sort_values()
+
+disagreements_sorted
+```
+
+```{python}
+# Create the horizontal bar plot
+disagreements_sorted.plot(kind='barh', figsize=[9, 15])
+
+# Add title and labels
+plt.title('Diferença Média no Rating\n(Diferença > 0 = Favoritado por homens)')
+plt.ylabel('Título')
+plt.xlabel('Diferença Média no Rating')
+
+
+# Show the plot
+plt.show()
+```

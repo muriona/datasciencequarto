@@ -1,0 +1,284 @@
+---
+title: "Tutorial 6 - Classificação com Tidymodels"
+cache: true
+execute: 
+  warning: false
+---
+
+## Carregando os dados
+
+Vamos usar um dataset sobre churn.
+
+```{r}
+#| echo: false
+#| eval: true
+#| 
+xfun::pkg_load2(c('htmltools', 'mime'))
+xfun::embed_dir("data6/", text = "Você pode baixar os dados aqui.")
+
+```
+
+```{r}
+library(tidyverse)
+library(tidymodels)
+library(fst)
+library(knitr)
+
+churn <- read_fst("data6/churn.fst")
+
+churn$has_churned <- as_factor(churn$has_churned)
+```
+
+```{r}
+set.seed(1212)
+
+split <- initial_split(churn, prop = 0.7, strata = has_churned)
+
+train <- training(split)
+test <- testing(split)
+```
+
+## Feature Engineering
+
+Para aprimorar a robustez das nossas estimações, iremos usar um procedimento denominado k-fold cross validation ou validação cruzada. Neste procedimento, os dados de treino são subdivididos aleatoriamente em treino e teste e seus parâmetros de acurácia são calculados. Este procedimento é repetido 'k' vezes de forma que sejam calculados os parâmetros de acurácia de cada 'k'. Uma vez que o procedimento é completado (ajustando o modelo a cada 'k' subdataset de treino e teste), calcula-se a média de todos os parâmetros de acurácia. Mais detalhes [aqui](https://pt.wikipedia.org/wiki/Valida%C3%A7%C3%A3o_cruzada#M%C3%A9todo_k-fold).
+
+```{r}
+fold <- vfold_cv(train)
+
+rec <- recipe(has_churned ~ ., data = train) %>%
+  step_dummy(all_nominal(), -all_outcomes()) %>%
+  step_normalize(all_numeric())
+
+wf <- workflow() %>% 
+  add_recipe(rec)
+```
+
+## Treinamento dos modelos
+
+Vamos treinar um modelo de Regressão Logística (usando `glm`), logo um de Árvore de Decisão (usando `rpart`) e finalmente um de Random Forest (usando `ranger`)
+
+```{r}
+
+glm_spec <- logistic_reg() %>% 
+  set_engine("glm")
+
+tree_spec <- decision_tree() %>%
+  set_engine("rpart") %>%
+  set_mode("classification")
+
+rf_spec <- rand_forest(trees=1000) %>% 
+  set_engine("ranger") %>% 
+  set_mode("classification")
+```
+
+## Regressão Logística
+
+Segue os resultados do modelo de Regressão Logística:
+
+```{r}
+#| label: glm
+doParallel::registerDoParallel()
+
+logreg <- wf %>% 
+  add_model(glm_spec) %>% 
+  fit_resamples(resamples=fold,
+                control=control_resamples(save_pred=TRUE))
+
+
+```
+
+```{r}
+collect_metrics(logreg) %>% 
+  kable()
+
+logreg %>% 
+  conf_mat_resampled() %>% 
+  kable()
+
+logreg %>% 
+  collect_predictions() %>% 
+  group_by(id) %>% 
+  roc_curve(has_churned, .pred_0) %>% 
+  autoplot()
+```
+
+## Árvore de Decisão
+
+Vamos treinar o modelo:
+
+```{r}
+#| label: tree
+tree <- wf %>% 
+  add_model(tree_spec) %>% 
+  fit_resamples(resamples=fold,
+                control=control_resamples(save_pred=TRUE))
+
+
+```
+
+Segue os resultados do modelo de Árvore de Decisão:
+
+```{r}
+collect_metrics(tree)
+
+tree %>% 
+  conf_mat_resampled()
+
+tree %>% 
+  collect_predictions() %>% 
+  group_by(id) %>% 
+  roc_curve(has_churned, .pred_0) %>% 
+  autoplot()
+```
+
+## Random Forest
+
+Vamos treinar o modelo:
+
+```{r}
+rf <- wf %>% 
+  add_model(rf_spec) %>% 
+  fit_resamples(resamples=fold,
+                control=control_resamples(save_pred=TRUE))
+```
+
+Segue os resultados do modelo do Random Forest:
+
+```{r}
+collect_metrics(rf)
+
+rf %>% 
+  conf_mat_resampled()
+
+rf %>% 
+  collect_predictions() %>% 
+  group_by(id) %>% 
+  roc_curve(has_churned, .pred_0) %>% 
+  autoplot()
+```
+
+## Tuning de Modelos
+
+O processo de tuning serve para procurar por valores para os parâmetros de um modelo de machine learning, que gerem a melhor previsão possível.
+
+Cada modelo de machine learning tem seus próprios parâmetros, por exemplo, para árvores de decisão, alguns dos parâmetros são o `cost complexity` e a `tree_depth` já para um modelo de random forest, os principais parâmetros são o `mtry`, e o `trees` (número de árvores).
+
+Para encontrar os parâmetros para o modelo que você está usando acesse o site do tidymodels com uma tabela dinâmica que ajuda na busca [aqui](https://www.tidymodels.org/find/parsnip/#model-args).
+
+### Árvore de Decisão
+
+Vamos melhorar a precisão do nosso modelo utilizando o procedimento conhecido como autotune com dois parâmetros: `cost_complexity` e `tree_depth`.
+
+```{r}
+
+tune_spec <- 
+  decision_tree(
+    cost_complexity = tune(),
+    tree_depth = tune()
+  ) %>% 
+  set_engine("rpart") %>% 
+  set_mode("classification")
+```
+
+Agora precisamos criar uma grid para o algoritmo procurar os melhores valores para os parâmetros mencionados anteriormente.
+
+```{r}
+
+tree_grid <- grid_regular(cost_complexity(),
+                          tree_depth(),
+                          levels = 5)
+
+```
+
+Como temos dois parâmetros para tuning, o tree_grid retornará 25 valores, 5 para cada parâmetro.
+
+```{r}
+tree_grid
+```
+
+Agora vamos treinar nosso modelo, criando também previsões com validação cruzada.
+
+```{r}
+tree_tune <- wf %>%
+  add_model(tune_spec) %>% 
+  tune_grid(resamples = fold,
+            grid = tree_grid)
+
+
+```
+
+```{r}
+  
+tree_tune %>% 
+  collect_metrics() %>% 
+  filter(.metric == "roc_auc") %>% 
+  ggplot(aes(cost_complexity, mean, color = factor(tree_depth)))+
+  geom_line(linewidth = 1)+
+  scale_x_log10(labels = scales::label_number())
+
+
+```
+
+O modelo que teve melhor desempenho foi o que tem a linha mais alta (tree_depth = 8), podemos conferir esse resultado com a função show_best():
+
+```{r}
+tree_tune %>% 
+  show_best()
+```
+
+Por fim, podemos escolher automaticamente os dois melhores valores para nossos parâmetros utilizando a função select_best():
+
+```{r}
+best_tree <- tree_tune %>% 
+  select_best("roc_auc")
+
+best_tree
+```
+
+Agora podemos atualizar nosso objeto de workflow com os valores obtidos por select_best():
+
+```{r}
+final_tree_wf <- wf %>% 
+  add_model(tune_spec) %>% 
+  finalize_workflow(best_tree)
+```
+
+Agora podemos calcular os indicadores nos dados de teste, para isto, utilizamos a função last_fit() que automaticamente reconhece o dataset de teste no objeto `split`
+
+```{r}
+final_tree_fit <- final_tree_wf %>% 
+  last_fit(split)
+
+final_tree_fit %>% 
+  collect_metrics()
+
+final_tree_fit %>% 
+  collect_predictions() %>% 
+  roc_curve(has_churned, .pred_0) %>% 
+  autoplot()
+
+
+```
+
+Uma vez finalizado o teste do modelo, podemos visualizar a arvore utilizando a função rpart.plot() do mesmo pacote.
+
+```{r}
+library(rpart.plot)
+
+
+
+final_tree_fit %>% 
+  extract_fit_engine() %>% 
+  rpart.plot()
+
+```
+
+E também podemos visualizar as variáveis mais importantes utilizando o pacote `vip` e a função `vip()`:
+
+```{r}
+library(vip)
+
+final_tree_fit %>% 
+  extract_fit_parsnip() %>% 
+  vip()
+```

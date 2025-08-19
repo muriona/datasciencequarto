@@ -1,0 +1,4 @@
+_site/pydata5/card_transdata.csv filter=lfs diff=lfs merge=lfs -text
+_site/pydata4/bcim_2016_21_11_2018.gpkg filter=lfs diff=lfs merge=lfs -text
+*.csv filter=lfs diff=lfs merge=lfs -text
+*.gpkg filter=lfs diff=lfs merge=lfs -text

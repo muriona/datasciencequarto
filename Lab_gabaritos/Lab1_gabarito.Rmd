@@ -1,0 +1,284 @@
+---
+title: "Lab 1 - EDA"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    theme: paper
+    css: styles.css
+date: "Última versão em `r format(Sys.time(), '%d/%m/%y')`"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, eval=FALSE)
+```
+
+# Carregando os dados
+
+Neste Lab iremos explorar os dados sobre seriados de TV, usando dois datasets, um do Netflix (informações do viewing history) e outro do IMDb, banco de dados com informações sobre o rating de seriados e filmes.
+
+Inicialmente vamos carregar os dados. Os dados do Netflix vem do site onde o usuário pode fazer download do seu histórico após o login. Já os dados o IMDb usam um script que encontra-se em: <https://github.com/nazareno/imdb-series> para fazer o web scrapping do site oficial do IMDb.
+
+Carregando os dados do IMDb e mostrando os primeiras 10 linhas:
+
+```{r imdb}
+library(tidyverse)
+library(readxl)
+imdb <- read_xlsx("imdb_series.xlsx")
+
+head(imdb, 10)
+
+```
+
+Carregando os dados do Netflix e mostrando as primeiras 10 linhas:
+
+```{r}
+netflix <- read.csv("NetflixViewingHistory.csv")
+
+head(netflix, 10)
+
+
+```
+
+Observe-se que os dados de `Date` não estão no formato certo, pois eles aparecem como `character` o que pode causar problemas posteriores. Portanto antes de continuar, precisamos arrumar o formato para "data" com os comandos a seguir:
+
+```{r}
+netflix$Date <- as.Date(netflix$Date, "%m/%d/%y")
+
+glimpse(netflix)
+```
+
+Como pode se ver, a estrutura dos dados do IMDb é mais complexa, vamos ver mais de perto os dados, usando a função `str()`:
+
+```{r}
+str(imdb)
+
+glimpse(imdb)
+```
+
+Nos dados do IMDb, as últimas 10 colunas representam a proporção de usuários que votou o capítulo específico com a nota `n`, sendo que, por exemplo, a coluna `r9` representa a proporção de usuários que votou com a nota `9`.
+
+# Limpando os dados do Netflix
+
+Primeiro, vamos explorar mais os dados do Netflix, que conta com apenas duas colunas: o Título e a data de visualização. Para isto, vamos filtrar o dataset original para ficarmos apenas com os seriados dos filmes, usando os comandos do `Tidyverse`: `filter` , `str_detect` e `separate`.
+
+```{r}
+netflix_series <- netflix %>% 
+  filter(str_detect(Title, ":")) %>% 
+  separate(Title,c("series_title","season","episode"),":")
+
+```
+
+Com os comandos anteriores conseguimos ter uma base limpa, onde apenas consideramos seriados e temos as informações separadas para cada capítulo e temporada. Porém, pode ser que o nosso processo de filtragem com `str_detect()` não tenha sido perfeito.
+
+Vamos fazer um teste verificando se existem registros com o campo `episode` com `NA`:
+
+```{r na}
+
+sum(is.na(netflix_series$episode))
+
+nas <- sum(is.na(netflix_series$episode))
+nas <- as.character(nas)
+```
+
+Ok, identificamos xx registros que apresentam `NA`, vamos explorá-los com mais cuidado para confirmar se de fato se trata de um problema do nosso filtrado inicial. E se de fato encontrarmos registros mal filtrados, faremos a limpeza manual.
+
+```{r}
+netflix_series %>% 
+  filter(is.na(episode))
+
+
+```
+
+Na verdade esses xx registros são de fato filmes com subtítulos (por isso o nosso filtro com `str_detect()` os pegou. Devemos retirá-los da nossa base de seriados.
+
+```{r}
+
+netflix_series_limpo <- netflix_series %>% 
+  filter(!is.na(episode))
+```
+
+# Explorando as séries de Netflix
+
+Agora, podemos iniciar algumas visualizações, por exemplo, podemos fazer uma tabela que nos indique o número de capítulos assistidos por cada seriado. Para isto, vamos usar os comandos do `dplyr`:
+
+```{r}
+netflix_series_limpo %>% 
+  group_by(series_title) %>% 
+  count() %>% 
+  arrange(desc(n)) %>% 
+  ungroup() %>% 
+  top_n(10, wt=n)
+```
+
+Uma outra forma de fazer esta mesma análise seria filtrar por seriados onde mais de `x` capítulos foram assistidos, por exemplo, seriados com mais de 20 capítulos assistidos:
+
+```{r}
+netflix_series_limpo %>% 
+  group_by(series_title) %>% 
+  summarize(assistidos = n())%>% 
+  filter(assistidos > 19) %>% 
+  arrange(desc(assistidos))
+```
+
+Também podemos fazer uma análise do número de capítulos assistidos em um ano específico, por exemplo, em 2020:
+
+```{r}
+series_mais_assistidas <- netflix_series_limpo %>% 
+  mutate(ano = as.numeric(format(Date,'%Y'))) %>% 
+  filter(ano == "2020") %>% 
+  group_by(series_title) %>% 
+  tally() 
+
+series_mais_assistidas %>% 
+  ggplot(aes(reorder(series_title,-n), n))+
+  geom_bar(stat="identity")+
+  coord_flip()+
+  labs(title = "Seriados mais assistidos em 2020")
+
+```
+
+Podemos ver que os seriados mais assistidos foram "Greenleaf", "How to get away with murder", "Once upon a Time", "Away", "Bates Motel", "Dark", "Money Heist" e "Ratched".
+
+Também podemos ver o número de capítulos totais assistidos por ano:
+
+```{r}
+netflix_series_limpo %>% 
+  mutate(ano = as.numeric(format(Date,'%Y'))) %>% 
+  group_by(ano) %>% 
+  tally() %>% 
+  ggplot(aes(factor(ano), n))+
+  geom_bar(stat="identity", fill="#e32d91")
+
+netflix_series_limpo %>% 
+  mutate(ano = as.numeric(format(Date,'%Y'))) %>% 
+  group_by(ano) %>% 
+  tally() %>% 
+  ggplot(aes(ano,n))+
+  geom_line(color = "#e32d91", size = 1.2)
+```
+
+E também ver a distribuição dos seriados por ano, por exemplo para o seriado "Bates Motel":
+
+```{r}
+netflix_series_limpo %>% 
+  mutate(ano = as.numeric(format(Date,'%Y'))) %>% 
+  group_by(series_title, ano) %>% 
+  summarize(assistidos = n()) %>% 
+  filter(series_title == "Bates Motel") %>% 
+  ggplot(aes(ano, assistidos))+ 
+  geom_bar(stat="identity", fill = "#5b59d6")+
+  labs(title="Bates Motel - capítulos assistidos por ano")
+  
+```
+
+Ou ver a distribuição por data:
+
+```{r}
+netflix_series_limpo %>% 
+  #filter(series_title == "Bates Motel") %>%
+  count(Date) %>% 
+  ggplot(aes(Date, n))+
+  geom_col(color = c("#f16727"))
+```
+
+Finalmente, podemos ver a distribuição dos seriados num ano específico:
+
+```{r}
+netflix_series_limpo %>% 
+  filter(Date >= "2020-01-01") %>%
+  group_by(series_title) %>% 
+  ggplot(aes(Date, fill = series_title))+
+  geom_bar()+
+  labs(title = "Capítulos assistidos por seriado em 2020")
+```
+
+# Explorando os dados do IMDb
+
+Agora vamos iniciar a análise dos dados do IMDB. Primeiro vamos contabilizar o número de capítulos por seriado e vamos ordenar usando a função `arrange`
+
+```{r}
+imdb %>% 
+  group_by(series_name) %>% 
+  count() %>% 
+  arrange(desc(n))
+```
+
+Claramente têm seriados com muitos capítulos e outros com poucos, pode ser por causa do número de temporadas? vamos conferir:
+
+```{r}
+imdb %>% 
+  group_by(series_name, season) %>% 
+  count() %>% 
+  ungroup() %>% 
+  group_by(series_name) %>% 
+  top_n(1, wt = season) %>% 
+  arrange(desc(season))
+```
+
+Será que há relação entre o número de capítulos e o número de temporadas?
+
+```{r}
+imdb %>% 
+  group_by(series_name, season) %>% 
+  count() %>% 
+  ungroup() %>% 
+  group_by(series_name) %>% 
+  top_n(1, wt = season) %>% 
+  arrange(desc(season)) %>% 
+  ggplot(aes(season, n))+
+  geom_point()+
+  geom_label(aes(label = series_name))
+```
+
+podemos ampliar a escala usando transformação log:
+
+```{r}
+imdb %>% 
+  group_by(series_name, season) %>% 
+  count() %>% 
+  ungroup() %>% 
+  group_by(series_name) %>% 
+  top_n(1, wt = season) %>% 
+  arrange(desc(season)) %>% 
+  ggplot(aes(season, n))+
+  geom_point()+
+  geom_label(aes(label = series_name))+
+  scale_x_continuous(trans = "log2")+
+  scale_y_continuous(trans = "log2")
+```
+
+Quais são as séries com as avaliações mais altas e baixas em média?
+
+```{r}
+
+imdb_rating <- imdb %>% 
+  group_by(series_name) %>% 
+  summarize(media = mean(UserRating)) %>% 
+  arrange(desc(media)) 
+
+imdb_rating
+```
+
+Se compararmos estes resultados com os obtidos acima, referentes aos seriados mais assistidos no Netflix ("Greenleaf", "How to get away with murder", "Once upon a Time", "Away", "Bates Motel", "Dark", "Money Heist" e "Ratched"), há alguma relação entre a média de avaliação e o número de capítulos assistidos?
+
+```{r}
+
+series_mais_assistidas_total <- netflix_series_limpo %>% 
+  group_by(series_title) %>% 
+  count()
+
+series_mais_assistidas_com_rating <- imdb_rating %>% 
+  left_join(series_mais_assistidas_total, by=c("series_name"="series_title"))
+series_mais_assistidas_com_rating
+```
+
+E se realizarmos um gráfico de dispersão?
+
+```{r}
+
+series_mais_assistidas_com_rating %>% 
+  ggplot(aes(n, media))+
+  geom_point()+
+  geom_label(aes(label=series_name))
+```

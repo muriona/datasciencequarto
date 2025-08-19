@@ -1,0 +1,283 @@
+---
+title: "Tutorial 4 - Métodos Não Supervisionados"
+execute: 
+  echo: true
+  message: false
+  warning: false 
+fig-width: 8
+fig-height: 4
+---
+
+Neste tutorial vamos aprender dois métodos de machine learning que servem para problemas de agrupamento. Neste tipo de problemas, não temos uma variável de saída conhecida, portanto não podemos usar os métodos supervisionados já conhecidos.
+
+```{r}
+#| echo: false
+#| eval: true
+xfun::pkg_load2(c('htmltools', 'mime'))
+xfun::embed_dir("data5/", text = "Você pode baixar os dados aqui.")
+
+```
+
+## K-means
+
+Vamos aprender inicialmente o método conhecido como 'k-means' que basicamente agrupa as observações por uma métrica de similaridade e distância e logo cria os grupos a partir da aproximação entre elas, ou seja, aquelas observações com distância pequena entre elas farão parte do mesmo grupo.
+
+![](images/cluster.jpg)
+
+Carregando os pacotes:
+
+```{r}
+library(devtools)
+#install_github("thomasp85/patchwork")
+#install.packages("skimr")
+#install.packages('ggforce')
+#install.packages("factoextra")
+#install.packages("FactoMineR")
+```
+
+```{r}
+library(tidyverse)
+library(patchwork)
+library(skimr)
+library(ggforce)
+library(factoextra)
+library(FactoMineR)
+
+theme_set(theme_minimal())
+```
+
+```{r}
+minhascores <- c("#9b5de5","#f15bb5","#fee440","#00bbf9","#00f5d4","#264653","#2A9D8F","#E9C46A","#F4A261",
+                 "#E76F51")
+```
+
+Vamos usar o dataset `ws_customers.rds`
+
+```{r}
+
+customers <- readRDS("data5/ws_customers.rds")
+
+head(customers)
+```
+
+Vamos plotar os dados:
+
+```{r}
+
+p1 <- customers %>% 
+  ggplot(aes(Milk, Grocery))+
+  geom_point(size=2, color=minhascores[1])
+
+p2 <- customers %>% 
+  ggplot(aes(Milk, Frozen))+
+  geom_point(size=2, color=minhascores[2])
+
+p3 <- customers %>% 
+  ggplot(aes(Frozen, Grocery))+
+  geom_point(size=2, color=minhascores[5])
+
+
+p1 + p2 + p3
+```
+
+Podemos ver a estrutura dos dados utilizando a `skim()` do pacote `skimr`:
+
+```{r}
+skim(customers)
+```
+
+Agora podemos começar o tratamento dos dados.
+
+```{r}
+customers_scaled <- scale(customers)
+```
+
+Rodando o algoritmo k-means:
+
+```{r}
+modelo <- kmeans(customers_scaled, centers = 3)
+```
+
+```{r}
+modelo
+```
+
+pronto, o modelo foi construido, agora vamos incorporar uma coluna no nosso datafram customers_df com o resultado do cluster.
+
+```{r}
+customers <- customers %>% 
+  mutate(cluster = factor(modelo$cluster))
+
+skim(customers)
+```
+
+Vamos refazer os gráficos, só que agora vamos colorir os pontos pelo cluster a qual pertencem.
+
+```{r}
+p1 <- customers %>% 
+  ggplot(aes(Milk, Grocery, color=cluster))+
+  geom_point(size=2)+
+  scale_color_manual(values=minhascores)+
+  theme(legend.position = "none")
+
+p2 <- customers %>% 
+  ggplot(aes(Milk, Frozen, color=cluster))+
+  geom_point(size=2)+
+  scale_color_manual(values=minhascores)+
+  theme(legend.position = "none")
+
+p3 <- customers %>% 
+  ggplot(aes(Frozen, Grocery, color=cluster))+
+  geom_point(size=2)+
+  scale_color_manual(values=minhascores)+
+  theme(legend.position = "none")
+
+p1+p2+p3
+```
+
+```{r}
+
+p1cluster <- p1 + 
+  geom_mark_ellipse(aes(color=cluster))
+
+
+p2cluster <- p2 + 
+  geom_mark_ellipse(aes(color=cluster))
+
+p3cluster <- p3 + 
+  geom_mark_ellipse(aes(color=cluster))
+  
+  p1cluster+p2cluster+p3cluster
+```
+
+### Escolhendo o número ideal de clusters
+
+```{r}
+
+fviz_nbclust(customers, kmeans, method = "wss")
+```
+
+Escolhe-se o ponto onde o 'cotovelo' é mais visível, neste caso, 2 clusters.
+
+```{r}
+modelo_final <- kmeans(customers_scaled, centers = 2)
+
+customers <- customers %>% 
+  mutate(cluster = factor(modelo_final$cluster))
+```
+
+Vamos refazer os gráficos mais uma vez.
+
+```{r}
+p1 <- customers %>% 
+  ggplot(aes(Milk, Grocery, color=cluster))+
+  geom_point(size=2)+
+  scale_color_manual(values=minhascores)+
+  theme(legend.position = "none")
+
+p2 <- customers %>% 
+  ggplot(aes(Milk, Frozen, color=cluster))+
+  geom_point(size=2)+
+  scale_color_manual(values=minhascores)+
+  theme(legend.position = "none")
+
+p3 <- customers %>% 
+  ggplot(aes(Frozen, Grocery, color=cluster))+
+  geom_point(size=2)+
+  scale_color_manual(values=minhascores)+
+  theme(legend.position = "none")
+
+p1cluster <- p1 + 
+  geom_mark_ellipse(aes(color=cluster))
+
+
+p2cluster <- p2 + 
+  geom_mark_ellipse(aes(color=cluster))
+
+p3cluster <- p3 + 
+  geom_mark_ellipse(aes(color=cluster))
+  
+  p1cluster+p2cluster+p3cluster
+```
+
+Uma melhor forma de gráficar é utilizar a redução de dimensionalidade.
+
+```{r}
+modelo_final <- eclust(customers_scaled, "kmeans", k=2)
+```
+
+## Cluster Hierárquico
+
+A diferença com o método anterior é que para o cluster hierárquico não é necessário pré-definir o número de clusters, pois o método agrupa as observações de forma sequencial, facilitando a identificação do número ideal de cluster.
+
+![](images/dendograma.png)
+
+O ideal é que os dados estejam normalizados, pelo menos as colunas numéricas, pois este método aceita também colunas (atributos) categóricos.
+
+Vamos usar a função `eclust()` do pacote `factoextra`.
+
+```{r}
+modelo2 <- eclust(customers_scaled, "hclust")
+```
+
+```{r}
+fviz_dend(modelo2)
+```
+
+## Análise dos Componentes Principais
+
+A Análise de Componentes Principais (PCA, do inglês "Principal Component Analysis") é uma técnica estatística usada para reduzir a dimensionalidade de um conjunto de dados, ao mesmo tempo em que preserva a maior quantidade possível de variação presente nesses dados. A PCA consegue isso transformando o conjunto original de variáveis em um novo conjunto de variáveis ortogonais (ou seja, não correlacionadas) chamadas de componentes principais. Esses componentes são ordenados de tal forma que o primeiro componente captura a maior parte da variação nos dados, o segundo componente captura a maior parte da variação restante, e assim por diante.
+
+```{r}
+
+customers <- readRDS("data5/ws_customers.rds")
+
+modelo_pca <- PCA(customers, graph = FALSE)
+```
+
+Agora podemos aplicar vários tipos de visualizações do pacote `factoExtra`.
+
+```{r}
+fviz_screeplot(modelo_pca, ncp=10)
+```
+
+```{r}
+fviz_screeplot(modelo_pca, ncp=10,
+               barfill = minhascores[4],
+               barcolor = minhascores[4])
+```
+
+```{r}
+fviz_pca_var(modelo_pca)
+```
+
+```{r}
+fviz_pca_var(modelo_pca,
+             col.var="contrib")+
+  scale_color_gradient2(low=minhascores[1],
+                        mid=minhascores[2],
+                        high=minhascores[3],
+                        midpoint = 34)
+```
+
+```{r}
+
+customers <- customers %>% 
+  mutate(cluster=factor(modelo2$cluster))
+
+fviz_pca_ind(modelo_pca, 
+             label="none",
+             habillage = customers$cluster,
+             addEllipses = TRUE)+
+  scale_fill_manual(values = minhascores)+
+  scale_color_manual(values=minhascores)
+```
+
+```{r}
+fviz_pca_biplot(modelo_pca,
+  label="var",
+             habillage = customers$cluster,
+             addEllipses = TRUE)+
+  scale_fill_manual(values = minhascores)+
+  scale_color_manual(values=minhascores)
+```

@@ -1,0 +1,370 @@
+---
+title: "Tutorial 7 - Métodos de Regressão"
+jupyter: python3
+---
+
+## Carregando os pacotes
+
+```{python}
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.preprocessing import LabelEncoder
+```
+
+## Lendo os dados
+
+```{python}
+
+#| echo: false
+
+
+```
+
+Usaremos dados do Ikea, uma loja de móveis com filiais em várias partes do mundo.
+
+O próposito é prever o preço dos móveis vendidos na IKEA a partir de várias características destes produtos como a categoria e o tamanho do móvel, conforme [aqui](https://github.com/rfordatascience/tidytuesday/blob/master/data/2020/2020-11-03/readme.md).
+
+Vamos carregar os dados e ver as primeiras linhas.
+
+```{python}
+
+df = pd.read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-11-03/ikea.csv')
+
+df.info()
+```
+
+```{python}
+df.head()
+```
+
+## Limpeza dos dados
+
+Também vamos fazer uma revisão geral dos dados.
+
+Conforme visto no output do `info()` há várias colunas em formato de `string` e algumas colunas que apenas são um id de cada linha, além de termos valores `NULL`. Precisamos limpar o dataset para deixá-lo mais adequado ao modelo de machine learning.
+
+```{python}
+
+ikea = df[['price','category','sellable_online','depth','height','width']].dropna()
+
+ikea['category'] = ikea['category'].astype('category')
+
+ikea.info()
+```
+
+## Análise Exploratória de Dados
+
+Análise de Correlação.
+
+```{python}
+num_cols = ikea.select_dtypes(include=['int64', 'float64'])
+corr_matrix = num_cols.corr()
+
+sns.heatmap(corr_matrix, annot=True, cmap='coolwarm')
+plt.title('Heatmap de Correlações')
+plt.show()
+```
+
+Gráficos de Dispersão com o preço
+
+```{python}
+
+sns.scatterplot(data=ikea, x='depth', y='price')
+plt.show()
+```
+
+```{python}
+sns.scatterplot(data=ikea, x='width', y='price')
+plt.show()
+```
+
+```{python}
+sns.scatterplot(data=ikea, x='height', y='price')
+plt.show()
+```
+
+```{python}
+sns.scatterplot(data=ikea, x='sellable_online', y='price')
+plt.show()
+```
+
+como praticamente todos os produtos se vendem online, vamos eliminar essa coluna.
+
+```{python}
+
+counts = ikea['sellable_online'].value_counts()
+
+sns.countplot(x='sellable_online', data=ikea)
+plt.show()
+```
+
+```{python}
+ikea = ikea.drop(['sellable_online'], axis=1)
+
+ikea.head()
+```
+
+Vamos ver o preço:
+
+```{python}
+sns.histplot(data=ikea, x='price', 
+bins=30, color='darkblue')
+plt.xlabel('Preço')
+plt.show()
+```
+
+Como o preço está muito agregaado aos valores mais baixos, é necessário transformar a coluna, p.ex. utilizando log10.
+
+```{python}
+ikea['log_price'] = np.log10(ikea['price'])
+
+ikea = ikea.drop(['price'], axis=1)
+
+ikea.head()
+```
+
+```{python}
+sns.histplot(data=ikea, x='log_price', 
+bins=30, color='darkblue')
+plt.xlabel('Log10 Preço')
+plt.show()
+```
+
+Antes de iniciar a modelagem, precisamos codificar a(s) coluna(s) categóricas, neste caso, temos uma única coluna, chamada `category`.
+
+```{python}
+
+label_encoder = LabelEncoder()
+ikea['category_encoded'] = label_encoder.fit_transform(ikea['category'])
+
+
+```
+
+```{python}
+ikea = ikea.drop('category', axis=1)
+```
+
+## Modelagem Supervisionada
+
+Vamos dividir o dataset em treino e teste:
+
+```{python}
+
+X = ikea.drop('log_price', axis=1)  # Features 
+y = ikea['log_price']  # Target variable
+
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42) 
+```
+
+### Árvores de Decisão (Decision Trees)
+
+Vamos treinar o modelo de árvore de decisão.
+
+```{python}
+from sklearn.tree import DecisionTreeRegressor
+```
+
+```{python}
+
+tree_model = DecisionTreeRegressor(random_state=42)  
+tree_model.fit(X_train, y_train)
+
+```
+
+Vamos criar uma nova coluna com os resultados da predição:
+
+```{python}
+y_pred = tree_model.predict(X_test)
+```
+
+Por fim, vamos avaliar o modelo de árvore que treinamos, para isso vamos usar os dados de teste.
+
+```{python}
+
+mse_tree = mean_squared_error(y_test, y_pred)
+r2_tree = r2_score(y_test, y_pred)
+rmse_tree = np.sqrt(mse_tree)
+
+print(f'Mean Squared Error: {mse_tree}')
+print(f'R-squared: {r2_tree}')
+print(f'RMSE: {rmse_tree}')
+
+
+```
+
+Os resultados parecem satisfatórios, vamos fazer um gráfico para visualizar o resultado do modelo.
+
+```{python}
+plt.scatter(y_test, y_pred, alpha=0.5)  
+plt.xlabel("Log Preço verdadeiro (y_test)")
+plt.ylabel("Log Preço predito (y_pred)")
+plt.title("Precisão do modelo para Árvore de Decisão")
+
+# Addicionar linha diagonal
+plt.plot([min(y_test), max(y_test)], [min(y_test), max(y_test)], color='red', linestyle='--')
+
+
+plt.show()
+```
+
+vamos criar um dataframe com os indicadores para compará-los com os outros modelos.
+
+```{python}
+indicadores = pd.DataFrame({
+  'R2':[r2_tree],
+  'MSE':[mse_tree],
+  'RMSE':[rmse_tree],
+  'Modelo':['Decision Tree']
+  
+})
+
+indicadores
+```
+
+### Random Forests
+
+Agora vamos treinar um modelo de RF.
+
+```{python}
+from sklearn.ensemble import RandomForestRegressor
+```
+
+```{python}
+rf_model = RandomForestRegressor(random_state=42) 
+rf_model.fit(X_train, y_train)
+```
+
+Vamos calcular a precisão com os dados de teste.
+
+```{python}
+y_pred_rf = rf_model.predict(X_test)
+
+mse_rf = mean_squared_error(y_test, y_pred_rf)
+r2_rf = r2_score(y_test, y_pred_rf)
+rmse_rf = np.sqrt(mse_rf)
+
+print(f'Random Forest Mean Squared Error: {mse_rf}')
+print(f'Random Forest R-squared: {r2_rf}')
+print(f'Random Forest RMSE: {rmse_rf}')
+
+```
+
+Novamente vamos fazer um gráfico para visualizar o desempenho do modelo RF.
+
+```{python}
+plt.scatter(y_test, y_pred_rf, alpha=0.5)  
+plt.xlabel("Log Preço verdadeiro (y_test)")
+plt.ylabel("Log Preço predito (y_pred)")
+plt.title("Precisão do modelo para Random Forest")
+
+# Addicionar linha diagonal
+plt.plot([min(y_test), max(y_test)], [min(y_test), max(y_test)], color='red', linestyle='--')
+
+
+plt.show()
+```
+
+E vamos incluir os indicadores do RF no nosso dataframe `indicadores`.
+
+```{python}
+
+rf_df = pd.DataFrame({
+  'R2':[r2_rf],
+  'MSE':[mse_rf],
+  'RMSE':[rmse_rf],
+  'Modelo':['Random Forest']
+  
+})
+
+indicadores = pd.concat([indicadores, rf_df], ignore_index=True)
+
+indicadores
+```
+
+### Support Vector Regression (SVR)
+
+Primeiro precisamos normalizar os valores dos atributos.
+
+```{python}
+from sklearn.preprocessing import StandardScaler
+
+scaler = StandardScaler().fit(X_train)
+X_train_scaled = scaler.transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+```
+
+Agora vamos treinar um modelo SVR.
+
+```{python}
+from sklearn.svm import SVR
+
+```
+
+Agora podemos treinar o modelo. Têm três tipos de modelos SVR: 'linear' é como se fosse uma regressão linear; 'poly' é como se fosse uma regressão polinomial; 'rbf' uma regressão não-linear.
+
+```{python}
+svr_model = SVR(kernel = 'rbf')
+
+svr_model.fit(X_train, y_train)
+```
+
+Vamos calcular a precisão com os dados de teste.
+
+```{python}
+y_pred_svr = svr_model.predict(X_test)
+
+mse_svr = mean_squared_error(y_test, y_pred_svr)
+r2_svr = r2_score(y_test, y_pred_svr)
+rmse_svr = np.sqrt(mse_svr)
+
+print(f'SVR Mean Squared Error: {mse_svr}')
+print(f'SVR R-squared: {r2_svr}')
+print(f'SVR RMSE: {rmse_svr}')
+```
+
+Novamente vamos fazer um gráfico para visualizar o desempenho do modelo SVR.
+
+```{python}
+plt.scatter(y_test, y_pred_svr, alpha=0.5)  
+plt.xlabel("Log Preço verdadeiro (y_test)")
+plt.ylabel("Log Preço predito (y_pred)")
+plt.title("Precisão do modelo para Support Vector Regression")
+
+# Addicionar linha diagonal
+plt.plot([min(y_test), max(y_test)], [min(y_test), max(y_test)], color='red', linestyle='--')
+
+
+plt.show()
+```
+
+E vamos incluir os valores no nosso dataframe de indicadores.
+
+```{python}
+
+new_row = pd.DataFrame({
+    'R2': [r2_svr],
+    'MSE': [mse_svr],
+    'RMSE':[rmse_svr],
+    'Modelo': ['SVR']
+})
+indicadores = pd.concat([indicadores, new_row], ignore_index=True)
+
+indicadores
+```
+
+## Gráfico comparativo
+
+```{python}
+fig = sns.scatterplot(data=indicadores, x='R2', y='RMSE', hue='Modelo')
+fig.set_xlim(0.5, 1)
+fig.set_ylim(0,0.5)
+plt.title('Gráfico comparativo entre os indicadores RMSE x R2')
+plt.show()
+```

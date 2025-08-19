@@ -1,0 +1,50 @@
+---
+title: "Lab 4 - Tidymodels - Classificação"
+subtitle: "Previsão de reservas de hotel com crianças"
+execute: 
+  echo: false
+  warning: false
+---
+
+# Carregamento dos dados
+
+Neste Lab usaremos dados sobre reservas de Hotéis. O objetivo é prever, dadas certas características (atributos) se uma determinada reserva inclui ou não crianças. Os dados fazem parte deste [estudo](#0).
+
+Vamos carregar os dados e incluir apenas as reservas que não foram canceladas uma vez que mais informações são coletadas do hóspede na hora do check-in. Neste caso, os dados são automaticamente baixados do site do [**tidytuesday**](https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-02-11/).
+
+```{r}
+library(tidyverse)
+library(tidymodels)
+
+hotels <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-02-11/hotels.csv")
+
+```
+
+Vamos considerar apenas as reservas efetivadas (e não as canceladas), portanto precisamos filtrá-las. Também vamos considerar bebês e crianças dentro da mesma categoria, então iremos criar uma nova coluna 'children'.
+
+```{r}
+hotel_stays <- hotels %>%
+  filter(is_canceled == 0) %>%
+  mutate(
+    children = case_when(
+      children + babies > 0 ~ "children",
+      TRUE ~ "none"
+    ),
+    required_car_parking_spaces = case_when(
+      required_car_parking_spaces > 0 ~ "parking",
+      TRUE ~ "none"
+    )
+  ) %>%
+  select(-is_canceled, -reservation_status, -babies)
+
+hotel_stays %>% 
+  head()
+```
+
+# Instruções
+
+A entrega deverá incluir uma análise exploratória de dados, prévia à construção dos modelos de machine learning. Deverão ser utilizados os três modelos aprendidos: **regressão logística, árvores de decisão e random forests**.
+
+Adicionalmente, será avaliada a estrutura e as etapas de machine learning para a resolução dos problemas, incluindo 1) a separação em dados de treino e teste, 2) o uso de indicadores de acurácia específicos para classificação, 3) a escolha das variáveis a serem utilizadas para o treino e a justificativa de inclusão de cada variável, 4) uso de validação cruzada.
+
+O documento deverá ser entregue em formato *PDF* pelo moodle, ou seja, deverá ser realizado no RStudio e deverá conter, além dos scripts utilizados e dos resultados gráficos e numéricos, uma descrição das atividades realizadas (comentários que ajudem à compreensão do que foi feito).

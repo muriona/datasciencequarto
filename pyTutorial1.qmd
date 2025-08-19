@@ -1,0 +1,261 @@
+---
+title: "Tutorial 1 - Pandas"
+jupyter: python3
+---
+
+O Pandas é uma biblioteca Python fundamental para análise de dados. Ela fornece estruturas de dados eficientes e ferramentas para manipulação, limpeza e análise de dados.
+
+```{python}
+#| echo: false
+
+import os
+from IPython.display import HTML
+
+def create_downloadable_dir_listing(directory, message="You can download the data here."):
+    file_list = os.listdir(directory)
+    html_content = f"<p>{message}</p><ul>"
+    for file in file_list:
+        html_content += f'<li><a href="{directory}/{file}" download>{file}</a></li>'
+    html_content += "</ul>"
+    return HTML(html_content) 
+
+# Example usage
+create_downloadable_dir_listing("pydata1/", message="Você pode baixar os dados aqui.")
+```
+
+```{python}
+import pandas as pd
+```
+
+# Criando um dataframe
+
+```{python}
+data = {'name': ['Alice', 'Bob', 'Charlie', 'Alice', 'David', 'Bob','Camille'],
+        'age': [25, 30, 35, 25, 40, 30,20],
+        'title':['Sherlock','The Walking Dead','Dark',
+        'Friends','Orange Is the New Black',
+        'The Walking Dead','Narcos']}
+df = pd.DataFrame(data)
+```
+
+```{python}
+print(df)
+```
+
+# Carregando os dados
+
+```{python}
+netflix = pd.read_excel("data1/netflix_series_limpo.xlsx")
+imdb = pd.read_excel("data1/imdb_series.xlsx")
+```
+
+```{python}
+print(netflix.head)
+```
+
+Também podemos ver rapidamente a estrutura de cada dataset, utilizando a função dtypes e describe().
+
+```{python}
+netflix.describe()
+```
+
+```{python}
+netflix.dtypes
+```
+
+Vamos converter a coluna `season` em variável categórica.
+
+```{python}
+
+netflix['season'].astype('category')
+```
+
+Podemos ver as dimensões do nosso dataframe:
+
+```{python}
+netflix.shape
+```
+
+# Selecionando colunas
+
+Para selecionar colunas utilizamos a forma `df[['coluna']]` onde df é o nome do dataframe e 'coluna' é o nome da coluna ou colunas que queremos selecionar.
+
+```{python}
+netflix[['series_title','season']]
+```
+
+# Ordenando os dados
+
+Para ordenar as linhas, podemos utilizar a função `sort_values()` de forma a termos, por exemplo, uma lista de maior a menor de um determinado valor. Vamos usar o dataframe `imdb` para exemplificar, ordenando as linhas por ordem crescente de `UserRating`:
+
+```{python}
+imdb.head()
+```
+
+```{python}
+imdb = imdb.sort_values('UserRating',
+                ascending=False)
+```
+
+Agora vamos ver como ficou:
+
+```{python}
+imdb[['series_name','UserRating']]
+```
+
+# Filtrando Linhas
+
+Podemos filtrar linhas utilizando o método `df.query()` onde df é o nome do dataframe.
+
+```{python}
+imdb.query('UserVotes > 10000')
+```
+
+Se quisermos combinar filtrado de linhas com seleção de colunas:
+
+```{python}
+imdb_10 = imdb.query('UserVotes > 10000')[['series_name','Episode','UserRating','UserVotes']]
+```
+
+```{python}
+imdb_10.head(10)
+```
+
+```{python}
+imdb_10.shape
+```
+
+vamos identificar se há duplicados.
+
+```{python}
+duplicates = imdb_10.duplicated()
+print(duplicates)
+```
+
+Notamos que existem duplicados, portanto precisamos removê-los utilizando o método `drop_duplicates()`.
+
+```{python}
+imdb_10 = imdb_10.drop_duplicates(subset=['Episode'])
+```
+
+Vamos ver quantas linhas temos agora.
+
+```{python}
+imdb_10.shape
+```
+
+também podemos filtrar por strings. Por exemplo, vamos filtrar pelo seriado "Dark":
+
+```{python}
+imdb['series_name'].isin(['Dark'])
+```
+
+Vemos que o código acima retorna uma série com valores lógicos (True-False) para cada linha. Para efetivamente ver o resultado do seriado Dark devemos:
+
+```{python}
+imdb[imdb['series_name'].isin(['Dark'])]
+```
+
+vamos guardar este dataframe com o nome `darkdf`:
+
+```{python}
+darkdf = imdb[imdb['series_name'].isin(['Dark'])]
+```
+
+# Agrupando dados por categorias
+
+Vamos agrupar os dados de `imdb` e calcular algumas informações: a contagem de capítulos por seriado, a média do `UserRating` por seriado e a soma total dos votos.
+
+```{python}
+imdb_summary = imdb.groupby(['series_name']).agg({'series_name':"count",'UserRating':'mean','UserVotes':'sum'})
+```
+
+```{python}
+imdb_summary
+```
+
+Podemos fazer o mesmo para o dataframe `darkdf`:
+
+```{python}
+darkdf_grouped = darkdf.groupby(['series_name']).count()
+
+darkdf_grouped
+```
+
+Uma boa prática é retornar o nome da coluna, neste caso `series_name` para uma nova coluna, e desta forma, deixar o `index` novamente numérico, para isto utilizamos a função `reset_index`.
+
+```{python}
+
+darkdf_grouped.reset_index()
+```
+
+Vamos fazer o mesmo para o `imdb_summary`:
+
+```{python}
+imdb_summary2 = imdb_summary.rename(columns={'series_name':'Episodes'})
+imdb_summary2.reset_index(inplace=True)
+
+imdb_summary2.head(7)
+```
+
+# Modificando ou criando novas colunas
+
+Similar à função mutate() no R, podemos usar o método `df.assign` em Python.
+
+```{python}
+imdb_rtotal = imdb.assign(r_total=imdb['r1']+imdb['r2']+imdb['r3']+imdb['r4']+imdb['r5']+imdb['r6']+imdb['r7']+imdb['r8']+imdb['r9']+imdb['r10'])
+```
+
+Agora podemos selecionar apenas as colunas que nos interessam.
+
+```{python}
+imdb_rtotal[['series_name','Episode','r_total']]
+```
+
+também podemos criar novas colunas utilizando outra notação, vamos assumir que queremos criar uma nova coluna no dataframe `imdb_summary` :
+
+```{python}
+
+imdb_summary2['VotesPerEpisode']=imdb_summary2['UserVotes']/imdb_summary2['Episodes']
+
+imdb_summary2.head(8)
+```
+
+e agora vamos ordenar pela nova coluna `VotesPerEpisode` e arredondar para dois decimais:
+
+```{python}
+imdb_summary2.sort_values('VotesPerEpisode',
+                ascending=False).round(decimals=2)
+```
+
+# Juntando dois ou mais df
+
+`merge` une dois DataFrames (`df1` e `df2`) com base em colunas especificadas (on, left_on, right_on). O tipo de junção (`how`) define como as tabelas serão combinadas:
+
+-   `'inner'`: Mantém apenas as linhas onde há correspondência nas colunas de junção (interseção).
+-   `'left'`: Mantém todas as linhas do DataFrame esquerdo (`df1`) e as correspondentes do direito (`df2`).
+-   `'right'`: Mantém todas as linhas do DataFrame direito (`df2`) e as correspondentes do esquerdo (`df1`).
+-   `'outer'`: Mantém todas as linhas de ambos os DataFrames, preenchendo com NaN onde não há correspondência (união).
+
+Use `left_on` e `right_on` quando as colunas de junção têm nomes diferentes nos DataFrames. Vamos a usar o pequeno `df` que foi criado no início deste tutorial para verificar o funcionamento do `merge`.
+
+```{python}
+df
+```
+
+e vamos criar um pequeno `df` com dados do Netflix:
+
+```{python}
+netflix_5 = {'season': ['Season 1', 'Season 2', 'Season 3', 'Season 4', 'Season 5', 'Part 1','Part 2'],
+        'title': ['Sherlock', 'The Walking Dead', 'Dark', 'Friends', 'Orange Is the New Black', 'The Walking Dead','Narcos']}
+
+netflix_5_df = pd.DataFrame(netflix_5)
+
+netflix_5_df
+```
+
+Vamos realizar o `merge`:
+
+```{python}
+netflix_5_df.merge(df, on='title', how='left')
+```

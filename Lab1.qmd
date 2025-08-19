@@ -1,0 +1,156 @@
+---
+title: "Lab 1 - EDA"
+---
+
+```{r}
+#| label: setup
+#| include: false
+knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE)
+```
+
+# Carregando os dados
+
+Neste Lab iremos explorar os dados sobre seriados de TV, usando dois datasets, um do Netflix (informações do viewing history) e outro do [IMDb](https://help.imdb.com/article/imdb/general-information/what-is-imdb/G836CY29Z4SGNMK5?ref_=helpsect_cons_1_1# "What is IMDB?"), banco de dados com informações sobre o rating de seriados e filmes.
+
+```{r}
+#| echo: false
+#| eval: true
+xfun::pkg_load2(c('htmltools', 'mime'))
+xfun::embed_dir("data_lab1/", text = "Você pode baixar os dados aqui.")
+
+```
+
+Inicialmente vamos carregar os dados. Os dados do Netflix vem do site onde o usuário pode fazer download do seu histórico após o login. Já os dados o IMDb usam um script que encontra-se em: <https://github.com/nazareno/imdb-series> para fazer o web scrapping do site oficial do IMDb.
+
+Carregando os dados do IMDb e mostrando os primeiras 10 linhas:
+
+```{r}
+library(tidyverse)
+library(readxl)
+
+```
+
+Carregando os dados do Netflix e mostrando as primeiras 10 linhas:
+
+```{r}
+
+#carregue os dados
+
+
+```
+
+Observe-se que os dados de `Date` não estão no formato certo, pois eles aparecem como `character` o que pode causar problemas posteriores. Portanto antes de continuar, precisamos arrumar o formato para "data" com os comandos a seguir:
+
+```{r}
+
+#configure a coluna 'Date'
+```
+
+Como pode se ver, a estrutura dos dados do IMDb é mais complexa, vamos ver mais de perto os dados, usando a função `str()`:
+
+```{r}
+#utilize str()
+```
+
+Nos dados do IMDb, as últimas 10 colunas representam a proporção de usuários que votou o capítulo específico com a nota `n`, sendo que, por exemplo, a coluna `r9` representa a proporção de usuários que votou com a nota `9`.
+
+# Limpando os dados do Netflix
+
+Primeiro, vamos explorar mais os dados do Netflix, que conta com apenas duas colunas: o Título (`Title`) e a data de visualização (`Date`). Para isto, vamos filtrar o dataset original para ficarmos apenas com os seriados, usando os comandos do `Tidyverse`: `filter` , `str_detect` e `separate`.
+
+```{r}
+#utilize filter(), str_detect() e separate()
+```
+
+Com os comandos anteriores conseguimos ter uma base limpa, onde apenas consideramos seriados e temos as informações separadas para cada capítulo e temporada.
+
+Porém, pode ser que o nosso processo de filtragem com `str_detect()` não tenha sido perfeito.
+
+Vamos fazer um teste verificando se existem registros com o campo `episode` com `NA`:
+
+```{r}
+#utilize is.na()
+
+```
+
+Ok, identificamos (x) registros que apresentam `NA`, vamos explorá-los com mais cuidado para confirmar se de fato se trata de um problema do nosso filtrado inicial. E se de fato encontrarmos registros mal filtrados, faremos a limpeza manual.
+
+```{r}
+#utilize filter() e is.na() para explorar os dados 'NA'
+```
+
+Na verdade esses (x) registros são de fato filmes com subtítulos (por isso o nosso filtro com `str_detect()` os pegou). Devemos retirá-los da nossa base de seriados.
+
+```{r}
+#utilize str_detect() para eliminar os registros com 'NA'
+```
+
+# Explorando as séries de Netflix
+
+Agora, podemos iniciar algumas visualizações, por exemplo, podemos fazer uma tabela que nos indique o número de capítulos assistidos por cada seriado. Para isto, vamos usar os comandos do `dplyr`:
+
+```{r}
+
+#utilize ggplot()
+  
+```
+
+Uma outra forma de fazer esta mesma análise seria filtrar por seriados onde mais de `x` capítulos foram assistidos, por exemplo, seriados com mais de 20 capítulos assistidos:
+
+```{r}
+#utilize ggplot()
+```
+
+Também podemos fazer uma análise do número de capítulos assistidos em um ano específico, por exemplo, em 2020:
+
+```{r}
+#utilize ggplot()
+```
+
+Podemos ver que os seriados mais assistidos foram \[liste aqui os seriados mais assistidos\].
+
+Também podemos ver o número de capítulos totais assistidos por ano:
+
+```{r}
+#utilize ggplot()
+```
+
+E também ver a distribuição dos seriados por ano, por exemplo para o seriado "Bates Motel":
+
+```{r}
+#utilize ggplot()
+```
+
+Ou ver a distribuição por data:
+
+```{r}
+#utilize ggplot()
+```
+
+Finalmente, podemos ver a distribuição dos seriados num ano específico:
+
+```{r}
+
+#utilize ggplot()
+```
+
+# Explorando os dados do IMDb
+
+Agora vamos iniciar a análise dos dados do IMDB. Primeiro vamos contabilizar o número de capítulos por seriado e vamos ordenar usando a função `arrange`
+
+```{r}
+#utilize arrange()
+```
+
+Claramente têm seriados com muitos capítulos e outros com poucos, pode ser por causa do número de temporadas? vamos conferir plotando o total de temporadas por seriado no eixo $x$ e o total de capítulos por seriado no eixo $y$ utilizando `geom_point()`
+
+```{r}
+#utilize ggplot()
+```
+
+Será que há relação entre o número de capítulos e o número de temporadas? ou seja, quanto maior o número de temporadas, maior o número de capítulos? utilize como base o gráfico anterior e inclua uma linha de tendência com `geom_smooth("lm")`
+
+```{r}
+#utilize ggplot()
+
+```

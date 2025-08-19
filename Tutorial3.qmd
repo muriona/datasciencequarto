@@ -1,0 +1,213 @@
+---
+title: "Tutorial 3 - Dashboards"
+subtitle: "Titanic"
+---
+
+```{r}
+#| label: setup
+#| include: false
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+# Flexdashboard e Shiny
+
+Os dashboards são provavelmente a forma mais flexível de comunicar os resultados de um projeto de Data Science/Business Analytics. Na linguagem R, um dos principais pacotes para a produção de dashboards é o `flexdashboard` pois facilita a criação e manutenção do dashboard diretamente pelo RStudio.
+
+Se além disso se quer um Dashboard responsivo, isto é, que responda a controles manipulados pela pessoa que está consumindo o Dashboard, deve-se utilizar um pacote adicional chamado `shiny`.
+
+Neste tutorial iremos construir um Dashboard utilizando os dados do Titanic.
+
+```{r}
+#| echo: false
+#| eval: true
+xfun::pkg_load2(c('htmltools', 'mime'))
+xfun::embed_dir("data2/", text = "Você pode baixar os dados e o dashboard aqui.")
+
+```
+
+# Carregando pacotes
+
+Para que o RStudio entenda que o output deve ser um Dashboard, é necessário carregar o pacote `flexdashboard` além de outros que comumente são usados, como o `tidyverse`. Além disso, é necessário carregar o `shiny`.
+
+Outro pacote que iremos utilizar para deixar os gráficos do `ggplot` responsivos será o `plotly`, que deverá ser carregado também.
+
+```{r}
+#| label: pacotes
+
+library(tidyverse)
+library(readxl)
+library(shiny)
+library(plotly)
+
+
+```
+
+Antes de continuar, vamos definir algumas propriedades gerais para os gráficos, em particular vamos usar o `theme_minimal()` e também uma paleta de cores personalizada.
+
+```{r}
+#| label: setup2
+minhascores <- c("#9b5de5","#f15bb5","#fee440","#00bbf9","#00f5d4")
+theme_set(theme_minimal())
+```
+
+# Carregando os dados
+
+O primeiro passo é carregar os dados do Titanic e armazená-los num dataframe:
+
+```{r}
+titanic <- read.csv("data2/train.csv")
+```
+
+# KPIs
+
+Normalmente os dashboards contém um conjunto de informações visuais (gráficos) mas também alguns números importantes, os chamados KPIs. Para poder construir nosso dashboard é necessário portanto, calcular alguns KPIs que podem ser de interesse.
+
+Vamos começar com o cálculo do total de passageiros, o código aparece abaixo.
+
+```{r}
+titanic %>% 
+  nrow()
+```
+
+O segundo KPI que iremos utilizar será o total de sobrevivientes, o código aparece abaixo.
+
+```{r}
+total_survived <- titanic %>% 
+  summarize(survived = sum(Survived))
+
+total_survived
+```
+
+Nota: neste caso criamos um novo objeto chamado `total_survived`, diferentemente do código anterior onde simplesmente imprimimos o número total de passageiros. Ambas as formas funcionam bem no Dashboard, mas é recomendável criar novos objetos, sempre que possível para que possam ser 'chamados' mais facilmente no código do dashboard. Portanto, vamos criar um objeto para o total de passageiros também.
+
+```{r}
+passenger <- titanic %>% 
+  nrow()
+passenger
+```
+
+O próximo KPI será o número de mulheres que eram passageiras.
+
+```{r}
+women <- titanic %>%
+  filter(Sex == "female") %>% 
+  nrow()
+women
+```
+
+Por fim, o último KPI será o número de crianças. Como o dataset não contém uma coluna específica para classificar se uma pessoa era ou não criança, cabe a nós decidirmos qual será a idade de corte para classificar uma pessoa como criança. Como exemplo iremos escolher a idade de 10 anos.
+
+```{r}
+
+child <- titanic %>%
+  filter(Age < 10) %>% 
+  nrow()
+child
+```
+
+# Gráficos
+
+A segunda parte importante do Dashboard são as informações gráficas, para facilitar a construção do Dashboard iremos mostrar aqui alguns gráficos de exemplo.
+
+## Boxplot
+
+O primeiro será a distribuição dos passageiros por idade, sexo e se sobreviveu ou não. Para isto vamos escolher dois filtros que logo serão substituidos no código do `shiny`, os filtros são um para o gênero (que neste caso está incluindo tanto masculino quanto feminino) e o outro para a idade (que neste caso está incluindo todos os passageiros pois a idade do passageiro mais idoso era 80). Adicionalmente vamos incluir uma linha de código para aplicar a nossa paleta de cores personalizada, usando `scale_fill_manual(values=minhascores)`.
+
+```{r}
+
+titanic$Survived <- factor(titanic$Survived, levels = c(0,1),
+                           labels=c("Óbitos","Sobrevivientes"))
+
+b1 <- titanic %>%
+      filter(Sex %in% c("male","female")) %>% 
+      filter(Age < 81) %>% 
+    ggplot(aes(Survived, Age, fill = Survived))+
+    geom_boxplot()+
+    scale_fill_manual(values=minhascores)+
+    theme(axis.title.x = element_blank(),
+          legend.position = "none")
+b1
+```
+
+Adicionalmente podemos usar um `facet_wrap()` para vermos as categorias de sobrevivência por gênero, por exemplo.
+
+```{r}
+
+b1 <- titanic %>%
+      filter(Sex %in% c("male","female")) %>% 
+      filter(Age < 81) %>% 
+    ggplot(aes(Survived, Age, fill = Survived))+
+    geom_boxplot()+
+    scale_fill_manual(values=minhascores)+
+    facet_wrap(vars(Sex))+
+    theme(axis.title.x = element_blank(),
+          legend.position = "none")
+b1
+```
+
+## Densidade
+
+Também podemos realizar um gráfico mostrando a densidade, usando a camada `geom_density()` dentro do `ggplot()`.
+
+```{r}
+#| label: density
+
+b2 <- titanic %>% 
+    filter(Sex %in% c("male","female")) %>% 
+    filter(Age < 81) %>%
+    ggplot(aes(Age, fill=Survived))+
+    geom_density(alpha=0.4)+
+    scale_fill_manual(values=minhascores)
+
+b2
+
+```
+
+Se queremos o mesmo gráfico mas agora divido por gênero, podemos adicionar uma camada `facet_wrap()`.
+
+```{r}
+#| label: density2
+
+b2 <- titanic %>% 
+    filter(Sex %in% c("male","female")) %>% 
+    filter(Age < 81) %>%
+    ggplot(aes(Age, fill=Survived))+
+    geom_density(alpha=0.4)+
+  facet_wrap(vars(Sex))+
+    scale_fill_manual(values=minhascores)
+
+b2
+```
+
+## Histograma
+
+Por fim, vamos incluir um histograma que demonstre a distribuição dos passageiros. Para o histograma, podemos definir também quantos intervalos queremos, por exemplo, 20
+
+```{r}
+#| label: histo
+
+b3 <- titanic %>% 
+    filter(Sex %in% c("male","female")) %>% 
+     filter(Age < 81) %>%
+    ggplot(aes(Age, fill=Survived))+
+    geom_histogram(alpha=0.9, bins = 20)+
+    scale_fill_manual(values=minhascores)
+
+b3
+```
+
+Da mesma forma que nos anteriores gráficos, se quissesemos ver a distribuição por gênero, precisariamos de um `facet_wrap()`:
+
+```{r}
+#| label: histo2
+
+b3 <- titanic %>% 
+    filter(Sex %in% c("male","female")) %>% 
+     filter(Age < 81) %>%
+    ggplot(aes(Age, fill=Survived))+
+    geom_histogram(alpha=0.9, bins = 20)+
+    facet_wrap(vars(Sex))+
+    scale_fill_manual(values=minhascores)
+
+b3
+```

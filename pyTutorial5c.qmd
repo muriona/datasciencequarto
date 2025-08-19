@@ -1,0 +1,69 @@
+---
+title: "Tutorial 5c - Dashboards Interativos"
+jupyter: python3
+---
+
+# Carregando os pacotes
+
+```{python}
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+```
+
+# Instalar pacotes
+
+Primeiro precisamos instalar o `shiny` e suas dependências:
+
+```{python}
+#| eval: false
+pip install --upgrade shiny shinywidgets
+```
+
+# Hello Shiny
+
+Vamos começar com um dashboard **reativo** simples.
+
+```{python}
+#| echo: false
+
+import os
+from IPython.display import HTML
+
+def create_downloadable_dir_listing(directory, message="You can download the data here."):
+    file_list = os.listdir(directory)
+    html_content = f"<p>{message}</p><ul>"
+    for file in file_list:
+        html_content += f'<li><a href="{directory}/{file}" download>{file}</a></li>'
+    html_content += "</ul>"
+    return HTML(html_content) 
+
+# Example usage
+create_downloadable_dir_listing("pydata5/", message="Você pode baixar os dados aqui.")
+```
+
+![](images/shiny.png)
+
+Usaremos como base este [código](https://quarto.org/docs/dashboards/interactivity/shiny-python/index.html) (que também está disponível nos arquivos da pasta.
+
+![](images/penguins.png)
+
+Para poder renderizar o `.qmd` o procedimento é similar aos arquivos `ipynb`, pois é necessário digitar os comandos no `Terminal`:
+
+```{python}
+#| eval: false
+
+quarto preview <filename>.qmd
+
+```
+
+Alternativamente, sugere-se utilizar um IDE como o [`RStudio`](https://posit.co/download/rstudio-desktop/), o [`VSCode`](https://code.visualstudio.com/download) ou o [`Positron`](https://positron.posit.co/download.html).
+
+# Hello Shiny 2
+
+Agora vamos criar um `dashboard` mais complexo:
+
+![](images/penguins2.png)
+
+Existem vários elementos que podemos incluir no dashboard para obter reatividade e podem ser encontrados [aqui](https://jcheng.shinyapps.io/shiny-component-browser/).

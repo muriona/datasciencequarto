@@ -1,0 +1,71 @@
+---
+title: "Tutorial 0 - Conhecendo o R"
+---
+
+```{r}
+#| label: setup
+#| include: false
+knitr::opts_chunk$set(echo = TRUE, eval=TRUE)
+```
+
+# Conhecendo o R
+
+O R é uma linguagem de programação muito poderosa e amplamente utilizada em data science.
+
+Para se ter uma noção do que é possível fazer com o R e do que vocês irão realizar em algumas semanas acesse um exemplo de dashboard [neste link](https://uriona.shinyapps.io/dash_meu_netflix/).
+
+# RStudio, Positron e Datacamp Datalab
+
+O RStudio é o software IDE (Interface Development Environment) mais conhecido e popular para trabalhar com o R. Tem uma interface informativa e uma simbiose muito forte com o R. Iremos usar o RStudio localmente nos nossos computadores.
+
+Alternativamente, iremos usar o [Positron](https://positron.posit.co/), uma nova IDE da mesma empresa desenvolvedora do RStudio.
+
+Já o Datacamp [Datalab](https://www.datacamp.com/datalab/) é um software em nuvem que está gratuitamente disponível para nós por sermos instituição educacional. A interface do Datacamp Datalab é mais simples e mais **clean**. Iremos usar o Datacamp Datalab na nuvem.
+
+# Datacamp
+
+Antes de prosseguir, confira que seu cadastro no Datacamp está ok. Caso não o tenha feito ainda, aproveite este momento para fazê-lo, lembre de cadastrar seu usuário com o email $@grad.ufsc.br$ e use o link disponível no Moodle para facilitar o cadastro.
+
+# Instalando pacotes no RStudio/Positron
+
+Em paralelo, vamos instalar localmente os pacotes que vamos usar ao longo do semestre no RStudio/Positron. No Datacamp Datalab não há necessidade pois os pacotes já vem pré-configurados.
+
+Uma vez baixado e instalado, abra um novo arquivo `.qmd` no RStudio/Positron, copie e cole o código a seguir e rode-o:
+
+```{r}
+#| eval: false
+install.packages("tidyverse")
+install.packages("flexdashboard")
+install.packages("forecast")
+install.packages("highcharter")
+install.packages("treemap")
+install.packages("viridisLite")
+install.packages("prettydoc")
+install.packages("openxlsx")
+install.packages("ggrepel")
+install.packages("bookdown")
+install.packages("tufte")
+install.packages("devtools")
+install.packages("ranger")
+install.packages("tidymodels")
+install.packages("leaflet")
+install.packages("DT")
+install.packages("kableExtra")
+install.packages("plotly")
+install.packages("titanic")
+install.packages("broom")
+install.packages("pROC")
+install.packages("WVPlots")
+install.packages("rpart")
+install.packages("rpart.plot")
+install.packages("vtreat")
+install.packages("cluster")
+install.packages("shiny")
+install.packages("skimr")
+install.packages("caret")
+install.packages("GGally")
+install.packages("vip")
+install.packages("remotes")
+install.packages("gt")
+
+```

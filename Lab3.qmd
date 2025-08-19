@@ -1,0 +1,38 @@
+---
+title: "Lab 3 - Métodos Supervisionados"
+execute: 
+  echo: false
+  message: false
+  warning: false
+---
+
+## Instruções
+
+Para praticar nossas novas habilidades em Machine Learning, iremos utilizar dois datasets, um para treinar modelos de classificação (titanic.csv) e outro para treinar modelos de regressão (houseprice.csv). Para isso vamos carregar os pacotes a seguir e eventualmente outros se forem necessários.
+
+```{r}
+#| label: pacotes
+#| echo: true
+
+library(tidyverse)
+library(readxl)
+library(tidymodels)
+library(ranger)
+library(rpart)
+library(rpart.plot)
+
+```
+
+A entrega deverá incluir uma análise exploratória de dados, prévia à construção dos modelos de machine learning. Deverão ser utilizados os três modelos aprendidos: **regressão linear múltivariada, árvores de decisão e random forests** para o problema de regressão, e **regressão logística, árvores de decisão e random forests para o problema de classificação**.
+
+Adicionalmente, será avaliada a estrutura e as etapas de machine learning para a resolução dos problemas, incluindo 1) a separação em dados de treino e teste, 2) o uso de indicadores de acurácia específicos para regressão ou classificação, 3) a escolha das variáveis a serem utilizadas para o treino e a justificativa de inclusão de cada variável.
+
+O documento deverá ser entregue em formato *PDF* pelo moodle, ou seja, deverá ser realizado no RStudio e deverá conter, além dos scripts utilizados e dos resultados gráficos e numéricos, uma descrição das atividades realizadas (comentários que ajudem à compreensão do que foi feito).
+
+## Sobre o Dataset Titanic
+
+Para mostrar a utilidade destes modelos, vamos usar um dataset sobre os sobrevivientes do Titanic. Há várias formas de carregar os dados, incluindo o pacote Titanic. Os dados mostram cada um dos passageiros do Titanic, incluindo informações como o nome, a idade, se estavam com filhos, esposos/esposas, em qual categoria de cabine se encontravam, quanto pagaram pela passagem, etc. Mais informações podem ser encontradas em: <https://www.kaggle.com/c/titanic/data>
+
+## Sobre o Dataset HousePrice
+
+Os dados referem-se a 12 características de propriedades à venda na Índia que foram coletadas por diferentes motores de busca. A construção do modelo deve ajudar na previsão do preço final de venda. Mais detalhes podem ser encontrados em: <https://www.kaggle.com/datasets/anmolkumar/house-price-prediction-challenge>

@@ -1,0 +1,165 @@
+---
+title: "Meu Netflix em números"
+output: 
+  flexdashboard::flex_dashboard:
+    theme: 
+      version: 4
+      bg: "#FDF7F7"
+      fg: "#000" 
+      primary: "#ED79F9"
+      navbar-bg: "#3ADAC6"
+      base_font: 
+        google: Prompt
+      heading_font:
+        google: Sen
+      code_font:
+        google: 
+          # arguments to sass::font_google() 
+          family: JetBrains Mono
+          local: false
+    orientation: columns
+    vertical_layout: fill
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(shiny)
+library(here)
+library(tidyverse)
+library(readxl)
+library(kableExtra)
+library(plotly)
+library(glue)
+```
+
+# Página 1
+
+## Column {.sidebar data-width="200"}
+
+### Controles
+
+```{r}
+
+selectInput("ano",
+            label = "Selecione o ano da sua preferência",
+            choices = c(2015,2016,2017,2018,2019,2020,2021),
+            selected = 2020)
+
+sliderInput("ncapitulos",
+            label = "Selecione o número mínimo de capítulos",
+            min = 0,
+            max = 100,
+            value = 20,
+            step = 1,
+            dragRange = TRUE
+            )
+```
+
+## Column {.tabset data-width="650"}
+
+### Mais assistidos em um ano específico
+
+```{r}
+
+minhascores <- c("#9b5de5","#f15bb5","#fee440","#00bbf9","#00f5d4")
+theme_set(theme_bw())
+
+netflix <- read.csv("NetflixViewingHistory_20211116.csv")
+netflix$Date <- as.Date(netflix$Date, format = "%m/%d/%y")
+netflix2 <- netflix %>% 
+  filter(str_detect(Title, ":")) %>% 
+  separate(Title, c("Titulo","Temporada","Capitulo"), ":")
+netflix3 <- netflix2 %>% 
+  filter(!is.na(Capitulo))
+
+renderPlotly({  
+mais_assistidos <- netflix3 %>% 
+  mutate(Ano = as.numeric(format(Date, '%Y'))) %>% 
+  filter(Ano == input$ano) %>% 
+  group_by(Titulo) %>% 
+  count() %>% 
+  arrange(desc(n)) %>% 
+  ggplot(aes(reorder(Titulo, -n), n))+
+  geom_bar(stat = "identity", fill = "#ED79F9") +
+  coord_flip()+
+  labs(title = glue("Seriados mais assistidos em {input$ano}"))+
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank())+
+  scale_fill_manual(values=minhascores)
+ggplotly(mais_assistidos)
+  })
+
+```
+
+### Mais assistidos por data
+
+```{r}
+renderPlotly({
+  netflix3 %>% 
+  group_by(Date) %>% 
+  count() %>% 
+  filter(Date > glue("{input$ano}-01-01")) %>% 
+  ggplot(aes(Date,n))+
+  geom_col(fill="#9b5de5")+
+  geom_smooth(color="#e32d91", size = 1.2, se=FALSE)
+  
+})
+```
+
+### Mais assistidos em todo o período
+
+```{r}
+renderPlotly({
+  mais_assistidos_total <- netflix3 %>% 
+  #mutate(Ano = as.numeric(format(Date, '%Y'))) %>% 
+  #filter(Ano == input$ano) %>% 
+  group_by(Titulo) %>% 
+  count() %>% 
+  arrange(desc(n)) %>% 
+  filter(n>=input$ncapitulos) %>% 
+  ggplot(aes(reorder(Titulo, -n), factor(n), fill=factor(n)))+
+  geom_bar(stat = "identity") +
+  coord_flip()+
+  labs(title = "Seriados mais assistidos em todo o período")+
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        legend.position = "none")
+  
+ggplotly(mais_assistidos_total)
+  
+})
+```
+
+## Column {data-width="350"}
+
+### Lista dos Mais assistidos em ano específico
+
+```{r}
+
+renderTable({  
+netflix3 %>% 
+  mutate(Ano = as.numeric(format(Date, '%Y'))) %>% 
+  filter(Ano == input$ano) %>% 
+  group_by(Titulo) %>% 
+  count() %>% 
+  arrange(desc(n)) %>% 
+  filter(n>input$ncapitulos) 
+})
+```
+
+### Total de capítulos por ano
+
+```{r plotlychunk}
+capitulos_ano <- netflix3 %>% 
+  mutate(Ano = as.numeric(format(Date, '%Y'))) %>% 
+  group_by(Ano) %>% 
+  count() %>% 
+  ggplot(aes(factor(Ano), n))+
+  geom_bar(stat = "identity", fill="#3ADAC6")+
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank())+
+  labs(title ="Número de capítulos por ano")
+
+capitulos_ano
+```

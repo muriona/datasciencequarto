@@ -1,0 +1,342 @@
+---
+title: "Tutorial 2 - Ggplot e Tidyverse"
+subtitle: "Gabarito"
+cache: true
+---
+
+# Carregando os dados
+
+Neste tutorial vamos aprender um pouco mais sobre o `ggplot` em conjunto com os outros pacotes do `tidyverse`.
+
+Para praticar, vamos usar o dataset `netflix_series_limpo.xlsx`, o dataset `NetflixViewingHistory.csv` e o dataset `imdb_series.xlsx` e o dataset `imdb.rds` de filmes. Portanto, o primeiro passo será carregar os datasets:
+
+```{r}
+#| label: tidyverse
+#| message: false
+#| warning: false
+#| echo: false
+#| 
+library(tidyverse)
+library(readxl) # para fazer leitura de arquivos excel
+library(knitr) # para formatar tabelas
+
+netflix <- read_xlsx("data1ggplot/netflix_series_limpo.xlsx")
+
+imdb <- read_xlsx("data1ggplot/imdb_series.xlsx")
+
+imdb_filmes <- read_rds("data1ggplot/imdb.rds") #está usando uma função do pacote readr do tidyverse
+
+netflix_filmes <- read_csv("data1ggplot/NetflixViewingHistory.csv") %>% 
+  separate(Title, c("movie_title","season","episode"),":") %>% 
+  filter(is.na(episode)) %>% 
+  select(movie_title, Date) %>% 
+  mutate(Date = lubridate::as_date(Date, format="%m/%d/%y")) %>% 
+  left_join(imdb_filmes, by=c("movie_title"="titulo")) %>% 
+  filter(!is.na(id_filme))
+
+```
+
+# Gráfico de Dispersão
+
+## Exemplo Base
+
+Para realizar gráficos de dispersão, precisamos passar a função `geom_point()` como uma nova camada do `ggplot`. As coordenadas `x` e `y` devem ser numéricas necessariamente. Vamos usar como exemplo, o dataframe `imdb_filmes`.
+
+No exemplo, a posição do ponto no eixo `x` pode ser dada pela coluna `orcamento` e a posição do ponto no eixo `y` pela coluna `receita`.
+
+```{r}
+#| label: dispersao
+
+imdb_filmes %>% 
+  ggplot(aes(orcamento/1000000,receita/1000000000))+
+  geom_point()+
+  scale_x_continuous(labels = scales::dollar,
+                     breaks = c(0, 50, 100,150,               200,250,300,350))+
+  scale_y_continuous(labels=scales::dollar,
+                     n.breaks = 8)+
+  labs(x="Orçamento em Milhões de $",
+       y="Receita em Bilhões de $")+
+  theme(panel.background = element_rect(fill = "#fbeca5",                 color = "black",
+                                        size = 2),
+        panel.grid = element_line(color= "white"))+
+  coord_cartesian(ylim = c(0,6),
+                  xlim = c(0,450))
+
+
+
+```
+
+## Adicionando cores
+
+Podemos adicionar cores grupalmente para todos os pontos ou podemos usar alguma outra variável para criar cores em gradiente
+
+```{r}
+#| label: dispersao-cores
+
+imdb_filmes %>% 
+  ggplot(aes(orcamento,receita))+
+  geom_point(color="#e38421", size=5)
+
+```
+
+Para ver mais detalhamento da função `geom_point()` recomenda-se a leitura do Capítulo 8 do Livro ["Curso-R"](https://livro.curso-r.com/8-1-o-pacote-ggplot2.html#gr%C3%A1ficos-de-pontos-dispers%C3%A3o).
+
+# Gráfico de Barras
+
+## Exemplo Base
+
+Para realizar gráficos de barras usamos `geom_col()`. Vamos usar o dataframe `imdb_filmes` para exemplificar, ordenando as linhas por ordem decrescente de `UserRating`. Primeiro vamos gerar o gráfico com as configuração padrão.
+
+```{r}
+#| label: barras
+imdb_filmes %>% 
+  arrange(desc(nota_imdb)) %>% 
+  head(10) %>%
+  ggplot(aes(titulo, nota_imdb,label = nota_imdb))+
+  geom_col()+
+  geom_label()+
+  theme_minimal()+
+  labs(x="",y="",
+       title = "Filmes com maior nota no imdb")+
+  scale_y_continuous(
+    breaks = c(0,2,4,6,8,10),
+    limits=c(0,10))+
+  coord_flip()
+
+```
+
+## Mudando os eixos e adicionando cores
+
+Podemos mudar os eixos (trocar de eixo) usando a função `coord_flip()`
+
+```{r}
+#| label: barras-add
+imdb_filmes %>% 
+  arrange(desc(nota_imdb)) %>% 
+  head(10) %>% 
+  ggplot(aes(reorder(titulo,nota_imdb), nota_imdb))+
+  geom_col(fill="#650871")+
+  coord_flip()
+
+imdb_filmes %>% 
+  arrange(desc(nota_imdb)) %>% 
+  head(10) %>% 
+  ggplot(aes(reorder(titulo,nota_imdb),
+             nota_imdb, 
+             fill=titulo,
+             label=nota_imdb))+
+  geom_col()+
+  geom_label()+
+  coord_flip()+
+  theme_minimal()+
+  theme(legend.position = "none")
+
+
+```
+
+Vamos aplicar tudo o aprendido num segundo exemplo, usando o dataframe `imdb` para mostrar os seriados com maior número de votos `UserVotes`.
+
+```{r}
+#| label: barras2
+imdb %>% 
+  group_by(series_name) %>% 
+  summarize(Votos = sum(UserVotes)) %>% 
+  arrange(desc(Votos)) %>% 
+  ggplot(aes(reorder(series_name,
+                     Votos), 
+             Votos))+
+  geom_col(fill="#c53a48")+
+  coord_flip()
+
+```
+
+Você pode ver mais exemplos no Capítulo 8 do livro [Curso-R](https://livro.curso-r.com/8-1-o-pacote-ggplot2.html#gr%C3%A1ficos-de-barras)
+
+# Gráfico de linha
+
+## Exemplo Base
+
+Vamos fazer um gráfico de linha usando a função `geom_line()` como camada do `ggplot` usando o dataset `netflix_filmes` para mostrar o total de capítulos assistidos por dia.
+
+```{r}
+#| label: linha-dia
+
+netflix_filmes %>%  #colocar código ggplot
+  group_by(Date) %>% 
+  summarize(filmes=n()) %>% 
+  ggplot(aes(Date,filmes))+
+  geom_point(size=5, color="black")+
+  geom_line(size=1.2, color="#c53a48")
+```
+
+Podemos agrupar contagens usando a função `floor_date` do pacote `lubridate` para meses, trimestres, etc. Adicionalmente, podemos incluir cores.
+
+```{r}
+#| label: linha-mes
+library(lubridate)
+
+netflix_filmes %>% 
+  count(mes = floor_date(Date, "month")) %>% 
+  ggplot(aes(mes,n))+
+  geom_line(size=1.2, color="#502846")
+```
+
+## Adicionando mais de uma linha
+
+Vamos usar o dataset `imdb_filmes` para comparar o desempenho dos filmes (nota imdb) em função de ter lucro ou não. Vamos adicionar também uma camada extra para nos mostrar a tendência de ambas curvas, usando `geom_smooth()`.
+
+```{r}
+imdb_filmes %>% 
+  mutate(lucro = receita - orcamento,
+         lucro_factor = ifelse(lucro > 0, "Sim","Não")) %>% 
+  filter(!is.na(lucro)) %>% 
+  group_by(lucro_factor,ano) %>% 
+  summarise(nota_media=mean(nota_imdb,na.rm=TRUE)) %>% 
+  ggplot(aes(ano,nota_media,color=lucro_factor))+
+  geom_line(size=1.5)+
+  geom_smooth()
+
+```
+
+Você pode ver mais exemplos do `geom_line()` no livro [Curso-R](https://livro.curso-r.com/8-1-o-pacote-ggplot2.html#gr%C3%A1ficos-de-linhas)
+
+# Gráfico de Boxplot
+
+## Exemplo Base
+
+Boxplots servem para comparar a distribuição dos dados em diferentes categorias. Vamos usar os dados do dataset `imdb` para comparar as notas de `UserRating` em cada temporada do seriado `The Walking Dead`.
+
+```{r}
+#| label: boxplot
+
+seriado_escolhido <- "The Walking Dead"
+
+imdb %>% 
+  filter(series_name == seriado_escolhido) %>% 
+  select(1,2,4,7) %>% 
+  ggplot(aes(factor(season), UserRating))+
+  geom_boxplot()
+
+```
+
+## Adicionando cores por meio de paletas pré-definidas
+
+Vamos adicionar cores para cada temporada, para isto precisamos incluir o argumento `fill` dentro da camada de estetica `aes`. Podemos também escolher as cores de paletas pré-definidas como: `scale_fill_viridis_d()` e `scale_fill_brewer()`
+
+```{r}
+#| label: boxplot-cores
+
+imdb %>% 
+  filter(series_name == seriado_escolhido) %>% 
+  select(1,2,4,7) %>% 
+  ggplot(aes(factor(season), UserRating, fill=factor(season)))+
+  geom_boxplot() + 
+  scale_fill_viridis_d(alpha=0.6)
+
+```
+
+# Gráfico de Histograma
+
+O Histograma serve para observar a distribuição dos dados e eventualmente serve para comparar mais de uma distribuição.
+
+## Exemplo Base
+
+Vamos continuar com os dados sobre `UserRating` usados anteriormente para graficar Boxplots. Neste caso, vamos graficar a distribuição do `UserRating` considerando apenas a contagem. Podemos usar o argumento `bins` ou `binwidth` para ajustar melhor o resultado.
+
+```{r}
+#| label: histo1
+imdb %>% 
+  filter(series_name == seriado_escolhido) %>% 
+  select(1,2,4,7) %>% 
+  ggplot(aes(UserRating))+
+  geom_histogram(binwidth = 0.5)
+```
+
+Agora, vamos usar o dataset `imdb_filmes` para verificar quão lucrativo é um determinado genero.
+
+```{r}
+#| label: histo2
+
+genero_escolhido <- "Comedy"
+
+imdb_filmes %>% 
+  #filter(str_detect(string = generos, pattern = genero_escolhido)) %>% 
+  filter(generos == genero_escolhido) %>% 
+  mutate(lucro = receita - orcamento) %>% 
+  ggplot(aes(lucro))+
+  geom_histogram(bins = 10)
+
+```
+
+## Adicionando cores
+
+Podemos melhorar a apresentação, escolhendo cores diferentes adicionando o argumento `fill` dentro de `geom_histogram()`.
+
+```{r}
+imdb_filmes %>% 
+  #filter(str_detect(string = generos, pattern = genero_escolhido)) %>% 
+  filter(generos == genero_escolhido) %>% 
+  mutate(lucro = receita - orcamento) %>% 
+  ggplot(aes(lucro))+
+  geom_histogram(bins = 50, fill="#cde55a")
+```
+
+Você pode ver mais exemplos do Histogramas e Boxplots no Cap. 8 do livro [Curso-R](https://livro.curso-r.com/8-1-o-pacote-ggplot2.html#histogramas-e-boxplots)
+
+Podemos usar alternativamente um outro tipo de visualização muito similar, que é a `geom_density()`. Vamos usar os mesmos exemplos anteriores.
+
+```{r}
+#| label: density1
+
+imdb_filmes %>% 
+  #filter(str_detect(string = generos, pattern = genero_escolhido)) %>% 
+  filter(generos == genero_escolhido) %>% 
+  mutate(lucro = receita - orcamento) %>% 
+  ggplot(aes(lucro))+
+  geom_density()
+
+
+```
+
+Podemos também customizar a cor da linha e da área abaixo da densidade usando os argumentos `fill` e `color` dentro do `geom_density()` bem como a transparência usando `alpha`.
+
+```{r}
+#| label: density2
+
+imdb_filmes %>% 
+  #filter(str_detect(string = generos, pattern = genero_escolhido)) %>% 
+  filter(generos == genero_escolhido) %>% 
+  mutate(lucro = receita - orcamento) %>% 
+  ggplot(aes(lucro))+
+  geom_density(fill="#e99d4e", alpha = 0.9,
+               color = "#e99d4e")
+
+```
+
+E por fim, podemos comparar duas ou mais categorias. Vamos fazer isso, comparando os generos "Comedy" e "Drama" para saber se há diferenças significativas em termos de lucro. Para isto, vamos incluir o argumento `group` dentro da camada `aes` além de `fill` e `color`. Adicionalmente podemos incluir `alpha` dentro de `geom_density()`.
+
+```{r}
+imdb_filmes %>% 
+  #filter(str_detect(string = generos, pattern = genero_escolhido)) %>% 
+  filter(generos %in% c("Comedy","Drama")) %>% 
+  mutate(lucro = receita - orcamento) %>% 
+  ggplot(aes(lucro, group=generos, fill=generos, color=generos))+
+  geom_density(alpha=0.5)
+```
+
+# Outras customizações
+
+O ggplot inclui praticamente customizações infinitas, desde as mais simples, como atribuir títulos aos eixos até mudar as escalas, por exemplo usando transformações logarítmicas.
+
+```{r}
+imdb_filmes %>% 
+  mutate(lucro = receita-orcamento) %>% 
+  ggplot(aes(x = orcamento, y = receita, color=lucro)) +
+  geom_point(alpha=0.5)+
+  scale_y_log10()+
+  scale_x_log10()+
+  geom_smooth(method = "lm", se=FALSE)+
+  theme_bw()+
+  scale_color_gradient(low = "red", high = "green")
+
+```

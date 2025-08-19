@@ -1,0 +1,382 @@
+---
+title: "Tutorial 5 - Métodos de Regressão"
+subtitle: "Aprendizagem Supervisionada"
+execute: 
+  echo: true
+  message: false
+  warning: false  
+---
+
+# Regressão Linear Univariada
+
+A regressão linear é talvez o método mais conhecido para realizar previsões quando o comportamento dos dados remete a uma forma linear. Para mostrar a utilidade deste método iremos usar três datasets, `Salary.csv`, `GPA.csv` e `real_estate_price_size`.
+
+```{r}
+#| echo: false
+#| eval: true
+xfun::pkg_load2(c('htmltools', 'mime'))
+xfun::embed_dir("data4/", text = "Você pode baixar os dados aqui.")
+
+```
+
+```{r}
+#| echo: true
+#| 
+library(tidyverse)
+library(broom) #para manipular objetos de regressão linear
+library(tidymodels) #para facilitar a manipulação de modelos de ML
+
+set.seed(1234)
+```
+
+## 1. Salário vs Experiência
+
+Vamos ajustar a pasta com que iremos trabalhar
+
+Importando os dados:
+
+```{r}
+
+sal_exp <- read.csv('data4/Salary_Data.csv')
+
+sal_exp %>% 
+  ggplot(aes(YearsExperience, Salary))+
+  geom_point()
+
+```
+
+Para criar uma regressão linear no R, basta usar a função `lm()`.
+
+```{r}
+
+model_sal_exp <- lm(formula = Salary ~ YearsExperience, 
+              data = sal_exp)
+```
+
+Para ver as informações sobre a regressão, podemos utilizar a função `summary()` no objeto de modelo, neste caso, em `model_sal_exp.`
+
+```{r}
+summary(model_sal_exp) 
+```
+
+E também podemos utilizar as funções `glance()`, `augment()` e `tidy()` todas do pacote `broom`
+
+```{r}
+
+glance(model_sal_exp)
+
+```
+
+```{r}
+augment(model_sal_exp)
+
+```
+
+```{r}
+tidy(model_sal_exp)
+```
+
+Finalmente, podemos incluir as predições dentro do nosso dataframe, utilizando a função `predict()` dentro de um `mutate()`. Note que o resultado da coluna `pred` é igual à coluna `.fitted` quando aplicamos `augment(model_sal_exp)` acima.
+
+```{r}
+sal_exp %>%
+mutate(pred = predict(model_sal_exp, sal_exp))
+```
+
+Vamos incluir ao código anterior, a camada de ggplot para fazer um gráfico que inclua tanto `salary` (real) e `pred` (predição)
+
+```{r}
+sal_exp %>%
+mutate(pred = predict(model_sal_exp, sal_exp))%>%
+ggplot(aes(YearsExperience, Salary))+
+geom_point()+
+geom_line(aes(x = YearsExperience, y = pred,
+             colour = 'pred'),
+             size=1) +
+  labs(title = 'Salary vs Experience',
+       x = 'Years of Experience',
+       y= 'Salary')
+
+```
+
+## 2. GPA
+
+### Carregando os dados
+
+Neste segundo exemplo queremos prever a nota do GPA de estudantes universitários com base nas notas obtidas por eles no exame SAT.
+
+```{r}
+gpa <- read.csv("data4/GPA.csv")
+
+ggplot(gpa, aes(SAT, GPA))+
+  geom_point()
+```
+
+O procedimento é o mesmo para realizar a regressão linear.
+
+```{r}
+#| eval: false
+
+model_gpa <- lm(_____~_____, data=_____)
+```
+
+Vamos utilizar as funções `glance()`, `augment()` e `tidy()` todas do pacote `broom`
+
+```{r}
+#| eval: false
+#| 
+glance(______)
+augment(_____)
+tidy(______)
+```
+
+Por fim, vamos fazer a predição dos valores, utilizando o modelo `model_gpa` e inclui-las no dataframe `gpa` para poder plotar o real (SAT) e a predição (pred).
+
+```{r}
+#| eval: false
+
+gpa %>%
+mutate(pred = predict(______, ______))%>%
+ggplot(aes(SAT, GPA))+
+geom_point()+
+geom_line(aes(______) +
+  labs(title = 'GPA vs SAT',
+       x = 'SAT',
+       y= 'GPA')
+```
+
+## 3. Real State
+
+### Carregando os dados
+
+```{r}
+real_estate <- read.csv("data4/real_estate_price_size.csv")
+```
+
+Rodando o modelo e graficando
+
+```{r}
+#| eval: false
+
+model_real_estate <- lm(__________, ____________)
+
+real_estate %>%
+mutate(pred = predict(________,____________))%>%
+ggplot(aes(size, price))+
+geom_point()+
+geom_line(aes(_________________) +
+  labs(title = 'Size vs Price',
+       x = 'Size',
+       y= 'Price')
+```
+
+# Regressão Linear Múltipla ou Multivariada
+
+Vamos utilizar os dados do `SeoulBikeData.csv` que mostra dados sobre bikesharing na cidade de Seul, Coréia.
+
+```{r}
+bike <- read.csv("data4/SeoulBikeData.csv")
+
+head(bike)
+
+```
+
+Vamos usar `str()` para verificar os tipos de dados e se as colunas estão corretamente identificadas.
+
+```{r}
+
+str(bike)
+```
+
+Vemos que há várias variáveis que precisam ser convertidas para `factor` antes de continuar, são elas: `Hour`, `Holiday`,`Month`, `Week`, e `Dayofweek`.
+
+```{r}
+
+# converter essas colunas para factor
+
+bike$Hour <- as.factor(bike$Hour)
+bike$Holiday <- as.factor(bike$Holiday)
+bike$Month <- as.factor(bike$Month)
+bike$Week <- as.factor(bike$Week)
+bike$Dayofweek <- as.factor(bike$Dayofweek)
+
+```
+
+Temos 8760 linhas de dados (observações), portanto vamos iniciar o processo de treinamento dos dados. Para isso, devemos dividir os dados em dois grupos: treino e teste.
+
+```{r}
+bike_split <- initial_split(bike, prop = 0.7, strata = "Rented.Bike.Count")
+
+train <- training(bike_split)
+test <- testing(bike_split)
+```
+
+## Treinar o modelo
+
+Agora, rodamos o modelo como fizemos com os casos anterior, utilizando a função `lm()` porém apenas utilizando os dados de treino.
+
+```{r}
+str(train)
+```
+
+```{r}
+bike_model <- lm(Rented.Bike.Count ~ ., data = train)
+```
+
+```{r}
+summary(bike_model)
+```
+
+Agora que rodamos o modelo, podemos calcular alguns indicadores de acurácia, os mais indicados são: $R^2$, o RMSE (root mean squared error) e o MAE (mean absolute error). Para isso, precisamos utilizar o modelo treinado nos dados `novos` isto é, no dataset de teste.
+
+Vamos utilizar a função `predict()` para que o modelo gere valores estimados e logo as funções `rmse_vec` e `rsq_vec` para gerar os valores de RMSE e $R^2$.
+
+## Avaliar o modelo
+
+```{r}
+
+bike_lm <- test %>%
+	mutate(pred_lm = as.numeric(predict(bike_model, newdata = test)),
+		   Rented.Bike.Count = as.numeric(Rented.Bike.Count))%>%
+	select(Rented.Bike.Count, pred_lm) %>%
+	summarize(
+			 R2 = rsq_vec(Rented.Bike.Count, pred_lm),
+			 RMSE = rmse_vec(Rented.Bike.Count, pred_lm),
+			 MAE = mae_vec(Rented.Bike.Count, pred_lm))
+
+bike_lm
+
+```
+
+# Árvores de Decisão
+
+Árvores de Decisão, ou Decision Trees, são algoritmos de machine learning largamente utilizados, com uma estrutura de simples compreensão e que costumam apresentar bons resultados em suas previsões.
+
+Eles também são a base do funcionamento de outros poderosos algoritmos, como o Random Forest, por exemplo.
+
+As decision trees estão entre os primeiros algoritmos aprendidos por iniciantes no mundo do aprendizado de máquina.
+
+Mais detalhes sobre como funciona em: [didatica.tech](https://didatica.tech/como-funciona-o-algoritmo-arvore-de-decisao/)
+
+```{r}
+
+library(rpart)
+library(rpart.plot)
+library(rattle)
+```
+
+Árvores de Decisão são mais úteis quando temos um modelo multivariado, isto é, dois ou mais atributos (features) para estimar o valor da nossa variável de output como é o caso do dataset `bike`
+
+## Treinar o modelo
+
+```{r}
+
+# Treinar um modelo utilizando rpart
+
+bike_tree_model <- rpart(Rented.Bike.Count ~ ., data = train, method = "anova")
+
+```
+
+## Plotar o modelo
+
+```{r}
+
+# usar a fun fancyRpartPlot() do pacote rattle para plotar a árvore
+
+fancyRpartPlot(bike_tree_model)
+```
+
+## Avaliar o modelo
+
+Para fazer a avaliação dos indicadores de acurácia, procedemos da mesma forma que antes.
+
+```{r}
+
+bike_tree <- test %>%
+	mutate(pred_tree = as.numeric(predict(bike_tree_model, newdata = test)),
+		   Rented.Bike.Count = as.numeric(Rented.Bike.Count))%>%
+	select(Rented.Bike.Count, pred_tree) %>%
+	summarize(
+			 R2 = rsq_vec(Rented.Bike.Count, pred_tree),
+			 RMSE = rmse_vec(Rented.Bike.Count, pred_tree),
+	         MAE = mae_vec(Rented.Bike.Count, pred_tree))
+
+bike_tree
+
+```
+
+# Random Forest
+
+Em português, Random Forest significa floresta aleatória. Este nome explica muito bem o funcionamento do algoritmo.
+
+Em resumo, o Random Forest irá criar muitas árvores de decisão, de maneira aleatória, formando o que podemos enxergar como uma floresta, onde cada árvore será utilizada na escolha do resultado final, em uma espécie de votação. Mais detalhes em: [didatica.tech](https://didatica.tech/o-que-e-e-como-funciona-o-algoritmo-randomforest/).
+
+Vamos carregar o pacote `ranger` que serve para treinar Random Forests
+
+## Treinar o modelo
+
+```{r}
+library(ranger)
+```
+
+```{r}
+# treinar um modelo usando o pacote `ranger`
+
+bike_rf_model <- ranger(Rented.Bike.Count ~ ., 
+							  data = train,
+                   			  num.trees = 300)
+```
+
+Uma vez que o modelo foi treinado, vamos calcular o indicadores de acurácia utilizando os procedimentos já vistos. Porém, há um passo intermediário que serve para extrair as predições do objeto criado pelo `predict()` do `ranger`.
+
+```{r}
+rf_predict <- predict(bike_rf_model, data = test, type = "response")$predictions
+```
+
+Agora sim, podemos utilizar o código dos modelos anteriores, adaptando-o ligeiramente para incluir o vetor criado acima com os valores preditos.
+
+## Avaliar o modelo
+
+```{r}
+bike_rf <- test %>%
+	mutate(pred_rf = as.numeric(rf_predict),
+		   Rented.Bike.Count = as.numeric(Rented.Bike.Count))%>%
+	select(Rented.Bike.Count, pred_rf) %>%
+	summarize(
+			 R2 = rsq_vec(Rented.Bike.Count, pred_rf),
+			 RMSE = rmse_vec(Rented.Bike.Count, pred_rf),
+			 MAE = mae_vec(Rented.Bike.Count, pred_rf))
+
+bike_rf
+
+```
+
+Para facilitar a comparação, vamos juntar todos os três grupos de resultados.
+
+# Avaliar os três modelos
+
+```{r}
+resultados <- rbind(bike_lm, bike_tree, bike_rf) %>%
+	mutate(Indicador = c("Reg Lin" , "Arvore", "Random For"))
+
+resultados 
+```
+
+Para finalizar vamos mostrar um gráfico onde apareçam os três modelos (eixo y) vs os dados reais (eixo x).
+
+```{r}
+
+test %>%
+	mutate(pred_lm = as.numeric(predict(bike_model, newdata = test)),
+		   pred_tree = as.numeric(predict(bike_tree_model, newdata = test)),
+		   pred_rf = as.numeric(rf_predict),
+		   Rented.Bike.Count = as.numeric(Rented.Bike.Count))%>%
+	select(Rented.Bike.Count, pred_lm, pred_tree, pred_rf) %>%
+	pivot_longer(2:4, values_to = "Pred") %>%
+	ggplot(aes(Rented.Bike.Count, Pred, color = name))+
+	geom_point()+
+facet_wrap(vars(name))+
+scale_x_continuous(limits = c(0, 2000))+
+scale_y_continuous(limits = c(0,2000))
+
+```

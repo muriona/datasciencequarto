@@ -1,0 +1,322 @@
+---
+title: "Tutorial 3a - Ggplot Avançado"
+execute: 
+  cache: true
+---
+
+# Fazendo mapas
+
+Com ggplot podemos fazer mapas para descrever informações geográficas e visualizar sua distribuição espacial.
+
+## Pacote `geobr` para mapas do Brasil
+
+Vamos utilizar o pacote `sf` e o pacote `geobr`.
+
+```{r}
+#install.packages("sf")
+#install.packages("geobr")
+```
+
+```{r}
+library(geobr)
+library(sf)
+library(tidyverse)
+library(readxl)
+library(knitr)
+library(ggrepel)
+library(patchwork)
+```
+
+O pacote `geobr` serve para fazer download de mapas do BR, mais informações [aqui](https://cran.r-project.org/web/packages/geobr/vignettes/intro_to_geobr.html).
+
+Vamos mostrar como baixar os dados do Brasil:
+
+```{r}
+#| cache: true
+
+estados <- read_state(
+  year = 2020
+)
+```
+
+```{r}
+head(estados)
+```
+
+Vamos fazer um gráfico do mapa:
+
+```{r}
+
+estados %>% 
+  ggplot()+
+  geom_sf()
+```
+
+Podemos colorir o mapa com uma cor pré-definida:
+
+```{r}
+estados %>% 
+  ggplot()+
+  geom_sf(fill = "#e32d91",
+          color = "white")+
+  theme_void()
+```
+
+## Para fazer o mapa de um Estado
+
+Vamos fazer o mapa de SC com todos seus municípios.
+
+```{r}
+#| cache: true
+#| 
+municipiosSC <- read_municipality(
+  code_muni = "SC",
+  year = 2020,
+  simplified = TRUE #esta opção em FALSE traz uma resolução maior
+)
+```
+
+```{r}
+municipiosSC %>% 
+  ggplot()+
+  geom_sf(fill = "#2d3e50",
+          color = "white",
+          linewidth = 0.03)+
+  theme_minimal()+
+  theme(panel.grid = element_blank())
+```
+
+Também podemos colorir o mapa utilizando uma 3a variável, que devemos anexar ao objeto `municipiosSC` ou `estados`.
+
+Como exemplo, vamos pegar dados da expectativa de vida para os estados brasileiros:
+
+```{r}
+vida <- utils::read.csv(system.file("extdata/br_states_lifexpect2017.csv", package = "geobr"), encoding = "UTF-8")
+```
+
+Vamos unir as informações dos dois dataframes.
+
+```{r}
+
+minexp = min(vida$ESPVIDA2017)
+maxexp = max(vida$ESPVIDA2017)
+
+estados %>% 
+  left_join(vida, by=c("name_state"="uf")) %>% 
+  ggplot()+
+  geom_sf(aes(fill=ESPVIDA2017), color = "white", linewidth = 0.1)+
+  scale_fill_distiller(palette = "Reds", name = "%", limits = c(minexp,maxexp))+
+  theme_void()+
+  theme(panel.grid = element_blank())
+```
+
+## Pacote `rnaturalearth` para mapas de outros países
+
+Instalar os pacotes `rnaturalearthhires` e `rnaturalearth`:
+
+```{r}
+library(devtools)
+#devtools::install_github("ropensci/rnaturalearthhires")
+#install.packages("rnaturalearth")
+#install.packages("rnaturalearthdata")
+library(rnaturalearth)
+```
+
+Para obter o mapa de um país, por exemplo India:
+
+```{r}
+map1 <- ne_countries(type = "countries", country = "India",
+                     scale = "medium", returnclass = "sf")
+```
+
+```{r}
+map1 %>% 
+  ggplot()+
+  geom_sf()
+```
+
+Para obter o mapa dos Estados de um determinado país:
+
+```{r}
+map2 <- ne_states("India", returnclass = "sf")
+```
+
+```{r}
+map2 %>% 
+  ggplot()+
+  geom_sf()
+```
+
+## Exemplo: India
+
+Vamos importar dados de energia solar fotovoltaica na India.
+
+```{r}
+#| echo: false
+#| eval: true
+
+xfun::pkg_load2(c('htmltools', 'mime'))
+xfun::embed_dir("datamap/", text = "Você pode baixar os dados aqui.")
+
+```
+
+```{r}
+india <- read_xlsx("datamap/importIN.xlsx")
+```
+
+Vamos fazer uma breve análise exploratória:
+
+```{r}
+glimpse(india) %>% 
+  kable()
+
+skimr::skim(india)
+```
+
+Precisamos converter as colunas `character` para `numeric`:
+
+```{r}
+india <- india %>% 
+  mutate(across(2:15, as.numeric)) %>% 
+  rename(name = Year)
+
+india %>% 
+  kable()
+```
+
+Tratando os dados:
+
+```{r}
+india %>% 
+  pivot_longer(2:15, names_to = "year", values_to = "mw") %>% 
+  mutate(year = as.numeric(year)) %>% 
+  ggplot(aes(x=year, y=mw, fill=name))+
+  geom_col()+
+  facet_wrap(vars(name),
+             scales = "free_y")+
+  theme(legend.position = "none")
+
+ggsave("all.jpg",
+       height = 10,
+       width = 12)
+```
+
+### Escolhendo dados de um ano especifico (p.ex. 2015):
+
+```{r}
+
+minexp = min(india$`2023`)
+maxexp = max(india$`2023`)
+
+maxcities <- india %>% 
+  select(name, `2015`) %>% 
+  filter(`2015` > mean(`2015`))
+
+maxcities_sf <- maxcities %>% 
+  left_join(map2)
+```
+
+Mapa para 2015:
+
+```{r}
+india2015 <- india %>%
+   select(1,`2015`) %>% 
+   rename(mw = `2015`) %>% 
+   left_join(map2) %>% 
+   ggplot()+
+   geom_sf(aes(fill=mw/1000, geometry = geometry), color = "white", linewidth = 0.1)+
+  geom_text_repel(data = maxcities_sf,
+                  aes(x=longitude,
+                      y=latitude,
+                      label = name),
+                  fontface = "bold", 
+                  nudge_x = c(10, -5, 10, -5, -3, -5,5), 
+                  nudge_y = c(0.25,-0.25, 6, -0.5, 2,1,1))+
+  scale_fill_distiller(palette = "Reds", 
+                       name = "GW",
+                       limits = c(minexp/1000,maxexp/1000),
+                       direction = 1)+
+  theme_void()+
+  theme(panel.grid = element_blank())+
+  labs(title = "Solar PV Installed Capacity in 2015")
+
+india2015
+```
+
+### Preparando os dados para 2023:
+
+```{r}
+
+maxcities <- india %>% 
+  select(name, `2023`) %>% 
+  filter(`2023` > mean(`2023`))
+
+maxcities_sf <- maxcities %>% 
+  left_join(map2)
+```
+
+Mapa para 2023:
+
+```{r}
+india2023 <- india %>%
+   select(1,`2023`) %>% 
+   rename(mw = `2023`) %>% 
+   left_join(map2) %>% 
+   ggplot()+
+   geom_sf(aes(fill=mw/1000, geometry = geometry), 
+           color = "white", linewidth = 0.1)+
+  geom_text_repel(data = maxcities_sf,
+                  aes(x=longitude,
+                      y=latitude,
+                      label = name),
+                  fontface = "bold", 
+                  nudge_x = c(10, -5, -5, 12, -5,-5,-5,5,-3), 
+                  nudge_y = c(0.25,-0.25, 0.5, 8, -0.5,2,-2,2,5))+
+  scale_fill_distiller(palette = "Reds", 
+                       name = "GW",
+                       limits = c(minexp/1000,maxexp/1000),
+                       direction = 1)+
+  theme_void()+
+  theme(panel.grid = element_blank())+
+  labs(title = "Solar PV Installed Capacity in 2023")
+
+india2023
+
+```
+
+### Juntando os dois gráficos
+
+```{r}
+
+india_2015_2023 <- india2015 + india2023 + plot_layout(ncol=1)
+
+india_2015_2023
+
+ggsave("india2015_2023.jpg",
+       width = 7,
+       height = 10)
+```
+
+Calculando o market share de cada estado:
+
+```{r}
+
+total <- sum(india$`2023`)
+maxcities_total <- sum(maxcities$`2023`)
+
+colnames(maxcities) <- c("name","mw")
+
+other <- data.frame(name = "Other",
+                    mw = total - maxcities_total)
+
+maxcities <- rbind(maxcities, other)
+
+maxcities %>% 
+  mutate(market = round(100*mw/total,2),
+         mw_2030 = 300000*market/100)
+```
+
+```{r}
+
+
+```

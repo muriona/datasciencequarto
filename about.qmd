@@ -1,0 +1,31 @@
+---
+title: "About"
+---
+
+About this site
+
+```{r}
+#| eval: false
+
+
+library(fs)
+library(stringr)
+rmd_names <- dir_ls(path = ".", glob = "*.Rmd")
+qmd_names <- str_replace(string = rmd_names,
+                         pattern = "Rmd",
+                         replacement = "qmd")
+file_move(path = rmd_names,
+          new_path = qmd_names)
+
+```
+
+```{r}
+#| label: photo
+#| fig.margin: true
+#| echo: false
+#| fig.width: 3.0
+#| fig.cap: Photo by Jaime Lopes on unsplash
+
+knitr::include_graphics("img/jaime-lopes-0RDBOAdnbWM-unsplash.jpg")
+
+```

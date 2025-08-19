@@ -1,0 +1,173 @@
+---
+title: "Tutorial 1 - Tidyverse"
+subtitle: "Gabarito"
+---
+
+```{r}
+#| label: setup
+#| include: false
+knitr::opts_chunk$set(echo = TRUE, eval=TRUE)
+```
+
+# Carregando os dados
+
+Neste tutorial vamos aprender um pouco mais sobre o `tidyverse`, em particular vamos conhecer as funções do `dplyr`:
+
+-   `select()` - seleciona colunas
+-   `arrange()` - ordena os dados
+-   `filter()` - filtra linhas
+-   `mutate()` - cria/modifica colunas
+-   `group_by()` - agrupa dados por categorias
+-   `summarize()` - sumariza dados
+
+Para praticar, vamos usar o dataset `netflix_series_limpo.xlsx` e o dataset `imdb_series.xlsx`. Portanto, o primeiro passo será carregar o dataset:
+
+Alternativamente, pode usar este [link](https://app.datacamp.com/workspace/w/4e266048-592b-486a-8005-c79bd95f0446/) para criar uma cópia no Workspace.
+
+```{r}
+#| label: tidyverse
+#| message: false
+#| warning: false
+library(tidyverse)
+library(readxl) # para fazer leitura de arquivos excel
+library(knitr) # para formatar tabelas
+
+netflix <- read_xlsx("netflix_series_limpo.xlsx")
+
+imdb <- read_xlsx("imdb_series.xlsx")
+```
+
+Uma visão geral dos dados é mostrada a seguir, usando a função `head()` para visualizar apenas as primeiras linhas do dataframe `netflix`, pois o dataset completo conta com 923 linhas.
+
+```{r}
+
+
+
+```
+
+Também podemos ver rapidamente a estrutura de cada dataset, utilizando a função `str()`.
+
+```{r}
+
+```
+
+Bem como as dimensões utilizando `dim()`:
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+# Selecionando colunas
+
+Para selecionar colunas, utilizamos a função `select()`, por exemplo, podemos selecionar a coluna `episode` como o script a seguir:
+
+```{r}
+
+
+```
+
+Também é possível selecionar várias colunas, separando-as com `,`:
+
+```{r}
+
+
+
+```
+
+A função `select()` conta com vários outros argumentos, recomenda-se a leitura do Capítulo 7 do Livro ["Curso-R"](https://livro.curso-r.com/7-2-dplyr.html#selecionando-colunas).
+
+# Ordenando os dados
+
+Para ordenar as linhas, podemos utilizar a função `arrange()` de forma a termos, por exemplo, uma lista de maior a menor de um determinado valor. Vamos usar o dataframe `imdb` para exemplificar, ordenando as linhas por ordem crescente de `UserRating`:
+
+```{r}
+#| label: arrange
+
+
+```
+
+Geralmente o uso do `arrange()` servirá para identificar os maiores valores dentro do dataframe, por exemplo, queremos saber quais são os capítulos com maior `UserRating` ou seja, ordenar de forma decrescente, além disso, vamos aproveitar o nosso conhecimento de `select()` para selecionar somente algumas colunas de interesse:
+
+```{r}
+#| label: desc
+
+
+```
+
+Você pode ver mais exemplos do `arrange()` no livro [Curso-R](https://livro.curso-r.com/7-2-dplyr.html#ordenando-a-base) e no livro [Ibpad](https://cdr.ibpad.com.br/manipulando-os-dados.html#arrange).
+
+# Filtrando linhas
+
+Para filtrar valores de um dataframe, primeiro precisamos identificar qual a coluna de interesse e logo utilizar a função `filter()`. Por exemplo, se quisermos identificar todos os capítulos do dataframe `imdb` com `UserVotes` maior a 10.000:
+
+```{r}
+#| label: filter
+
+
+```
+
+Para filtrar textos sem correspondência exata, podemos utilizar a função auxiliar `str_detect()` do pacote `stringr`. Ela serve para verificar se cada string de um vetor contém um determinado padrão de texto.
+
+Usando este comando, podemos encontrar qualquer caractere ou string de interesse. Por exemplo, se quisermos identificar todos os capítulos com o string `and` no título:
+
+```{r}
+
+
+```
+
+A tabela de cima nos mostra todos os capítulos com `and` no título porém não nos diz quantos capítulos em total cada seriado tem com o referido string. A próxima função vai nos ajudar a atingir esse objetivo.
+
+Você pode ver mais exemplos do `filter()` no livro [Curso-R](https://livro.curso-r.com/7-2-dplyr.html#filtrando-linhas) e no livro [Ibpad](https://cdr.ibpad.com.br/manipulando-os-dados.html#filter).
+
+# Agrupando ou juntando dados por categorias e sumarizando
+
+A função que usamos para agrupar dados é `group_by()` e serve para agregar os dados de acordo com algum critério de interesse. Comumente é usado junto com uma função para sumarizar o resultado, chamada `summarize()`. Vamos mostrar o uso de ambos em conjunto.
+
+Vamos aproveitar o exercício anterior (capítulos com o string `and`) e agrupar por seriado para finalmente, contabilizar o número de capítulos com o string `and` para cada seriado.
+
+```{r}
+
+```
+
+Você pode ver mais exemplos do `summarize()` no livro [Curso-R](https://livro.curso-r.com/7-2-dplyr.html#sumarizando-a-base) e de `group_by()` no livro [Ibpad](https://cdr.ibpad.com.br/manipulando-os-dados.html#group-by-e-summarise).
+
+# Modificando e/ou criando novas colunas
+
+Para modificar uma coluna existente ou criar uma nova coluna, utilizamos a função `mutate()`. Por exemplo, podemos usá-la para criar uma nova coluna no dataframe `netflix` contendo apenas o ano em que cada capítulo foi exibido (no futuro, esta nova coluna pode nos ajudar a criar um gráfico de barras para cada ano):
+
+```{r}
+
+```
+
+Um segundo exemplo com o dataframe `imdb` mostra a soma das colunas `r1` a `r10`, numa nova coluna chamada `r_total`. As referidas colunas são na verdade proporções do número de pessoas que votou com nota 1 (`r1`) até nota 10 (`r10`), portanto a soma delas deveria ser igual a $1$.
+
+```{r}
+
+```
+
+Você pode ver mais exemplos do `mutate()` no livro [Curso-R](https://livro.curso-r.com/7-2-dplyr.html#modificando-e-criando-novas-colunas)
+
+Existem muitas mais funções no `tidyverse` além das principais que já vimos, dentre elas, vamos mostrar a função `join`.
+
+# Juntando dois ou mais dataframes
+
+Existem vários tipos de `join` mas aqui vamos focar especificamente na função `left_join()` que mantém todas as observações da primeira base e adiciona colunas da segunda (para mais detalhes consultar o livro [R for Data Science](https://r4ds.had.co.nz/relational-data.html#mutating-joins) e o livro [Curso-R](https://livro.curso-r.com/7-2-dplyr.html#juntando-duas-bases)).
+
+Vejamos no exemplo a seguir. Vamos juntar as duas bases, `netflix` e `imdb`, tomando como a base de referência `netflix`. O que queremos é extrair a nota `UserRating` de `imdb` e inclui-la como nova coluna na base `netflix` para cada capítulo e seriado.
+
+Note que para o `R` identificar corretamente cada capítulo, neste caso devemos comparar duas colunas de cada base, a do título do seriado e a do título do capítulo.
+
+```{r}
+
+```
+
+Finalmente vamos limpar as colunas e deixar apenas aquelas que nos interessam.
+
+```{r}
+
+
+```

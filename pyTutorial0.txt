@@ -1,0 +1,41 @@
+---
+title: "Datasets - 2025.1"
+jupyter: python3
+---
+
+Os datasets para este semestre encontram-se disponíveis no Moodle e também aqui:
+
+```{python}
+#| echo: false
+
+import os
+from IPython.display import HTML
+
+def create_downloadable_dir_listing(directory, message="You can download the data here."):
+    file_list = os.listdir(directory)
+    html_content = f"<p>{message}</p><ul>"
+    for file in file_list:
+        html_content += f'<li><a href="{directory}/{file}" download>{file}</a></li>'
+    html_content += "</ul>"
+    return HTML(html_content) 
+
+# Example usage
+create_downloadable_dir_listing("2025-1/", message="Você pode baixar os dados aqui.")
+```
+
+```{python}
+import pandas as pd
+```
+
+Para ler os arquivos diretamente da nuvem (sem necessidade de fazer download):
+
+```{python}
+df = pd.read_csv('https://eps7008ufsc.netlify.app/2025-1//G06_ufo3.csv')
+
+```
+
+vamos mostrar as primeiras 7 linhas:
+
+```{python}
+df.head(7)
+```

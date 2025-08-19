@@ -1,0 +1,366 @@
+---
+title: "Tutorial 4 - Seaborn e GeoPandas"
+subtitle: "Aprendendo a fazer gráficos mais avançados"
+jupyter: python3
+---
+
+## Carregando os pacotes
+
+```{python}
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+```
+
+## Lendo os dados
+
+```{python}
+#| echo: false
+
+import os
+from IPython.display import HTML
+
+def create_downloadable_dir_listing(directory, message="You can download the data here."):
+    file_list = os.listdir(directory)
+    html_content = f"<p>{message}</p><ul>"
+    for file in file_list:
+        html_content += f'<li><a href="{directory}/{file}" download>{file}</a></li>'
+    html_content += "</ul>"
+    return HTML(html_content) 
+
+# Example usage
+create_downloadable_dir_listing("pydata3/", message="Você pode baixar os dados aqui.")
+```
+
+```{python}
+
+imdb_filmes = pd.read_csv("pydata3/imdb_filmes.csv")
+```
+
+```{python}
+imdb_filmes.info()
+```
+
+```{python}
+imdb_filmes.describe()
+```
+
+```{python}
+imdb_filmes.sample(8)
+```
+
+## Limpeza dos dados
+
+Vamos converter a coluna `data_lancamento` para formato `data`.
+
+```{python}
+
+# Get all unique non-date values from `data_lancamento`
+non_date_values = imdb_filmes[pd.to_datetime(imdb_filmes['data_lancamento'], errors='coerce').isna()]['data_lancamento'].unique() 
+
+if (len(non_date_values) > 20):
+  # Sample 20 of them if there are too many unique values
+  print(f"Non-date values in `data_lancamento`: {np.random.choice(non_date_values, 20, replace=False)}")
+else:
+  # Otherwise print all unique non-date values from `data_lancamento`
+  print(f"Non-date values in `data_lancamento`: {non_date_values}")
+```
+
+```{python}
+
+imdb_filmes['data_lancamento']=pd.to_datetime(imdb_filmes['data_lancamento'], format='%Y-%m-%d',
+errors='coerce')
+```
+
+# Tipos de visualizações
+
+A visualização de dados é uma ferramenta poderosa que não só simplifica a compreensão de grandes volumes de dados, mas também desempenha um papel crucial na estatística aplicada e no aprendizado de máquina. Imagine o potencial de desbloquear insights valiosos e identificar padrões ocultos em seus conjuntos de dados! Com um conhecimento prévio do assunto, você pode explorar as nuances dos dados e revelar conexões significativas que podem surpreender e iluminar tanto você quanto sua audiência.
+
+![](images/Screenshot%202024-03-31%20at%204.45.55%20PM.png)
+
+## Gráfico de Dispersão
+
+Quando há necessidade de encontrar correlações, são utilizados os gráficos de dispersão. Se existir um conjunto de dados XY, então um gráfico de dispersão é utilizado para encontrar a relação entre as variáveis X e Y.
+
+As coordenadas `x` e `y` devem ser numéricas necessariamente. Vamos usar como exemplo, o dataframe `imdb_filmes`.
+
+No exemplo, a posição do ponto no eixo `x` pode ser dada pela coluna `orcamento` e a posição do ponto no eixo `y` pela coluna `receita`.
+
+```{python}
+
+sns.scatterplot(data=imdb_filmes, x='orcamento', y='receita')
+```
+
+Deixando o gráfico mais informativo:
+
+```{python}
+sns.scatterplot(data=imdb_filmes, x='orcamento', y='receita', hue='ano')
+
+plt.title('Gráfico de Dispersão entre Orçamento x Receita')
+plt.xlabel('Orçamento (x 100 Mi UDS)')
+plt.ylabel('Receita (Bi USD)')
+plt.show()
+```
+
+## Gráfico de Barras
+
+Um gráfico de barras também exibe tendências ao longo do tempo. No caso de múltiplas variáveis, um gráfico de barras pode facilitar a comparação dos dados para cada variável em todos os momentos no tempo. Por exemplo, um gráfico de barras pode ser utilizado para comparar o crescimento da empresa ano a ano.
+
+Vamos usar o dataframe `imdb_filmes` para exemplificar, ordenando as linhas por ordem decrescente de `nota_imdb`. Primeiro vamos gerar o gráfico com as configuração padrão.
+
+```{python}
+
+imdb_summary = imdb_filmes.sort_values('nota_imdb',
+ascending=False).head(8)
+
+```
+
+```{python}
+
+sns.barplot(imdb_summary, x='titulo', y='nota_imdb')
+```
+
+Mas os nomes dos filmes estão sobrepostos, então neste caso é recomendável realizar um gráfico de barras horizontais.
+
+```{python}
+sns.barplot(imdb_summary, x='nota_imdb', y='titulo')
+plt.title('Top 10 Filmes por Nota IMDB')
+plt.xlabel('Nota IMDB')
+plt.show()
+```
+
+## Gráfico de linha
+
+Gráficos de linhas são utilizados para exibir tendências ao longo do tempo. O eixo X é geralmente utilizado para representar um período, enquanto o eixo Y é utilizado para representar a quantidade associada ao período de tempo no eixo X. Por exemplo, um gráfico de linhas pode ilustrar o horário de pico de visitas em um shopping durante o dia, dividido por dias da semana e horas.
+
+Vamos fazer um gráfico utilizando a coluna `data_lancamento`
+
+```{python}
+
+imdb_lancamento = imdb_filmes.groupby('data_lancamento').agg({'titulo':"count",'nota_imdb':'mean','duracao':'mean'})
+
+imdb_lancamento.head(3)
+```
+
+Vamos agrupar os filmes por ano.
+
+```{python}
+
+imdb_anual = imdb_filmes.groupby(pd.Grouper(key='data_lancamento', freq='Y'))['nota_imdb'].mean()
+
+imdb_anual.head(3)
+```
+
+```{python}
+
+imdb_anual_df = pd.DataFrame(imdb_anual).reset_index()
+
+imdb_anual_df['data_lancamento'] = pd.to_datetime(imdb_anual_df['data_lancamento'], format='%Y-%m-%d')
+
+sns.lineplot(x='data_lancamento', y='nota_imdb', data=imdb_anual_df)
+
+```
+
+Também podemos plotar duas ou mais linhas. Vamos calcular intervalo interquartil e inclui-la no gráfico anterior.
+
+```{python}
+
+
+```
+
+## Gráfico de Boxplot
+
+Um gráfico de boxplot, também conhecido como diagrama de caixa, é uma ferramenta de visualização estatística que fornece uma representação compacta e informativa da distribuição de um conjunto de dados. Consiste em um retângulo (“caixa”) que se estende de um quartil ao outro, com uma linha vertical (ou “whisker”) estendendo-se de cada extremidade da caixa para representar a amplitude dos dados fora do intervalo interquartil.
+
+```{python}
+imdb_filmes['ano'] = imdb_filmes['data_lancamento'].dt.year
+
+imdb_filmes['decada'] = imdb_filmes['ano'] // 10 * 10
+
+imdb_filmes['decada'].astype('category')
+```
+
+```{python}
+
+sns.boxplot(x='decada', y='nota_imdb', data=imdb_filmes, showmeans=True)
+plt.title('Distribuição de notas IMDB por Década')
+plt.ylabel('IMDb Rating')
+plt.show()
+
+```
+
+O gráfico ficou ruim de visualizar, porém, é possível alterar as dimensões de qualquer gráfico matplotlib, utilizando a opção: `plt.figure(figsize=(15, 8))`. Também podemos mudar a cor de cada caixa.
+
+```{python}
+
+plt.figure(figsize=(15, 8))
+sns.boxplot(x='decada', y='nota_imdb', hue='decada', data=imdb_filmes, showmeans=True)
+plt.title('Distribuição de notas IMDB por Década')
+plt.ylabel('IMDb Rating')
+plt.show()
+```
+
+## Gráfico de Histograma
+
+Um histograma representa dados usando barras de alturas diferentes. Geralmente, cada barra agrupa números em intervalos em um histograma. Quanto mais alta as barras, mais dados se encaixam nesse intervalo. É usado para exibir a forma e a dispersão de amostras de um conjunto de dados contínuos. Por exemplo, podemos usar um histograma para medir as frequências de resposta da variável `nota_imdb` .
+
+O Histograma serve para observar a distribuição dos dados e eventualmente serve para comparar mais de uma distribuição.
+
+```{python}
+
+sns.histplot(data=imdb_filmes, x='nota_imdb', 
+bins=30, color='darkblue')
+plt.xlabel('Nota IMDb')
+plt.show()
+```
+
+# Mapas
+
+Precisamos instalar alguns pacotes:
+
+-   `pip install geobr`
+
+-   `pip install geopandas`
+
+## **Pacote `geobr` para mapas do Brasil**
+
+Vamos baixar os dados do Brasil por Estados.
+
+```{python}
+#| cache: true
+import numpy as np
+import geobr
+import geopandas as gpd
+
+states = geobr.read_state(year=2019)
+
+
+```
+
+```{python}
+
+fig, ax = plt.subplots(figsize=(15, 15), dpi=300)
+states.plot(facecolor="#2D3E50", edgecolor="#FEBF57", ax=ax)
+ax.set_title("Estados do Brasil", fontsize=20)
+plt.show()
+```
+
+Outra forma de trabalhar manualmente o mapa é utilizando a library geopandas e importando diretamente os dados geográficos.
+
+```{python}
+#| echo: false
+
+import os
+from IPython.display import HTML
+
+def create_downloadable_dir_listing(directory, message="You can download the data here."):
+    file_list = os.listdir(directory)
+    html_content = f"<p>{message}</p><ul>"
+    for file in file_list:
+        html_content += f'<li><a href="{directory}/{file}" download>{file}</a></li>'
+    html_content += "</ul>"
+    return HTML(html_content) 
+
+# Example usage
+create_downloadable_dir_listing("pydata4/", message="Você pode baixar os dados aqui.")
+```
+
+Vamos baixar os dados do Brasil do seguinte endereço:
+
+`www.ibge.gov.br –> geociências –> downloads –> cartas e mapas –> bases cartográficas contínuas –> bcim –> versao 2016 –> geopackage`
+
+```{python}
+mapa = gpd.read_file('pydata4/bcim_2016_21_11_2018.gpkg', layer='lim_unidade_federacao_a')
+```
+
+```{python}
+mapa.head()
+```
+
+Vamos a plotar o mapa do Brasil
+
+```{python}
+mapa.plot()
+```
+
+Agora queremos mapear alguma informação. Como exemplo, vamos pegar dados da expectativa de vida para os estados brasileiros:
+
+```{python}
+vida = pd.read_csv('pydata4/br_states_lifexpect2017.csv')
+vida.info()
+```
+
+Vamos unir as informações dos dois dataframes.
+
+```{python}
+br = pd.merge(mapa, vida, left_on='nome',right_on='uf', how='left')
+br= br.fillna(73)
+```
+
+Finalmente, vamos plotar o mapa:
+
+```{python}
+vmax = np.max(br['ESPVIDA2017'])
+vmin=np.min(br['ESPVIDA2017'])
+
+br.plot(column='ESPVIDA2017',
+        legend=True,
+        cmap='Reds',
+        vmax=vmax,
+        vmin=70)
+plt.show()
+```
+
+## Exemplo com dados de outro pais
+
+```{python}
+
+mapa_india = gpd.read_file('pydata4/india/india-polygon.shp')
+
+mapa_india.head(3)
+```
+
+```{python}
+mapa_india.plot()
+```
+
+Vamos mapear os dados provenientes de:
+
+```{python}
+dados_india = pd.read_excel('pydata4/importIN.xlsx')
+dados_india.head(3)
+
+dados_india2023 = dados_india[['Year',2023]]
+```
+
+Juntando os dados
+
+```{python}
+
+mapa_india_2023 = pd.merge(mapa_india, dados_india2023,
+left_on = 'st_nm', right_on='Year', how='left')
+
+mapa_india_2023.head(3)
+```
+
+Agora vamos plotar:
+
+```{python}
+np.min(mapa_india_2023[2023])
+```
+
+```{python}
+
+np.min(mapa_india_2023[2023])
+
+mapa_india_2023.plot(column=2023,
+        missing_kwds={'color':'lightgrey'},
+        legend=True,
+        cmap='YlOrRd',
+        linewidth=0.2,
+        edgecolor='0',
+        vmin=0).set_axis_off()
+plt.title('Capacidade Instalada Solar na India em 2023 (em MW)')
+plt.show()
+```

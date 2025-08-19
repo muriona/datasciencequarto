@@ -1,0 +1,23 @@
+---
+title: "Gestão Estratégica da Tecnologia de Informação"
+author: "Mauricio Uriona Maldonado"
+---
+
+```{r}
+#| label: photo
+#| fig.margin: true
+#| echo: false
+#| fig.width: 3.0
+#| fig.cap: Photo by Jaime Lopes on unsplash
+
+knitr::include_graphics("img/jaime-lopes-0RDBOAdnbWM-unsplash.jpg")
+
+```
+
+Bem-vindos!
+
+Neste site vocês encontrarão todas as tarefas e webinars que serão realizados ao longo do semestre.
+
+Agradecemos o apoio de [**Datacamp**.](https://www.datacamp.com/pt)
+
+![](img/DataCamp_Logo.jpg){width="694"}

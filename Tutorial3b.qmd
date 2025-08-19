@@ -1,0 +1,464 @@
+---
+title: "Tutorial 3b - Quarto Dashboards"
+subtitle: "NY"
+format: html
+execute: 
+  echo: true
+  message: false
+  warning: false
+---
+
+# Quarto Dashboards e Shiny
+
+Os dashboards são provavelmente a forma mais flexível de comunicar os resultados de um projeto de Data Science/Business Analytics. Na linguagem R, um dos principais pacotes para a produção de dashboards é o `flexdashboard` pois facilita a criação e manutenção do dashboard diretamente pelo RStudio.
+
+Se além disso se quer um Dashboard responsivo, isto é, que responda a controles manipulados pela pessoa que está consumindo o Dashboard, deve-se utilizar um pacote adicional chamado `shiny`.
+
+O Quarto recentemente lançou um formato `dashboard` como parte integral dos seus tipos de arquivos. Para isto, basta carregar `format = dashboard` dentro das opções do `yaml` conforme figura abaixo.
+
+![](images/Screenshot%202024-05-07%20at%201.51.48%20PM.png)
+
+Para nosso tutorial de esta aula,
+
+```{r}
+#| echo: false
+#| eval: true
+
+xfun::pkg_load2(c('htmltools', 'mime'))
+#xfun::embed_dir("datadash/", text = "Você pode baixar os dados aqui.")
+```
+
+```{r}
+#| echo: false
+create_downloadable_dir_listing <- function(directory, message = "Você pode baixar os dados aqui.") {
+
+  # Get the list of files in the specified directory
+  # Use full.names = FALSE to get only the filenames, as we prepend 'directory'
+  # Consider adding error handling for non-existent directories if needed
+  if (!dir.exists(directory)) {
+     warning("Directory not found: ", directory)
+     # Return an empty list or an error message wrapped in HTML
+     return(htmltools::HTML(paste0("<p>Error: Directory '", htmlEscape(directory), "' not found.</p>")))
+  }
+  file_list <- list.files(path = directory, full.names = FALSE)
+
+  # Start building the HTML content string
+  # Use htmlEscape for the user-provided message for safety
+  html_content <- paste0("<p>", htmltools::htmlEscape(message), "</p>\n<ul>\n")
+
+  # Check if the directory is empty
+  if (length(file_list) == 0) {
+    html_content <- paste0(html_content, "  <li>No files found in this directory.</li>\n")
+  } else {
+    # Loop through each file and create a list item with a download link
+    for (file in file_list) {
+      # Construct the href path. IMPORTANT: Assumes 'directory' is the correct
+      # URL prefix. Uses '/' which is standard for URLs.
+      # We escape the filename for display, but usually not needed for href itself.
+      # Browsers handle most special characters in hrefs, but complex cases might
+      # need URL encoding (e.g., using `URLencode()`) on the 'file' part if issues arise.
+      href_path <- paste0(directory, "/", file)
+      escaped_file_name <- htmltools::htmlEscape(file)
+
+      # Use sprintf for cleaner string formatting
+      list_item <- sprintf('  <li><a href="%s" download>%s</a></li>\n',
+                           href_path,
+                           escaped_file_name)
+
+      # Append the list item to the main HTML content
+      html_content <- paste0(html_content, list_item)
+    }
+  }
+
+  # Close the unordered list tag
+  html_content <- paste0(html_content, "</ul>")
+
+  # Return the complete HTML string wrapped in htmltools::HTML()
+  # This tells R environments (like Shiny/RMarkdown) to treat it as raw HTML
+  return(htmltools::HTML(html_content))
+}
+```
+
+```{r}
+#| echo: false
+create_downloadable_dir_listing("datadash/")
+```
+
+# Carregando pacotes
+
+Além dos pacotes comumente usados como o `tidyverse`, é necessário carregar o `shiny` para poder incluir interatividade nos dashboards.
+
+Outro pacote que iremos utilizar para deixar os gráficos do `ggplot` responsivos será o `plotly`, que deverá ser carregado também. E por fim, o `leaflet` para realizar mapas interativos.
+
+```{r}
+#| label: pacotes
+
+library(tidyverse)
+library(shiny)
+library(plotly) #precisa instalar a primeira vez
+library(leaflet) #para mapas interativos
+
+```
+
+# Básicos
+
+Para definir a orientação (layout) do dashboard, você pode testar entre `orientation: columns` ou `orientation: rows`:
+
+```{r}
+#| eval: false
+#| echo: true
+
+---
+title: "Aqui vem seu title"
+subtitle: "Aqui vem seu subtitle"
+format: 
+  dashboard:
+    orientation: columns
+theme: yeti
+---
+
+```
+
+Também podemos definir a largura de cada coluna utilizando: `{width=xx%}.`
+
+Têm muitas outras opções para customizar o dashboard, recomenda-se visitar o site de Dashboards em Quarto [aqui](https://quarto.org/docs/dashboards/#getting-started).
+
+## Dados de NY
+
+Para facilitar a construção do nosso dashboard, vamos utilizar como exemplo três datasets diferentes sobre a cidade de Nova Iorque (NY). Um deles contém a lista de restaurantes na cidade, o outro contém dados sobre propriedades para alugar via airbnb e a última contém dados sobre crimes ocorridos na cidade. Vamos carregar os dados:
+
+```{r}
+crime <- read.csv("datadash/nyccrimes.csv", stringsAsFactors=TRUE)
+
+airbnb <- read_csv("datadash/AB_NYC_2019.csv", 
+    col_types = cols(last_review = col_date(format = "%Y-%m-%d")))
+
+rest <- read_csv("datadash/restaurant_week_2018_final.csv")
+```
+
+Para construir dashboards é muito importante definir uma paleta de cores padrão para ser utilizada uniformemente em todos os gráficos, tabelas e KPIs, para isto vamos criar um objeto com cores previamente selecionadas:
+
+```{r}
+minhascores <- c("#9b5de5","#f15bb5","#fee440","#00bbf9","#00f5d4","#264653","#2A9D8F","#E9C46A","#F4A261",
+                 "#E76F51")
+```
+
+### Restaurantes
+
+Agora vamos realizar alguns gráficos para o dataset de restaurantes:
+
+```{r}
+
+rest %>% 
+  group_by(restaurant_type) %>% 
+  summarize(Media = mean(average_review)) %>%
+  head(10) %>% 
+  ggplot(aes(reorder(restaurant_type,Media), 
+             Media,fill=restaurant_type))+
+  geom_col()+
+  coord_flip()+
+  scale_fill_manual(values=minhascores)
+```
+
+```{r}
+rest %>% 
+  group_by(restaurant_type, price_range) %>% 
+  summarize(Media = mean(average_review)) %>%
+ # head(10) %>% 
+  ggplot(aes(reorder(restaurant_type,Media), Media, fill=price_range))+
+  geom_col()+
+  coord_flip()+
+  facet_wrap(vars(price_range), scales = "free")+
+  scale_fill_manual(values=minhascores)+
+  theme(legend.position = "none")
+```
+
+```{r}
+rest %>%  
+  group_by(restaurant_type, price_range) %>% 
+  summarize(Media = mean(average_review)) %>%
+  #head(10) %>% 
+  ggplot(aes(price_range, Media, fill=price_range))+
+  geom_boxplot()+
+  scale_fill_manual(values=minhascores)+
+  theme(legend.position = "none")
+```
+
+### Airbnb
+
+Da mesma forma, vamos criar alguns gráficos para o dataset Airbnb.
+
+```{r}
+boxplot <- airbnb %>% 
+    ggplot(aes(neighbourhood_group, price, 
+             fill=neighbourhood_group))+
+  geom_boxplot()+
+  scale_fill_manual(values=minhascores)+
+  scale_y_log10()
+
+boxplot
+
+```
+
+Podemos converter o boxplot anterior em interativo, utilizando `plotly`
+
+```{r}
+
+ggplotly(boxplot)
+```
+
+```{r}
+airbnb %>% 
+  ggplot(aes(last_review, number_of_reviews))+
+  geom_point(color="#9b5de5",
+             alpha=0.5)
+```
+
+```{r}
+densidade <- airbnb %>% 
+  ggplot(aes(price))+
+  geom_density(color="#F4A261",
+               fill = "#F4A261",
+               alpha=0.7)+
+  scale_x_log10()
+
+densidade
+```
+
+Podemos converter o gráfico anterior em interativo utilizando `plotly`
+
+```{r}
+ggplotly(densidade)
+```
+
+### Crimes
+
+Agora, por fim, vamos criar alguns gráficos para visualizar os crimes em NY.
+
+```{r}
+#| eval: true
+
+crime %>%
+  sample_frac(0.01) %>% #para escolher 1% dos dados
+  filter(LAW_CAT_CD=="FELONY") %>% 
+  filter(BORO_NM=="MANHATTAN") %>% 
+  leaflet() %>% 
+  addTiles() %>% 
+  addMarkers()
+```
+
+# Pacote `highcharter`
+
+O pacote `highcharter` tem o mesmo propósito que o `plotly`, o de fazer gráficos dinâmicos.
+
+```{r}
+#| eval: false
+
+library(highcharter)
+
+boxplot2 <- airbnb %>%
+  hchart(
+    type = "boxplot",
+    hcaes(x = neighbourhood_group, y = price),
+    colorByPoint = TRUE,  
+    colors = minhascores, 
+    yAxis = list(type = "logarithmic") 
+  ) %>%
+  hc_title(text = "Distribuição de Preços por Bairro")
+
+boxplot2
+
+```
+
+# Shiny
+
+O `shiny` é um pacote que serve para criar um dashboard responsivo (veja [aqui](https://programando-em-shiny.curso-r.com/)).
+
+Para poder converter o nosso dashboard em responsivo precisamos alterar (re-arranjar) a estrutura de células de código do nosso arquivo `qmd`.
+
+Primeiro, devemos colocar todos os nossos pacotes bem como a leitura de arquivos e outras etapas de pré-processamento numa célula `chunk` antes de todos os títulos (#, ##, etc.), utilizando `"#| context: setup` como mostra a figura abaixo.
+
+![](images/Screenshot%202024-05-14%20at%202.37.17%20PM.png)
+
+O conteúdo completo do primeiro `chunk` aparece abaixo.
+
+```{r}
+#| eval: false
+#| echo: true
+#| context: setup
+
+library(tidyverse)
+library(shiny)
+library(plotly) #precisa instalar a primeira vez
+library(leaflet) #para mapas interativos
+
+
+crime <- read.csv("nyccrimes.csv", stringsAsFactors=TRUE)
+
+airbnb <- read_csv("AB_NYC_2019.csv", 
+    col_types = cols(last_review = col_date(format = "%Y-%m-%d")))
+
+rest <- read_csv("restaurant_week_2018_final.csv")
+
+zipcodes <- read_csv("NYCZipcodes.csv")
+
+rest <- rest %>% 
+  left_join(zipcodes, by=c("postal_code"="ZIP Codes"))
+
+minhascores <- c("#9b5de5","#f15bb5","#fee440","#00bbf9","#00f5d4","#264653","#2A9D8F","#E9C46A","#F4A261",
+                 "#E76F51")
+
+
+```
+
+Logo, devemos criar uma nova coluna utilizando "\## {.sidebar}". É nesta coluna que os controles para interagir com o nosso dashboard serão colocados. Um exemplo de `sidebar` segue abaixo.
+
+![](images/Screenshot%202024-05-14%20at%202.41.58%20PM.png)
+
+Cada gráfico precisará de dois `chunks`, um para plotar o gráfico e outro para preparar o gráfico reativo.
+
+Para plotar o gráfico usaremos algo como:
+
+```{r}
+#| eval: false
+
+plotOutput('plot')
+```
+
+E para preparar o gráfico reativo precisaremos chamar uma função `reactive()` e depois uma função `renderPlot()`, `renderTable()`, etc.:
+
+```{r}
+#| eval: false
+
+#primeira parte usando reactive
+dataset <- reactive(
+  {
+    filter(rest, Neighborhood==input$bairro) %>% 
+  group_by(restaurant_type) %>% 
+  summarize(Media = mean(average_review)) %>%
+  head(10)
+    })
+
+#segunda parte usando renderPlot
+output$plot <- renderPlot({
+  
+  p <- ggplot(dataset(),
+         aes(reorder(restaurant_type,Media), 
+             Media,fill=restaurant_type))+
+  geom_col()+
+  coord_flip()+
+  scale_fill_manual(values=minhascores)
+  p
+})
+
+```
+
+Um outro exemplo usando `renderTable()` segue abaixo. Note que para plotar a tabela `data` será necessário ter um `chunk` acima utilizando `plotTable('data')`.
+
+```{r}
+#| eval: false
+
+dataset2 <- reactive(
+  {
+  filter(rest, Neighborhood==input$bairro) %>% 
+  group_by(restaurant_type) %>% 
+  summarize(Media = mean(average_review)) %>%
+  head(10)
+    })
+
+output$data <- renderTable({
+  dataset2()
+})
+
+```
+
+## Opções para o *Sidebar* {#sec-opções-para-o-sidebar}
+
+Criar uma coluna sidebar usando o código: `## {.sidebar}`
+
+```{r}
+#| eval: false
+
+# Menu desplegável
+
+
+selectInput("nome",
+            label = "Selecione ...",
+            choices = c(____),
+            selected = ____)
+
+# Slider
+
+sliderInput("nome2",
+            label = "Escolha ....",
+            min = "___", max = "____", value = "___", step = '___', 
+            dragRange = TRUE)
+
+# Data
+
+dateInput(inputid = "data1", 
+          label = "____", 
+          value = "YYYY-MM-DD", #informar a data
+          format = "mm/dd/yy",
+          language = "pt")
+
+# Intervalo de datas - produzirá um objeto com dois valores
+
+dateRangeInput("data2", label = "______",
+                 start  = "_____", #informar a data de início
+                 end    = "_____", #informar a data de finalização
+                 format = "mm/dd/yy",
+                 language = "pt",
+                 separator = " - ")
+```
+
+## Opções para o corpo
+
+```{r}
+#| eval: false
+
+# KPIs
+
+renderValueBox({
+
+valueBox(prettyNum(______, big.mark = ','), 
+         icon = 'fa-ship', caption = "_____",
+         color="#9b5de5")
+}
+)
+
+# Requer library(plotly)
+
+renderPlotly({  
+df <- _____
+ggplotly(df)
+  })
+
+# Gauges - velocímetros
+
+renderGauge({
+  df <- _____
+  gauge(____, min = ___, max = ___, symbol = '%', gaugeSectors(
+    success = c(____, ___), warning = c(____, ___ ), danger = c(____, ___)
+  ))
+})
+
+
+# Tabelas
+
+renderTable({  
+df %>% 
+  mutate(____) %>% 
+  filter(_____) %>% 
+  group_by(____) %>% 
+  count() %>% 
+  arrange(desc(n)) 
+})
+
+```
+
+# Instruções para subir seu dashboard
+
+Uma vez que você tenha escolhido as melhores visualizações, deverá criar um dashboard utilizando o`format: dashboard` e subi-lo à plataforma [shinyapps.io](https://www.shinyapps.io/).
+
+Para poder configurar o shinyapps.io deve seguir as instruções [nesta página](https://docs.posit.co/shinyapps.io/getting-started.html#working-with-shiny-for-r).

@@ -1,0 +1,418 @@
+---
+title: "Tutorial 8 - Métodos de Classificação"
+jupyter: python3
+---
+
+## Carregando os pacotes
+
+```{python}
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+from sklearn.model_selection import train_test_split
+from sklearn import preprocessing
+```
+
+## Classificação
+
+Em machine learning, um problema de **classificação** é a tarefa de ensinar um computador a categorizar um item em uma de várias classes ou grupos pré-definidos, com base em suas características. Imagine que você tem um conjunto de dados históricos, como e-mails já rotulados como "spam" ou "não spam", ou peças de um motor identificadas como "aptas" ou "defeituosas". O algoritmo aprende os padrões nesses dados para construir um modelo. O objetivo final é que esse modelo, ao receber um *novo* e-mail ou os dados de uma *nova* peça, consiga prever com alta precisão a qual classe ele pertence. Essencialmente, a classificação responde à pergunta: "A qual categoria este item pertence?".
+
+[![O problema de classificação em ML. Fonte: Gong (2022)](images/classification.png)](https://medium.com/data-science/top-machine-learning-algorithms-for-classification-2197870ff501)
+
+## Os algoritmos
+
+### 1. Regressão Logística
+
+[![Regressão Logística. Fonte: Gong (2022)](images/logreg.png)](https://medium.com/data-science/top-machine-learning-algorithms-for-classification-2197870ff501)
+
+A Regressão Logística usa a função sigmoide para retornar a probabilidade de um rótulo. Ela é muito utilizada quando o problema de classificação é binário — por exemplo, verdadeiro ou falso, ganhar ou perder, positivo ou negativo.
+
+A função sigmoide gera um valor de probabilidade e, ao compará-lo com um limiar (*threshold*) pré-definido, o item é classificado com o rótulo correspondente.
+
+### 2. Árvore de Decisão
+
+[![Árvore de Decisão. Fonte: Gong (2022)](images/dectree.png)](https://medium.com/data-science/top-machine-learning-algorithms-for-classification-2197870ff501)
+
+A Árvore de Decisão cria seus ramos de forma hierárquica, onde cada ramo pode ser entendido como uma estrutura condicional `if-else`.
+
+Os ramos são desenvolvidos dividindo-se o conjunto de dados (*dataset*) em subconjuntos, com base nas características (*features*) de maior importância. A classificação final ocorre nas folhas da árvore.
+
+### 3. Random Forest
+
+[![Random Forests. Fonte: Gong (2022)](images/randomforest.png)](https://medium.com/data-science/top-machine-learning-algorithms-for-classification-2197870ff501)
+
+Como o próprio nome sugere, o **Random Forest** (ou Floresta Aleatória) é um conjunto de árvores de decisão. É um tipo comum de método de *ensemble*, que agrega os resultados de múltiplos preditores.
+
+O *Random Forest* utiliza adicionalmente a técnica de **bagging**, que permite que cada árvore seja treinada com uma amostragem aleatória do conjunto de dados original e, ao final, considera o voto da maioria das árvores para o resultado.
+
+Em comparação com uma única árvore de decisão, este método tem uma **melhor generalização**, mas é **menos interpretável**, devido às múltiplas camadas de complexidade adicionadas ao modelo.
+
+## Lendo os dados
+
+```{python}
+
+df = pd.read_csv('pydata5/card_transdata.csv')
+
+df = df.sample(10000).copy()
+```
+
+```{python}
+df.head(10)
+```
+
+```{python}
+df.info()
+```
+
+```{python}
+
+df.describe()
+```
+
+```{python}
+df.query('distance_from_home > 1000')
+```
+
+## Análise exploratória
+
+```{python}
+colors = ['#d62828', '#f77f00', '#003049']
+
+num_list = ['distance_from_home', 'distance_from_last_transaction', 'ratio_to_median_purchase_price']
+fig, axes = plt.subplots(nrows=3, ncols=1, figsize=(8, 10))
+
+for i, column in enumerate(num_list):
+  df[column].plot(kind='kde', ax=axes[i], color=colors[i], lw=3)
+  axes[i].set_title(f'Distribuição de "{column}"', fontsize=14)
+  axes[i].set_xlabel('')
+  axes[i].set_xscale('log')
+  
+plt.tight_layout()
+plt.show()
+
+```
+
+Features Categóricas e o `target`:
+
+```{python}
+
+cat_list = ['repeat_retailer','used_chip','used_pin_number','online_order']
+fig = plt.figure(figsize=(8,4))
+
+for i in range(len(cat_list)):
+  column = cat_list[i]
+  sub = fig.add_subplot(2,2, i+1)
+  chart = sns.countplot(data=df, x=column, hue='fraud', palette = colors[0:2])
+
+plt.tight_layout()
+plt.show()
+
+```
+
+Features numéricas e o `target`:
+
+```{python}
+
+fig = plt.figure(figsize = (6,12))
+for i, column in enumerate(num_list):
+  
+  ax = fig.add_subplot(3, 1, i + 1)
+  sns.boxplot(x='fraud', y=column, data=df, hue='fraud', palette=colors[0:2], ax=ax)
+  ax.set_yscale('log')
+  ax.set_title(f'Distribuição de "{column}" por Fraude (Escala Log)', fontsize=14)
+
+plt.tight_layout()
+
+plt.show()
+```
+
+## Split dataset
+
+```{python}
+X = df.drop(['fraud'], axis=1)
+y = df["fraud"]
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=2025)
+```
+
+## Regressão Logística
+
+```{python}
+from sklearn.linear_model import LogisticRegression
+```
+
+Para modelos com poucas observações usar `solver='liblinear'`, já para modelos com datasets grandes, usar `solver='saga'.`
+
+```{python}
+modelo_logreg = LogisticRegression(
+    solver='liblinear', 
+    n_jobs=-1,
+    random_state=42,
+    max_iter=5000 
+)
+```
+
+```{python}
+
+# Medir o tempo de treinamento
+
+#start_time = time.time()
+modelo_logreg.fit(X_train, y_train)
+#end_time = time.time()
+#training_time = end_time - start_time
+
+```
+
+Fazer Previsões com os Dados de Teste:
+
+```{python}
+y_pred_logreg = modelo_logreg.predict(X_test)
+```
+
+### Avaliação do Modelo
+
+A **Acurácia** é o indicador mais direto do desempenho do modelo. Ela mede o percentual de previsões corretas:
+
+$$
+A=\frac{TP+TN}{TP+FP+FN+TN}
+$$
+
+Agora vamos calcular alguns indicadores de acurácia.
+
+```{python}
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report, roc_curve, roc_auc_score
+
+acuracia_logreg = accuracy_score(y_test, y_pred_logreg)
+print(f"\nAcurácia do modelo: {acuracia_logreg:.4f}")
+
+```
+
+Outro indicador da acurácia diz respeito às vezes que o modelo acertou, para isto é necessário calcular a Matriz de Confusão.
+
+[![Matriz de Confusão. Fonte: van Otten (2024)](images/confusion-matrix.png)](https://spotintelligence.com/2024/09/06/confusion-matrix-a-beginners-guide-how-to-tutorial-in-python/)
+
+```{python}
+cm_log_reg = confusion_matrix(y_test, y_pred_logreg)
+
+plt.figure(figsize=(8, 6))
+sns.heatmap(
+    cm_log_reg, 
+    annot=True,
+    fmt='d', 
+    cmap='Reds',
+    xticklabels=['Classe 0', 'Classe 1'],
+    yticklabels=['Classe 0', 'Classe 1']
+)
+plt.title('Matriz de Confusão', fontsize=16)
+plt.ylabel('Rótulo Verdadeiro', fontsize=12)
+plt.xlabel('Rótulo Previsto', fontsize=12)
+plt.show()
+```
+
+O próximo indicador é o AUC (área sob a curva) que é calculada a partir da ROC (curva característica do processo). Imagine que você está avaliando um médico.
+
+[![Curva ROC. Fonte: Gong (2022)](images/rocauc.png)](https://medium.com/data-science/top-machine-learning-algorithms-for-classification-2197870ff501)
+
+A **Curva ROC** é um gráfico que mostra o quão bom o médico (seu modelo) é em fazer diagnósticos. Ela mostra o equilíbrio entre duas coisas:
+
+1.  **Acertar os doentes (Eixo Y):** A taxa de "Verdadeiros Positivos". O ideal é que seja alta.
+
+2.  **Errar com os saudáveis (Eixo X):** A taxa de "Falsos Positivos", ou seja, quantas vezes ele diagnostica a doença em quem não a tem. O ideal é que seja baixa.
+
+**O objetivo é ter uma curva que "suba rápido" e fique o mais próximo possível do canto superior esquerdo**, o que significa acertar muitos doentes sem errar muito com os saudáveis.
+
+A **AUC** (Área Sob a Curva) é a **nota final** que o médico recebe, resumindo o gráfico inteiro em um único número.
+
+-   $AUC = 1.0$: Um médico perfeito. Nunca erra.
+-   $AUC > 0.8$: Um médico excelente, muito confiável.
+-   $AUC = 0.5$: Um médico inútil. O desempenho dele é igual a jogar uma moeda para decidir.
+
+**Em resumo:** A **Curva ROC** é o relatório de desempenho completo, e a **AUC** é a nota final que diz, de 0.5 a 1.0, o quão bom seu modelo é em separar as classes.
+
+Para obter o valor de AUC, é necessário calcular as probabilidades:
+
+```{python}
+y_pred_logreg_proba = modelo_logreg.predict_proba(X_test)[:, 1]
+```
+
+```{python}
+
+auc_score_logreg = roc_auc_score(y_test, y_pred_logreg_proba)
+print(f"Pontuação ROC AUC: {auc_score_logreg:.4f}")
+```
+
+Calcular a curva ROC:
+
+```{python}
+
+fpr, tpr, thresholds = roc_curve(y_test, y_pred_logreg_proba)
+
+plt.figure(figsize=(8, 4))
+# Plotar a curva do nosso modelo
+plt.plot(fpr, tpr, color=colors[0], lw=2, label=f'Curva ROC (AUC = {auc_score_logreg:.4f})')
+# Plotar a linha de referência de um classificador aleatório (AUC = 0.5)
+plt.plot([0, 1], [0, 1], color=colors[1], lw=2, linestyle='--', label='Classificador Aleatório')
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.05])
+plt.xlabel('Taxa de Falsos Positivos (FPR)', fontsize=12)
+plt.ylabel('Taxa de Verdadeiros Positivos (TPR)', fontsize=12)
+plt.title('Curva ROC (Receiver Operating Characteristic)', fontsize=16)
+plt.legend(loc="lower right")
+plt.tight_layout()
+plt.show()
+```
+
+## Árvore de Decisão
+
+```{python}
+from sklearn.tree import DecisionTreeClassifier, plot_tree
+```
+
+Vamos treinar o modelo:
+
+```{python}
+modelo_tree = DecisionTreeClassifier(
+    max_depth=6,
+    class_weight='balanced',
+    random_state=2025
+)
+
+modelo_tree.fit(X_train, y_train)
+```
+
+Fazemos as previsões:
+
+```{python}
+
+y_pred_tree = modelo_tree.predict(X_test)
+y_pred_tree_proba = modelo_tree.predict_proba(X_test)[:, 1] #classe com fraude
+
+```
+
+### Avaliação do Modelo
+
+```{python}
+acuracia_tree = accuracy_score(y_test, y_pred_tree)
+print(f"\nAcurácia do modelo: {acuracia_tree:.4f}")
+```
+
+```{python}
+auc_score_tree = roc_auc_score(y_test, y_pred_tree_proba)
+print(f"Pontuação ROC AUC: {auc_score_tree:.4f}")
+```
+
+E a curva ROC:
+
+```{python}
+fpr, tpr, thresholds = roc_curve(y_test, y_pred_tree_proba)
+
+plt.figure(figsize=(8, 8))
+plt.plot(fpr, tpr, color=colors[0], lw=2, label=f'Curva ROC (AUC = {auc_score_tree:.4f})')
+plt.plot([0, 1], [0, 1], color=colors[1], lw=2, linestyle='--', label='Classificador Aleatório')
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.05])
+plt.xlabel('Taxa de Falsos Positivos (FPR)', fontsize=12)
+plt.ylabel('Taxa de Verdadeiros Positivos (TPR)', fontsize=12)
+plt.title('Curva ROC (Receiver Operating Characteristic)', fontsize=16)
+plt.legend(loc="lower right")
+plt.tight_layout()
+plt.show()
+```
+
+## Random Forest
+
+```{python}
+from sklearn.ensemble import RandomForestClassifier
+```
+
+construimos o modelo:
+
+```{python}
+
+modelo_rf = RandomForestClassifier(
+    n_estimators=100,
+    class_weight='balanced',
+    random_state=42,
+    n_jobs=-1)
+```
+
+treinamos o modelo:
+
+```{python}
+modelo_rf.fit(X_train, y_train)
+```
+
+construimos as previsões:
+
+```{python}
+y_pred_rf = modelo_rf.predict(X_test)
+y_pred_rf_proba = modelo_rf.predict_proba(X_test)[:, 1]
+```
+
+### Avaliação do Modelo
+
+```{python}
+acuracia_rf = accuracy_score(y_test, y_pred_rf)
+print(f"\nAcurácia do modelo: {acuracia_rf:.4f}")
+```
+
+```{python}
+auc_score_rf = roc_auc_score(y_test, y_pred_rf_proba)
+print(f"Pontuação ROC AUC: {auc_score_rf:.8f}")
+```
+
+Matriz de confusão:
+
+```{python}
+cm_rf = confusion_matrix(y_test, y_pred_rf)
+
+plt.figure(figsize=(8, 6))
+sns.heatmap(
+    cm_rf, 
+    annot=True,
+    fmt='d', 
+    cmap='Reds',
+    xticklabels=['Classe 0', 'Classe 1'],
+    yticklabels=['Classe 0', 'Classe 1']
+)
+plt.title('Matriz de Confusão', fontsize=16)
+plt.ylabel('Rótulo Verdadeiro', fontsize=12)
+plt.xlabel('Rótulo Previsto', fontsize=12)
+plt.show()
+```
+
+E a curva ROC:
+
+```{python}
+fpr, tpr, thresholds = roc_curve(y_test, y_pred_rf_proba)
+
+plt.figure(figsize=(8, 8))
+plt.plot(fpr, tpr, color=colors[0], lw=2, label=f'Curva ROC (AUC = {auc_score_rf:.8f})')
+plt.plot([0, 1], [0, 1], color=colors[1], lw=2, linestyle='--', label='Classificador Aleatório')
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.05])
+plt.xlabel('Taxa de Falsos Positivos (FPR)', fontsize=12)
+plt.ylabel('Taxa de Verdadeiros Positivos (TPR)', fontsize=12)
+plt.title('Curva ROC (Receiver Operating Characteristic)', fontsize=16)
+plt.legend(loc="lower right")
+plt.tight_layout()
+plt.show()
+```
+
+## Comparando os modelos
+
+```{python}
+results_data = {
+    'Modelo': ['Regressão Logística', 'Árvore de Decisão', 'Random Forest'],
+    'Acurácia': [acuracia_logreg, acuracia_tree, acuracia_rf],
+    'AUC': [auc_score_logreg, auc_score_tree, auc_score_rf]
+}
+
+resultados_df = pd.DataFrame(results_data)
+```
+
+```{python}
+resultados_df
+```

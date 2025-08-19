@@ -1,0 +1,51 @@
+project:
+  type: website
+
+website:
+  title: "EPS7008-UFSC"
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+      - text: Tutoriais Python
+        menu:
+          - href: pyTutorialPython.qmd
+          - href: pyTutorial1.qmd
+          - href: pyTutorial2.qmd
+          - href: pyTutorial3.qmd
+          - href: pyTutorial4.qmd
+          - href: pyTutorial5.ipynb
+          - href: pyTutorial5b.qmd
+          - href: pyTutorial5c.qmd
+          - href: pyTutorial6.qmd
+          - href: pyTutorial7.qmd
+          - href: pyTutorial8.qmd
+      - text: Tutoriais R
+        menu: 
+          - href: Tutorial0.qmd
+          - href: Tutorial1.qmd
+          - href: Tutorial2.qmd
+          - href: Tutorial_av_ggplot.qmd
+          - href: Tutorial3b.qmd
+          - href: Tutorial4.qmd
+          - href: Tutorial5regtidymodels.qmd
+#          - href: Tutorial5.qmd
+#          - href: Tutorial6.qmd
+        
+#      - text: Labs
+#        menu: 
+#          - href: Lab1.qmd
+#          - href: Lab2.qmd
+#          - href: Lab3.qmd
+#          - href: Lab4enunciado.qmd
+#          - href: Lab5.qmd
+#          - href: Lab6.qmd
+
+format:
+  html:
+    theme: flatly
+    css: styles.css
+    toc: true
+
+editor: visual
+

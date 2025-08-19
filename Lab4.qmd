@@ -1,0 +1,252 @@
+---
+title: "Lab 4 - Tidymodels - Classificação"
+subtitle: "Previsão de reservas de hotel com crianças"
+---
+
+```{r}
+#| label: setup
+#| include: false
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, cache = TRUE)
+```
+
+# Carregando os dados
+
+Este webinar usará dados sobre reservas de Hotéis que incluem crianças (versus aquelas que não. Os dados fazem parte deste [estudo](https://www.sciencedirect.com/science/article/pii/S2352340918315191).
+
+Vamos carregar os dados e incluir apenas as reservas que não foram canceladas uma vez que mais informações são coletadas do hospede na hora do check-in. Neste caso, os dados são automaticamente baixados do site do **tidytuesday**.
+
+```{r}
+library(tidyverse)
+
+hotels <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-02-11/hotels.csv")
+
+```
+
+# Limpeza dos dados
+
+Inicialmente é necessário fazer uma limpeza dos dados. Por exemplo, vamos considerar apenas as reservas efetivadas (e não as canceladas), portanto precisamos filtrá-las. Também vamos considerar bebês e crianças dentro da mesma categoria, então iremos criar uma nova coluna 'children'.
+
+```{r}
+hotel_stays <- hotels %>%
+  filter(is_canceled == 0) %>%
+  mutate(
+    children = case_when(
+      children + babies > 0 ~ "children",
+      TRUE ~ "none"
+    ),
+    required_car_parking_spaces = case_when(
+      required_car_parking_spaces > 0 ~ "parking",
+      TRUE ~ "none"
+    )
+  ) %>%
+  select(-is_canceled, -reservation_status, -babies)
+
+hotel_stays %>% 
+  head()
+```
+
+Observamos que há quase 10x mais reservas sem crianças.
+
+```{r}
+hotel_stays %>%
+  count(children)
+```
+
+# Análise exploratória de dados - EDA
+
+Vamos usar a função `skim` que ajuda a identificar de forma rápida as características do nosso dataframe, por exemplo, se há valores `NA` bem como os máximos e mínimos das colunas numéricas, etc.
+
+```{r}
+library(skimr)
+
+skim(hotel_stays)
+```
+
+As reservas de Hotel variam de acordo com o mês? há diferenças entre Hotéis Resort e Hotéis de Executivo?
+
+```{r}
+hotel_stays %>%
+  mutate(arrival_date_month = factor(arrival_date_month,
+    levels = month.name
+  )) %>%
+  count(hotel, arrival_date_month, children) %>%
+  group_by(hotel, children) %>%
+  mutate(proportion = n / sum(n)) %>%
+  ggplot(aes(arrival_date_month, proportion, fill = children)) +
+  geom_col(position = "dodge") +
+  scale_y_continuous(labels = scales::percent_format()) +
+  facet_wrap(~hotel, nrow = 2) +
+  labs(
+    x = NULL,
+    y = "Proporção de reservas",
+    fill = NULL
+  )
+```
+
+Vamos explorar algumas outras relações entre as variáveis:
+
+```{r}
+library(GGally)
+
+hotel_stays %>%
+  select(
+    children, adr,
+    required_car_parking_spaces,
+    total_of_special_requests
+  ) %>%
+  ggpairs(mapping = aes(color = children))
+```
+
+# Modelagem supervisionada usando Tidymodels
+
+O pacote `tidymodels` é uma evolução do `caret` e procura facilitar a construção de modelos de machine learning, seguindo um padrão que independe do modelo a ser construído (regressão linear, árvores de decisão, etc.).
+
+Para isto, vamos selecionar apenas algumas colunas de interesse e criar um novo objeto denominado `hotels_df`.
+
+```{r}
+hotels_df <- hotel_stays %>%
+  select(
+    children, hotel, arrival_date_month, meal, adr, adults,
+    required_car_parking_spaces, total_of_special_requests,
+    stays_in_week_nights, stays_in_weekend_nights
+  ) %>%
+  mutate_if(is.character, factor)
+```
+
+Vamos dividir o dataset em treino e teste:
+
+```{r}
+library(tidymodels)
+
+set.seed(1234)
+hotel_split <- initial_split(hotels_df, strata=children)
+
+hotel_train <- training(hotel_split)
+hotel_test <- testing(hotel_split)
+
+```
+
+Para aprimorar a robustez das nossas estimações, iremos usar um procedimento denominado k-fold cross validation ou validação cruzada. Neste procedimento, os dados de treino são subdivididos aleatoriamente em treino e teste e seus parâmetros de acurácia são calculados. Este procedimento é repetido 'k' vezes de forma que sejam calculados os parâmetros de acurácia de cada 'k'. Uma vez que o procedimento é completado (ajustando o modelo a cada 'k' subdataset de treino e teste), calcula-se a média de todos os parâmetros de acurácia. Mais detalhes [aqui](https://pt.wikipedia.org/wiki/Valida%C3%A7%C3%A3o_cruzada#M%C3%A9todo_k-fold).
+
+```{r}
+hotel_fold <- vfold_cv(hotel_train)
+
+hotel_rec <- recipe(children ~ ., data = hotel_train) %>%
+  step_dummy(all_nominal(), -all_outcomes()) %>%
+  step_normalize(all_numeric())
+
+hotel_wf <- workflow() %>% 
+  add_recipe(hotel_rec)
+```
+
+Vamos treinar um modelo de Regressão Logística (usando `glm`), logo um de Árvore de Decisão (usando `rpart`) e finalmente um de Random Forest (usando `ranger`)
+
+```{r}
+
+glm_spec <- logistic_reg() %>% 
+  set_engine("glm")
+
+tree_spec <- decision_tree() %>%
+  set_engine("rpart") %>%
+  set_mode("classification")
+
+rf_spec <- rand_forest(trees=1000) %>% 
+  set_engine("ranger") %>% 
+  set_mode("classification")
+```
+
+Segue os resultados do modelo de Regressão Logística:
+
+```{r}
+#| label: glm
+doParallel::registerDoParallel()
+
+glm_rs <- hotel_wf %>% 
+  add_model(glm_spec) %>% 
+  fit_resamples(resamples=hotel_fold,
+                metrics=metric_set(roc_auc, accuracy, sensitivity, specificity),
+                control=control_resamples(save_pred=TRUE))
+
+collect_metrics(glm_rs)
+
+glm_rs %>% 
+  conf_mat_resampled()
+
+glm_rs %>% 
+  collect_predictions() %>% 
+  group_by(id) %>% 
+  roc_curve(children, .pred_children) %>% 
+  autoplot()
+```
+
+Segue os resultados do modelo de Árvore de Decisão:
+
+```{r}
+#| label: tree
+tree_rs <- hotel_wf %>% 
+  add_model(tree_spec) %>% 
+  fit_resamples(resamples=hotel_fold,
+                metrics=metric_set(roc_auc, accuracy, sensitivity, specificity),
+                control=control_resamples(save_pred=TRUE))
+
+collect_metrics(tree_rs)
+
+tree_rs %>% 
+  conf_mat_resampled()
+
+tree_rs %>% 
+  collect_predictions() %>% 
+  group_by(id) %>% 
+  roc_curve(children, .pred_children) %>% 
+  autoplot()
+```
+
+Segue os resultados do modelo Random Forest:
+
+```{r}
+#| label: rf
+rf_rs <- hotel_wf %>% 
+  add_model(rf_spec) %>% 
+  fit_resamples(resamples=hotel_fold,
+                metrics=metric_set(roc_auc, accuracy, sensitivity, specificity),
+                control=control_resamples(save_pred=TRUE))
+
+collect_metrics(rf_rs)
+
+rf_rs %>% 
+  conf_mat_resampled()
+
+rf_rs %>% 
+  collect_predictions() %>% 
+  group_by(id) %>% 
+  roc_curve(children, .pred_children) %>% 
+  autoplot()
+```
+
+O melhor modelo é o Random Forest, portanto o usaremos para realizar as estimações finais no dataset de teste. A função `last_fit()` realiza um último ajuste (fit) usando os dados de treino (dentro da especificação rf_spec) e automaticamente uma última estimação, usando os dados de teste (a função reconhece os dados de treino e teste no objeto `hotel_split`).
+
+Note que até agora, não usamos em nenhum momento os dados de teste.
+
+```{r}
+
+modelo_final <- hotel_wf %>% 
+  add_model(rf_spec) %>% 
+  last_fit(hotel_split)
+
+collect_metrics(modelo_final)
+
+collect_predictions(modelo_final) %>% 
+  conf_mat(children, .pred_class)
+
+collect_predictions(modelo_final) %>% 
+  roc_curve(children, .pred_children) %>% 
+  ggplot(aes(x = 1 - specificity, y = sensitivity)) +
+  geom_line(size = 1.5, color = "midnightblue") +
+  geom_abline(
+    lty = 2, alpha = 0.5,
+    color = "gray50",
+    size = 1.2
+  ) +
+  coord_equal()
+
+```

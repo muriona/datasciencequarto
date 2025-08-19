@@ -1,0 +1,380 @@
+---
+title: "Webinar 3a - Business Analytics e Data Mining"
+subtitle: "Previsão de sobrevivientes do Titanic"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,cache = TRUE)
+```
+
+# Carregando os dados
+
+Para este webinar vamos usar dados do Titanic (para os métodos supervisionados a partir de [kaggle](https://www.kaggle.com/competitions/titanic/overview)) e um dataset hipotético sobre clientes (para o método não supervisionado)
+
+# Carregando pacotes
+
+```{r pacotes}
+
+library(tidyverse)
+library(readxl)
+library(ggrepel)
+library(tidymodels)
+library(ranger)
+library(viridisLite)
+
+
+```
+
+# Métodos Supervisionados
+
+Para mostrar a utilidade destes modelos, vamos usar um dataset sobre os sobrevivientes do Titanic. Há várias formas de carregar os dados, incluindo o pacote Titanic. Os dados mostram cada um dos passageiros do Titanic, incluindo informações como o nome, a idade, se estavam com filhos, esposos/esposas, em qual categoria de cabine se encontravam, quanto pagaram pela passagem, etc. Mais informações podem ser encontradas em: <https://www.kaggle.com/c/titanic/data>
+
+```{r}
+
+titanic <- read.csv("train.csv")
+titanic_test <- read.csv("test.csv")
+```
+
+Uma vez que os dados os carregados, várias das variáveis devem ser convertidas a fatores.
+
+```{r}
+#titanic$Survived <- factor(titanic$Survived)
+titanic$Pclass <- factor(titanic$Pclass)
+titanic$Sex <- factor(titanic$Sex)
+
+
+```
+
+Primeiramente, precisamos limpar os dados. Por exemplo, o `PassengerID` é um identificador único para os registros de cada passageiro, mas não nos diz nada sobre a sobrevivência ou não. Intuitivamente, as variáveis `Name`, `Cabin`, `Embarqued` e `Ticket` também não decidirão a sobrevivência, por isso precisamos retirá-los também. Assim, selecionaremos as colunas restantes usando a função `select()` da biblioteca `dplyr`:
+
+```{r selecting}
+
+titanic_df <- titanic %>% 
+  select(-PassengerId,-Name,-Ticket, -Cabin, -Embarked) %>% 
+  rename(Siblings_and_Spouses = SibSp,
+         Parents_and_Children = Parch)
+
+
+```
+
+## Criar test e train datasets
+
+Podemos usar a função `initial_split()` do pacote `tidymodels`.
+
+```{r}
+
+set.seed <- 2020
+
+#split <- initial_split(titanic_df, strata =Survived)
+
+#titanic_train <- training(split)
+#titanic_test <- testing(split)
+
+```
+
+Mas neste caso, o kaggle já nos deu os datasets separados, portanto, o nosso dataset `titanic_df` é o dataset de treino. Além disso, vamos retirar eventuais observações com `NA`.
+
+```{r treino}
+library(skimr)
+
+skim(titanic_df)
+
+titanic_df <- titanic_df %>% 
+  filter(!is.na(Age))
+
+titanic_train <- titanic_df
+
+```
+
+Nesta análise, vamos formular algumas perguntas:
+
+-   Qual é a relação entre as características e as chances de sobrevivência de um passageiro.
+
+-   Previsão de sobrevivência para o navio inteiro.
+
+## Regressão Linear
+
+Vamos usar primeiramente um modelo linear para fazer a previsão de sobrevivência.
+
+```{r ols}
+
+titanic_lm <- lm(Survived~., data=titanic_train)
+
+summary(titanic_lm)
+```
+
+Note que `Parents` e `Fare` não são significativos pois os valores `p` são 0,52725 e 0,4048 respectivamente, ambos maiores a 0,05 de nível de significância.
+
+Porém, o valor de `Survived` inicia com um intercepto de 1,1740, ou seja, acima do valor de `1` que indicaria sobrevivência.
+
+Vamos calcular a probabilidade de sobrevivência para cada passageiro e plotar um gráfico para reforçar este argumento.
+
+```{r}
+
+pred_lm <- predict(titanic_lm, data=titanic_train)
+
+titanic_df <- titanic_df %>% 
+  mutate(prob_lm = pred_lm)
+
+
+titanic_df %>% 
+  ggplot(aes(factor(Survived),prob_lm,
+             color=factor(Survived)))+
+  geom_boxplot()+
+  scale_y_continuous(limits = c(-0.2,1.1),
+                     n.breaks = 12)+
+  scale_color_brewer(palette = "Dark2")+
+  theme_minimal()
+  
+```
+
+## Regressão Logística
+
+Um modelo que responde melhor quando a variável de saída está entre `0` e `1` é o de regressão logística. Podemos ver os resultados do modelo abaixo.
+
+```{r logistic}
+
+titanic_logistic_model <- glm(Survived~., 
+                      data = titanic_train, 
+                      family = "binomial")
+
+summary(titanic_logistic_model)
+
+```
+
+Os coeficientes do modelo logístico são difíceis de intepretar. Para variáveis categóricas (fatores), o coeficiente representa o **odds ratio** entre por exemplo para a variável 'Sex', a interpretação é:
+
+$$log(oddsratio)=log(\beta)$$ portanto, $$oddsratio=e^{\beta}=e^{-2.6374}=0.07154$$ Ou seja, um passageiro homem tinha $0,07154$ vezes menos chances (*odds*) de sobrevivência do que uma passageira mulher. Ou em outras palavras uma passageira mulher tinha $1/0,07154=13.97$ vezes mais chances de sobrevivência.
+
+Nota: $odds=\frac{p}{1-p}$ , sendo $p$ a probabilidade de um evento acontecer.
+
+Igualmente, podemos interpretar os coeficientes relacionados com a classe: um passageiro na 2a classe tinha $e^{-1.292538}=0,2745$ vezes menos chances de sobrevivência do que um passageiro da 1a classe (ou um passageiro de 1a classe tinha $1/0,2745=3,64$ vezes mais chances de sobrevivência do que um de 2a classe). Já, um passageiro da 3a classe tinha $e^{-2.501069}=0,0819$ vezes menos chances de sobrevivência do que um passageiro da 1a classe (ou um passageiro de 1a classe tinha $1/0,0819=12,21$ vezes mais chances de sobrevivência do que um de 3a classe).
+
+Para as variáveis continuas, a interpretação é um pouco mais direta. Por exemplo, para cada adicional de idade, as chances de sobrevivência reduzem em $e^{-0.0441}=0,9568$ vezes (aproximadamente em 50% de probabilidade).
+
+Observação: Em alguns casos, vale a pena alterar o fator base de uma determinada variável, principalmente quando os níveis do fator possuem um valor de referência. Neste caso pode usar-se a função `relevel`.
+
+Agora que temos um objeto denominado `titanic_logistic_model`, podemos prever os valores de sobrevivência (0,1) para o nosso dataset de treino, usando a função `predict`. Após, mostraremos uma primeira medida de precisão do modelo que é calcular o Pseudo $R^{2}$:
+
+```{r}
+library(broom)
+
+glance(titanic_logistic_model) %>% 
+  summarize(pR2 = 1 - deviance / null.deviance)
+
+
+titanic_df <- titanic_df %>% 
+  mutate(prob_log = predict(titanic_logistic_model, 
+                        type = "response"))
+
+media <- mean(titanic_train$Survived)
+
+```
+
+```{r boxplot-log}
+titanic_df %>% 
+  ggplot(aes(factor(Survived),prob_log,
+             color=factor(Survived)))+
+  geom_boxplot()+
+  scale_y_continuous(limits = c(-0.2,1.1),
+                     n.breaks = 12)+
+  scale_color_brewer(palette = "Dark2")+
+  theme_minimal()
+
+
+```
+
+A probabilidade média de sobrevivência é `r round(media, digits = 2)`, portanto podemos definir o limiar da previsão como sendo esse valor.
+
+```{r}
+titanic_df$pred_log <- ifelse(titanic_df$prob_log > media, 1, 0)
+```
+
+Para calcular a precisão da previsão, podemos comparar as médias.
+
+```{r predlog}
+pred_log <- mean(titanic_df$Survived==titanic_df$pred_log)
+```
+
+Desta forma, chegamos ao valor de `r round(pred_log*100, digits = 2)` %.
+
+Uma forma mais elegante de verificar a precisão do modelo é usar a Curva ROC e o valor de AUC.
+
+```{r auclog}
+
+
+titanic_df$Survived <- factor(titanic_df$Survived, levels=c(1,0))
+
+autoplot(roc_curve(titanic_df, Survived, prob_log))
+
+roc_auc(titanic_df, Survived, prob_log)
+
+```
+
+## Como lidar com dados faltantes
+
+Como vimos anteriormente, o dataset continha um grande número de valores `NA` na variável `Age`. No procedimento anterior, simplesmente eliminamos as linhas com `NA`, ou seja, 177 de um total de 891.
+
+Vamos conhecer um método de inputar valores para esses `NA`, e ver o efeito que pode dar nosso modelo. Vamos retornar ao dataframe `titanic`.
+
+```{r faltantes1}
+
+
+# Imputar usando média
+titanic_train_age <- titanic %>% 
+  mutate(Age_imputada = ifelse(is.na(Age),
+                               round(mean(Age,na.rm=TRUE),digits = 2),
+                               Age)) %>% 
+# Criar indicador para saber qual foi imputado e qual não
+  mutate(faltante_age = ifelse(is.na(Age),1,0)) %>% 
+  select(-PassengerId,-Name,-Ticket, -Cabin, -Embarked) %>% 
+  rename(Siblings_and_Spouses = SibSp,
+         Parents_and_Children = Parch)
+```
+
+Uma vez imputados os valores de idade, podemos calcular novamente o modelo logístico:
+
+```{r faltantes2}
+titanic_train_age <- titanic_train_age %>% 
+  select(-Age, -faltante_age)
+
+titanic_logistic_model2 <- glm(Survived~., 
+                      data = titanic_train_age, family = "binomial")
+
+summary(titanic_logistic_model2)
+```
+
+O valor do Pseudo R2 para o modelo logístico 2 é:
+
+```{r faltantes3}
+glance(titanic_logistic_model2) %>% summarize(pR2 = 1-deviance/null.deviance)
+```
+
+e por fim, a curva ROC e o valor de AUC:
+
+```{r faltantes4}
+
+titanic_train_age <- titanic_train_age %>% 
+  mutate(prob_log_age = predict(titanic_logistic_model2, 
+                        type = "response"))
+
+titanic_train_age$Survived <- factor(titanic_train_age$Survived, levels=c(1,0))
+
+autoplot(roc_curve(titanic_train_age, Survived, prob_log_age))
+
+roc_auc <- roc_auc(titanic_train_age, Survived, prob_log_age)
+
+roc_auc
+
+library(WVPlots)
+GainCurvePlot(titanic_train_age, "prob_log_age","Survived","Curva de Ganho")
+
+```
+
+E a área abaixo da curva (AUC) é `r roc_auc`. Mais sobre ROC, GainCurve e Matriz de Confusão podem ser encontradas em: <https://community.tibco.com/wiki/gains-vs-roc-curves-do-you-understand-difference>
+
+## Árvores de Decisão
+
+Usaremos o dataframe `titanic_train`.
+
+```{r}
+library(rpart)
+library(rpart.plot)
+
+
+
+titanic_tree_model <- rpart(Survived~.,
+                    data = titanic_train, 
+                    method = "class", 
+                    control = rpart.control(cp = 0))
+
+# Plot the loan_model with default settings
+rpart.plot(titanic_tree_model)
+
+rpart.plot(titanic_tree_model, type = 3, box.palette = c("#f16727", "#1a954d"), fallen.leaves = TRUE)
+```
+
+Agora que a árvore de decisão foi criada, podemos verificar a sua precisão comparando as previsões com a coluna `Survived`.
+
+```{r}
+
+pred_tree <- predict(titanic_tree_model, titanic_train,
+                             type = "class")
+
+
+caret::confusionMatrix(as.factor(pred_tree),as.factor(titanic_train$Survived))
+
+titanic_df <- titanic_df %>% 
+  mutate(pred_tree=pred_tree) 
+
+titanic_df$pred_tree <- factor(titanic_df$pred_tree, levels = c(1,0))
+
+titanic_df %>%   
+  conf_mat(Survived, pred_tree)
+```
+
+Vamos calcular a curva ROC, AUC e GainCurve para o modelo de Árvore:
+
+```{r}
+
+titanic_df$pred_tree <- as.character(titanic_df$pred_tree)
+titanic_df$pred_tree <- as.numeric(titanic_df$pred_tree)
+
+#autoplot(roc_curve(titanic_df, truth = Survived, estimate = pred_tree))
+
+#roc_auc(titanic_df, truth = Survived, estimate = pred_tree)
+
+GainCurvePlot(titanic_df, "pred_tree","Survived","Gain Curve para o Modelo Arvore de Decisão")
+```
+
+## Random Forest
+
+Para construir o modelo RF, é necessário eliminar os `NAs` que aparecem na variável `Age`. Como nosso dataset não tem mais `NAs`, podemos continuar com a previsão.
+
+```{r}
+
+
+titanic_rf_model <- ranger(Survived~., # formula 
+                         titanic_train, # data
+                         num.trees = 500, 
+                         respect.unordered.factors = "order", 
+                         seed = set.seed,
+                         classification = TRUE)
+```
+
+Agora sim, podemos usar o modelo para fazer as previsões usando `predict`
+
+```{r}
+
+
+pred_rf <- predict(titanic_rf_model, titanic_train)$predictions
+
+
+titanic_rf_model
+
+titanic_df <- titanic_df %>% 
+  mutate(pred_rf = pred_rf)
+
+```
+
+A curva ROC, o AUC:
+
+```{r predrfplot}
+
+#autoplot(roc_curve(titanic_df, truth = Survived, estimate = pred_rf))
+
+
+#roc_auc(titanic_df, truth = Survived, estimate = pred_rf)
+```
+
+E a Matriz de confusão para o modelo de Random Forest é:
+
+```{r confmatpredrf}
+
+titanic_df$pred_rf <- factor(titanic_df$pred_rf, levels = c(1,0))
+
+titanic_df %>%   
+  conf_mat(Survived, pred_rf)
+
+
+```

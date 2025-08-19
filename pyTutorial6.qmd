@@ -1,0 +1,209 @@
+---
+title: "Tutorial 6 - Métodos não supervisionados"
+jupyter: python3
+---
+
+## Carregando os pacotes
+
+```         
+```
+
+```{python}
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.cluster import KMeans, DBSCAN
+from sklearn.preprocessing import StandardScaler
+```
+
+## Lendo os dados
+
+```{python}
+#| echo: false
+
+import os
+from IPython.display import HTML
+
+def create_downloadable_dir_listing(directory, message="You can download the data here."):
+    file_list = os.listdir(directory)
+    html_content = f"<p>{message}</p><ul>"
+    for file in file_list:
+        html_content += f'<li><a href="{directory}/{file}" download>{file}</a></li>'
+    html_content += "</ul>"
+    return HTML(html_content) 
+
+# Example usage
+create_downloadable_dir_listing("pydata5/", message="Você pode baixar os dados aqui.")
+```
+
+Neste tutorial vamos aprender 2 métodos de machine learning que servem para problemas de agrupamento. Neste tipo de problemas, não temos uma variável de saída conhecida, portanto não podemos usar os métodos supervisionados já conhecidos.
+
+```{python}
+
+penguins = pd.read_csv('pydata5/penguins.csv')
+
+penguins.head()
+```
+
+colunas:
+
+```{python}
+penguins.info()
+penguins.isna().sum()
+```
+
+quantidades:
+
+```{python}
+sns.countplot(x = "species", data = penguins)
+plt.show()
+```
+
+boxplots:
+
+```{python}
+fig,axs = plt.subplots(ncols = 2)
+fig.tight_layout()
+
+sns.boxplot(y= 'bill_length_mm', x = 'species', data = penguins, ax= axs[0])
+sns.boxplot(y= 'bill_depth_mm', x = 'species', data = penguins, ax= axs[1])
+```
+
+## K-means
+
+Vamos aprender inicialmente o método conhecido como 'k-means' que basicamente agrupa as observações por uma métrica de similaridade e distância e logo cria os grupos a partir da aproximação entre elas, ou seja, aquelas observações com distância pequena entre elas farão parte do mesmo grupo.
+
+![](images/cluster.jpg)
+
+Vamos plotar os dados:
+
+```{python}
+sns.scatterplot(x='bill_length_mm', y='bill_depth_mm', data = penguins)
+```
+
+Agora podemos começar o tratamento dos dados.
+
+```{python}
+df = penguins.dropna(inplace=True)
+df = penguins.drop(columns=['species', 'island', 'sex'])
+
+df.info()
+```
+
+Utilizando o algoritmo de padronização:
+
+```{python}
+scaler = StandardScaler()
+scaled_data = scaler.fit_transform(df)
+```
+
+Reconvertendo o dataset `scaled_data` para `dataframe` para facilitar o manuseio.
+
+```{python}
+df = pd.DataFrame(scaled_data, columns=df.columns)
+
+df.head()
+```
+
+```{python}
+df.info()
+```
+
+Rodando o algoritmo k-means:
+
+```{python}
+kmeans = KMeans(n_clusters=3, random_state=42, n_init=10)
+
+```
+
+```{python}
+kmeans.fit(df)
+```
+
+incluindo a coluna `cluster:`
+
+```{python}
+df['cluster'] = kmeans.labels_
+
+df.head()
+
+df.tail()
+```
+
+```{python}
+sns.scatterplot(x='bill_length_mm', y='bill_depth_mm', hue = 'cluster', data = df)
+```
+
+### Escolhendo o número ideal de clusters
+
+```{python}
+
+inertia = []
+for i in range(1, 11):
+    kmeans = KMeans(n_clusters=i, random_state=i, n_init=10)
+    kmeans.fit(df)
+    inertia.append(kmeans.inertia_)
+```
+
+Criar um dataframe com todos os valores de `k` :
+
+```{python}
+inertia_df = pd.DataFrame({'k': range(1, 11), 'inertia': inertia})
+
+inertia_df.head()
+```
+
+Escolhe-se o ponto onde o 'cotovelo' é mais visível, neste caso, 3 clusters:
+
+```{python}
+
+plt.plot(inertia_df['k'], inertia_df['inertia'])
+plt.show()
+```
+
+## Cluster Hierárquico
+
+A diferença com o método anterior é que para o cluster hierárquico não é necessário pré-definir o número de clusters, pois o método agrupa as observações de forma sequencial, facilitando a identificação do número ideal de cluster.
+
+![](images/dendograma.png)
+
+O ideal é que os dados estejam normalizados, pelo menos as colunas numéricas, pois este método aceita também colunas (atributos) categóricos.
+
+```{python}
+from scipy.cluster.hierarchy import linkage, dendrogram
+```
+
+aplicando o algoritmo:
+
+```{python}
+
+```
+
+```{python}
+h_clustering = linkage(scaled_data, method="ward", metric="euclidean")
+```
+
+graficando o dendograma:
+
+```{python}
+dendrogram(h_clustering)
+plt.show()
+```
+
+salvando os resultados no dataframe:
+
+```{python}
+from sklearn.cluster import AgglomerativeClustering
+
+cluster = AgglomerativeClustering(n_clusters=3, metric='euclidean', linkage='ward')
+df['hcluster'] = cluster.fit_predict(df)
+```
+
+graficando os resultados:
+
+```{python}
+
+sns.scatterplot(x='bill_length_mm', y='bill_depth_mm', hue = 'hcluster', data = df)
+
+```

@@ -1,0 +1,44 @@
+---
+title: "Tutorial de Instalação do Python"
+jupyter: python3
+---
+
+# Windows
+
+Para instalar o python em Windows, siga os passos abaixo.
+
+1.  Faça o download do Python em: [python.org](https://www.python.org/downloads/windows/ "Download do Python") (a versão de 64-bit).
+
+2.  Ao clicar duas vezes no instalador, a tela abaixo deve aparecer.
+
+    ![](img/python_instalar.png)
+
+3.  Importante: marque as duas opções na parte de baixo (`Use admin...`) e (`Add python.exe to PATH`)
+
+4.  Clique em "Install now" e siga os passos.
+
+5.  Se a instalação foi bem-sucedida, pesquise no menu iniciar por `cmd` e clique duas vezes para abri-lo
+
+    ![](img/python_cmd.png)
+
+6.  Digite o seguinte comando `python --version` e a tela deve retornar a versão instalada: `Python 3.nn.x`
+
+7.  Por fim, verifique a instalação do `pip` (o gerenciador que permite adicionar novas libraries ao Python): `pip --version`
+
+    ![](img/python_cmd2.png)
+
+8.  O último comando deve retornar a versão do `pip` instalada na sua máquina.
+
+# Mac OS
+
+1.  Faça o download do Python em: [python.org](https://www.python.org/downloads/windows/ "Download do Python") e siga os passos do instalador.
+
+# Instalação de pacotes
+
+Para instalar os principais pacotes que iremos usar, abra o `cmd` e digite:
+
+1.  `pip install numpy pandas matplotlib seaborn plotly jupyterlab`
+
+# Instalação do `quarto`
+
+Para instalar o `quarto` visite [quarto.org](#0), escolha a versão do seu sistema: Windows, Mac, etc. e faça do download do instalador e siga os passos do mesmo.

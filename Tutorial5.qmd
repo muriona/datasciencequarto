@@ -1,0 +1,255 @@
+---
+title: "Tutorial 6 - Métodos de Classificação simplificados"
+subtitle: "Aprendizagem Supervisionada"
+execute: 
+  warning: false
+cache: true
+---
+
+## Carregando os pacotes
+
+Vamos usar um dataset sobre churn.
+
+```{r}
+#| echo: false
+#| eval: true
+#| 
+xfun::pkg_load2(c('htmltools', 'mime'))
+xfun::embed_dir("data6/", text = "Você pode baixar os dados aqui.")
+
+```
+
+```{r}
+library(tidyverse)
+library(tidymodels)
+library(fst)
+
+
+```
+
+## Regressão Logística
+
+### Carregando o dataset
+
+```{r}
+churn <- read_fst("data6/churn.fst")
+
+churn$has_churned <- as_factor(churn$has_churned)
+```
+
+Vamos fazer uma análise da estrutura dos dados:
+
+```{r}
+
+glimpse(churn)
+
+summary(churn)
+
+
+```
+
+A regressão logística tem a propriedade de predizer valores entre o intervalo 0 e 1 (pense nesses valores como a probabilidades de churn de 0 a 100%).
+
+### Análise Exploratória de Dados
+
+Uma breve EDA mostra a relação entre os tempos de primeira e última compras com o churn de clientes.
+
+```{r}
+churn %>%
+ggplot(aes(time_since_first_purchase, fill=has_churned,
+          color=has_churned))+
+geom_density(alpha = 0.5)+
+labs(title = "O tempo desde a primeira compra é maior para clientes perdidos")+
+theme_light()
+```
+
+Já para o tempo desde a última compra:
+
+```{r}
+churn %>%
+ggplot(aes(time_since_last_purchase, fill=has_churned,
+          color=has_churned))+
+geom_density(alpha = 0.5)+
+labs(title = "Clientes perdidos demoram mais tempo para voltar a comprar")+
+theme_light()
+```
+
+### Modelo
+
+O primeiro passo será separar os dados em treino e teste.
+
+```{r}
+set.seed(1212)
+
+split <- initial_split(churn, prop = 0.7, strata = has_churned)
+
+train <- training(split)
+test <- testing(split)
+```
+
+Para treinar um modelo de regressão logística, usamos a função `glm()` e o argumento `family = "binomial"`
+
+```{r}
+logmodel <- glm(has_churned ~ ., data = train, family = "binomial")
+
+logmodel
+```
+
+Para se ter uma noção sobre a curva de ajuste, a regressão logística segue o formato de uma curva em "S" onde as probabilidades (neste caso de churn) sempre estarão entre 0 e 1
+
+```{r}
+curva <- churn %>%
+ggplot(aes(time_since_last_purchase, has_churned))+
+geom_point()+
+scale_x_continuous(limits = c(-20,20))
+
+curva
+```
+
+adicionamos uma camada: `stat_smooth(method="glm", method.args=list(family="binomial"), fullrange = TRUE, se = FALSE)` ao ggplot:
+
+```{r}
+curva +
+ stat_smooth(method="glm", 
+			 method.args=list(family="binomial"), 
+			 fullrange = TRUE, 
+			 se = FALSE)
+```
+
+Para predizer valores a partir de novos dados de `time_since_last_purchase` e `time_since_first_purchase` deve-se usar a função `predict()`. Podemos criar um novo dataframe denominado `churn_df_log` e incluir uma nova coluna com `predict()` dentro do `mutate()`
+
+```{r}
+pred <- predict(logmodel,
+				   test,
+				   type = "response")
+
+churn_df_log <- test %>%
+	mutate(pred_log = pred)
+```
+
+Agora vamos plotar a curva ROC e calcular a área abaixo da curva ROC, conhecida como AUC.
+
+```{r}
+# Plotar a curva ROC com autoplot
+autoplot(roc_curve(churn_df_log, has_churned, pred_log))
+
+# Calcular AUC usando a função roc_auc
+roc_auc(churn_df_log, has_churned, pred_log)
+```
+
+## Árvores de Decisão
+
+Árvores de Decisão, ou Decision Trees, são algoritmos de machine learning largamente utilizados, com uma estrutura de simples compreensão e que costumam apresentar bons resultados em suas previsões.
+
+Eles também são a base do funcionamento de outros poderosos algoritmos, como o Random Forest, por exemplo.
+
+As decision trees estão entre os primeiros algoritmos aprendidos por iniciantes no mundo do aprendizado de máquina.
+
+Mais detalhes sobre como funciona em: [**didatica.tech**](https://app.datacamp.com/workspace/external-link?url=https%3A%2F%2Fdidatica.tech%2Fcomo-funciona-o-algoritmo-arvore-de-decisao%2F)
+
+```{r}
+library(rpart)
+library(rpart.plot)
+
+tree_model <- rpart(has_churned ~.,
+			 data = train,
+			 method = "class")
+```
+
+```{r}
+rpart.plot(tree_model)
+```
+
+Agora que a árvore de decisão foi criada, podemos verificar a sua precisão comparando as previsões com a coluna original.
+
+```{r}
+pred_tree <- predict(tree_model,
+					test,
+					type = "class")
+
+
+churn_df_tree <- test %>%
+	mutate(pred_tree = pred_tree)
+```
+
+Antes de continuar, precisamos converter a coluna `has_churned` para `factor` e a coluna `pred_tree` para `numeric`
+
+```{r}
+#convertendo has_churned para factor
+
+churn_df_tree$has_churned <- factor(churn_df_tree$has_churned, levels = c(0,1))
+
+#convertendo pred_tree para numeric
+churn_df_tree$pred_tree <- as.character(churn_df_tree$pred_tree)
+churn_df_tree$pred_tree <- as.numeric(churn_df_tree$pred_tree)
+```
+
+Agora sim, podemos plotar a curva ROC
+
+```{r}
+autoplot(roc_curve(churn_df_tree, truth = has_churned, pred_tree))
+
+```
+
+E a AUC:
+
+```{r}
+roc_auc(churn_df_tree, truth = has_churned, pred_tree)
+```
+
+## Random Forests
+
+Em português, Random Forest significa floresta aleatória. Este nome explica muito bem o funcionamento do algoritmo.
+
+Em resumo, o Random Forest irá criar muitas árvores de decisão, de maneira aleatória, formando o que podemos enxergar como uma floresta, onde cada árvore será utilizada na escolha do resultado final, em uma espécie de votação. Mais detalhes em: [**didatica.tech**](https://app.datacamp.com/workspace/external-link?url=https%3A%2F%2Fdidatica.tech%2Fo-que-e-e-como-funciona-o-algoritmo-randomforest%2F).
+
+Vamos carregar o pacote `ranger` que serve para treinar Random Forests
+
+```{r}
+library(ranger)
+```
+
+```{r}
+
+# treinar um modelo usando o pacote `ranger`
+
+rf_model <- ranger(has_churned ~ ., 
+							  data = train,
+                   			  num.trees = 500,
+					   classification = TRUE)
+```
+
+Uma vez que o modelo foi treinado, vamos calcular o indicadores de acurácia utilizando os procedimentos já vistos. Porém, há um passo intermediário que serve para extrair as predições do objeto criado pelo `predict()` do `ranger`.
+
+```{r}
+rf_predict <- predict(rf_model, data = test, type = "response")$predictions
+```
+
+Agora sim, podemos utilizar o código dos modelos anteriores, adaptando-o ligeiramente para incluir o vetor criado acima com os valores preditos.
+
+```{r}
+churn_df_rf <- test %>%
+	mutate(pred_rf = rf_predict)
+```
+
+Como no caso anterior, a coluna `has_churned` precisa estar no formato `factor`, e a coluna `pred_rf` no formato `numeric`.
+
+```{r}
+#convertendo has_churned para factor
+
+churn_df_rf$has_churned <- factor(churn_df_rf$has_churned, levels = c(0,1))
+
+#convertendo pred_rf para numeric
+churn_df_rf$pred_rf <- as.character(churn_df_rf$pred_rf)
+churn_df_rf$pred_rf <- as.numeric(churn_df_rf$pred_rf)
+```
+
+Agora sim, podemos plotar a curva ROC
+
+```{r}
+autoplot(roc_curve(churn_df_rf, truth = has_churned, pred_rf))
+```
+
+```{r}
+roc_auc(churn_df_rf, truth = has_churned, pred_rf)
+```

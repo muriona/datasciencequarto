@@ -1,0 +1,165 @@
+---
+title: "Tutorial - Dashboards"
+subtitle: "IMDB"
+format: html
+execute: 
+  echo: true
+  message: false
+  warning: false
+---
+
+# Flexdashboard e Shiny
+
+Os dashboards são provavelmente a forma mais flexível de comunicar os resultados de um projeto de Data Science/Business Analytics. Na linguagem R, um dos principais pacotes para a produção de dashboards é o `flexdashboard` pois facilita a criação e manutenção do dashboard diretamente pelo RStudio.
+
+Se além disso se quer um Dashboard responsivo, isto é, que responda a controles manipulados pela pessoa que está consumindo o Dashboard, deve-se utilizar um pacote adicional chamado `shiny`.
+
+Neste tutorial iremos construir um Dashboard utilizando os dados do IMDB, disponíveis [aqui](https://github.com/curso-r/livro-material/raw/master/assets/data/imdb.rds).
+
+# Carregando pacotes
+
+Para que o RStudio entenda que o output deve ser um Dashboard, é necessário carregar o pacote `flexdashboard` além de outros que comumente são usados, como o `tidyverse`. Além disso, é necessário carregar o `shiny`.
+
+Outro pacote que iremos utilizar para deixar os gráficos do `ggplot` responsivos será o `plotly`, que deverá ser carregado também.
+
+```{r}
+#| label: pacotes
+
+library(tidyverse)
+library(shiny)
+library(plotly) #precisa instalar a primeira vez
+
+
+```
+
+# A estrutura do cabeçalho
+
+O cabeçalho deve conter algumas informações básicas, e além delas é possível incluir muitas mais opções
+
+```{r}
+#| eval: false
+#| echo: true
+---
+title: "Untitled"
+output: 
+  flexdashboard::flex_dashboard:
+    theme: 
+      version: 4
+      bg: "#FDF7F7"
+      fg: "#000" 
+      primary: "darkblue"
+      navbar-bg: "lightblue"
+      base_font: 
+        google: Prompt
+      heading_font:
+        google: Sen
+      code_font:
+        google: 
+          # arguments to sass::font_google() 
+          family: JetBrains Mono
+          local: false
+    orientation: columns
+    vertical_layout: fill
+runtime: shiny
+---
+      
+```
+
+A estrutura original do template de dashboard é a seguinte:
+
+![](images/Screenshot%202023-09-19%20at%2010.20.36%20AM.png)
+
+e o output é o seguinte:
+
+![](images/Screenshot%202023-09-19%20at%2010.21.44%20AM.png)
+
+## Opções para o *Sidebar* {#sec-opções-para-o-sidebar}
+
+Criar uma coluna sidebar usando o código: `## Column{data-width=200 .sidebar}`
+
+```{r}
+#| eval: false
+
+# Menu desplegável
+
+
+selectInput("nome",
+            label = "Selecione ...",
+            choices = c(____),
+            selected = ____)
+
+# Slider
+
+sliderInput("nome2",
+            label = "Escolha ....",
+            min = "___", max = "____", value = "___", step = '___', 
+            dragRange = TRUE)
+
+# Data
+
+dateInput(inputid = "data1", 
+          label = "____", 
+          value = "YYYY-MM-DD", #informar a data
+          format = "mm/dd/yy",
+          language = "pt")
+
+# Intervalo de datas - produzirá um objeto com dois valores
+
+dateRangeInput("data2", label = "______",
+                 start  = "_____", #informar a data de início
+                 end    = "_____", #informar a data de finalização
+                 format = "mm/dd/yy",
+                 language = "pt",
+                 separator = " - ")
+```
+
+## Opções para o corpo
+
+```{r}
+#| eval: false
+
+# KPIs
+
+renderValueBox({
+
+valueBox(prettyNum(______, big.mark = ','), 
+         icon = 'fa-ship', caption = "_____",
+         color="#9b5de5")
+}
+)
+
+# Requer library(plotly)
+
+renderPlotly({  
+df <- _____
+ggplotly(df)
+  })
+
+# Gauges - velocímetros
+
+renderGauge({
+  df <- _____
+  gauge(____, min = ___, max = ___, symbol = '%', gaugeSectors(
+    success = c(____, ___), warning = c(____, ___ ), danger = c(____, ___)
+  ))
+})
+
+
+# Tabelas
+
+renderTable({  
+df %>% 
+  mutate(____) %>% 
+  filter(_____) %>% 
+  group_by(____) %>% 
+  count() %>% 
+  arrange(desc(n)) 
+})
+
+```
+
+# Instruções para subir seu dashboard
+
+Uma vez que você tenha escolhidos as melhores visualizações, deverá criar um dashboard utilizando o pacote `flexdashboard` e subi-lo à plataforma [shinyapps.io](https://www.shinyapps.io/).
+
+Para poder configurar o shinyapps.io deve seguir as instruções [nesta página](https://docs.posit.co/shinyapps.io/getting-started.html#working-with-shiny-for-r).
