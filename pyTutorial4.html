@@ -1,0 +1,1607 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Tutorial 4 - Seaborn e GeoPandas – EPS-UFSC</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-6033a600180109c3731f6a886c29932c.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">EPS-UFSC</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-tutoriais-python" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Tutoriais Python</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-tutoriais-python">    
+        <li>
+    <a class="dropdown-item" href="./pyTutorialPython.html">
+ <span class="dropdown-text">Tutorial de Instalação do Python</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./pyTutorial1.html">
+ <span class="dropdown-text">Tutorial 1 - Pandas</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./pyTutorial2.html">
+ <span class="dropdown-text">Tutorial 2 - Pandas</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./pyTutorial3.html">
+ <span class="dropdown-text">Tutorial 3 - Matplotlib</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./pyTutorial4.html">
+ <span class="dropdown-text">Tutorial 4 - Seaborn e GeoPandas</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./pyTutorial5.html">
+ <span class="dropdown-text">Tutorial 5 - Quarto Dashboards em Python</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./pyTutorial5b.html">
+ <span class="dropdown-text">Tutorial 5b - Mapas Interativos</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./pyTutorial5c.html">
+ <span class="dropdown-text">Tutorial 5c - Dashboards Interativos</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./pyTutorial6.html">
+ <span class="dropdown-text">Tutorial 6 - Métodos não supervisionados</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./pyTutorial7.html">
+ <span class="dropdown-text">Tutorial 7 - Métodos de Regressão</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./pyTutorial8.html">
+ <span class="dropdown-text">Tutorial 8 - Métodos de Classificação</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./pyTutorial9.html">
+ <span class="dropdown-text">Tutorial 9 - Métodos Avançados de Regressão</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./pyTutorial10.html">
+ <span class="dropdown-text">Tutorial 10 - Métodos Avançados em Classificação</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-tutoriais-r" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Tutoriais R</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-tutoriais-r">    
+        <li>
+    <a class="dropdown-item" href="./Tutorial0.html">
+ <span class="dropdown-text">Tutorial 0 - Conhecendo o R</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./Tutorial1.html">
+ <span class="dropdown-text">Tutorial 1 - Tidyverse</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./Tutorial2.html">
+ <span class="dropdown-text">Tutorial 2 - Ggplot2 e Tidyverse</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./Tutorial_av_ggplot.html">
+ <span class="dropdown-text">Tutorial 3a - Ggplot Avançado</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./Tutorial3b.html">
+ <span class="dropdown-text">Tutorial 3b - Quarto Dashboards</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./Tutorial4.html">
+ <span class="dropdown-text">Tutorial 4 - Métodos Não Supervisionados</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./Tutorial5regtidymodels.html">
+ <span class="dropdown-text">Tutorial 5 - Métodos de Regressão e Classificação em R</span></a>
+  </li>  
+    </ul>
+  </li>
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#carregando-os-pacotes" id="toc-carregando-os-pacotes" class="nav-link active" data-scroll-target="#carregando-os-pacotes">Carregando os pacotes</a></li>
+  <li><a href="#lendo-os-dados" id="toc-lendo-os-dados" class="nav-link" data-scroll-target="#lendo-os-dados">Lendo os dados</a></li>
+  <li><a href="#limpeza-dos-dados" id="toc-limpeza-dos-dados" class="nav-link" data-scroll-target="#limpeza-dos-dados">Limpeza dos dados</a></li>
+  <li><a href="#tipos-de-visualizações" id="toc-tipos-de-visualizações" class="nav-link" data-scroll-target="#tipos-de-visualizações">Tipos de visualizações</a>
+  <ul class="collapse">
+  <li><a href="#gráfico-de-dispersão" id="toc-gráfico-de-dispersão" class="nav-link" data-scroll-target="#gráfico-de-dispersão">Gráfico de Dispersão</a></li>
+  <li><a href="#gráfico-de-barras" id="toc-gráfico-de-barras" class="nav-link" data-scroll-target="#gráfico-de-barras">Gráfico de Barras</a></li>
+  <li><a href="#gráfico-de-linha" id="toc-gráfico-de-linha" class="nav-link" data-scroll-target="#gráfico-de-linha">Gráfico de linha</a></li>
+  <li><a href="#gráfico-de-boxplot" id="toc-gráfico-de-boxplot" class="nav-link" data-scroll-target="#gráfico-de-boxplot">Gráfico de Boxplot</a></li>
+  <li><a href="#gráfico-de-histograma" id="toc-gráfico-de-histograma" class="nav-link" data-scroll-target="#gráfico-de-histograma">Gráfico de Histograma</a></li>
+  </ul></li>
+  <li><a href="#mapas" id="toc-mapas" class="nav-link" data-scroll-target="#mapas">Mapas</a>
+  <ul class="collapse">
+  <li><a href="#pacote-geobr-para-mapas-do-brasil" id="toc-pacote-geobr-para-mapas-do-brasil" class="nav-link" data-scroll-target="#pacote-geobr-para-mapas-do-brasil"><strong>Pacote <code>geobr</code> para mapas do Brasil</strong></a></li>
+  <li><a href="#exemplo-com-dados-de-outro-pais" id="toc-exemplo-com-dados-de-outro-pais" class="nav-link" data-scroll-target="#exemplo-com-dados-de-outro-pais">Exemplo com dados de outro pais</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Tutorial 4 - Seaborn e GeoPandas</h1>
+<p class="subtitle lead">Aprendendo a fazer gráficos mais avançados</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="carregando-os-pacotes" class="level2">
+<h2 class="anchored" data-anchor-id="carregando-os-pacotes">Carregando os pacotes</h2>
+<div id="85928ce6" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> fiona</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="lendo-os-dados" class="level2">
+<h2 class="anchored" data-anchor-id="lendo-os-dados">Lendo os dados</h2>
+<div id="5842e95f" class="cell" data-execution_count="2">
+<div class="cell-output cell-output-display" data-execution_count="2">
+<p>Você pode baixar os dados aqui.</p><ul><li><a href="pydata3//.DS_Store" download="">.DS_Store</a></li><li><a href="pydata3//imdb_filmes.csv" download="">imdb_filmes.csv</a></li></ul>
+</div>
+</div>
+<div id="f79cda4a" class="cell" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>imdb_filmes <span class="op">=</span> pd.read_csv(<span class="st">"pydata3/imdb_filmes.csv"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="ca46265f" class="cell" data-execution_count="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>imdb_filmes.info()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;class 'pandas.DataFrame'&gt;
+RangeIndex: 11340 entries, 0 to 11339
+Data columns (total 20 columns):
+ #   Column                Non-Null Count  Dtype  
+---  ------                --------------  -----  
+ 0   id_filme              11340 non-null  str    
+ 1   titulo                11340 non-null  str    
+ 2   ano                   11339 non-null  float64
+ 3   data_lancamento       11340 non-null  str    
+ 4   generos               11340 non-null  str    
+ 5   duracao               11340 non-null  float64
+ 6   pais                  11340 non-null  str    
+ 7   idioma                11261 non-null  str    
+ 8   orcamento             6389 non-null   float64
+ 9   receita               6366 non-null   float64
+ 10  receita_eua           5997 non-null   float64
+ 11  nota_imdb             11340 non-null  float64
+ 12  num_avaliacoes        11340 non-null  float64
+ 13  direcao               11340 non-null  str    
+ 14  roteiro               11325 non-null  str    
+ 15  producao              11220 non-null  str    
+ 16  elenco                11336 non-null  str    
+ 17  descricao             11326 non-null  str    
+ 18  num_criticas_publico  11330 non-null  float64
+ 19  num_criticas_critica  11300 non-null  float64
+dtypes: float64(9), str(11)
+memory usage: 6.9 MB</code></pre>
+</div>
+</div>
+<div id="48e5366d" class="cell" data-execution_count="5">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>imdb_filmes.describe()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="5">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">ano</th>
+<th data-quarto-table-cell-role="th">duracao</th>
+<th data-quarto-table-cell-role="th">orcamento</th>
+<th data-quarto-table-cell-role="th">receita</th>
+<th data-quarto-table-cell-role="th">receita_eua</th>
+<th data-quarto-table-cell-role="th">nota_imdb</th>
+<th data-quarto-table-cell-role="th">num_avaliacoes</th>
+<th data-quarto-table-cell-role="th">num_criticas_publico</th>
+<th data-quarto-table-cell-role="th">num_criticas_critica</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">count</th>
+<td>11339.000000</td>
+<td>11340.000000</td>
+<td>6.389000e+03</td>
+<td>6.366000e+03</td>
+<td>5.997000e+03</td>
+<td>11340.000000</td>
+<td>1.134000e+04</td>
+<td>11330.000000</td>
+<td>11300.000000</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">mean</th>
+<td>1989.452244</td>
+<td>99.691975</td>
+<td>1.903052e+07</td>
+<td>5.468264e+07</td>
+<td>3.147534e+07</td>
+<td>6.102487</td>
+<td>3.591951e+04</td>
+<td>138.221977</td>
+<td>65.660885</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">std</th>
+<td>25.548495</td>
+<td>17.649559</td>
+<td>3.238295e+07</td>
+<td>1.433980e+08</td>
+<td>6.033264e+07</td>
+<td>1.128953</td>
+<td>1.051027e+05</td>
+<td>303.109281</td>
+<td>85.890610</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">min</th>
+<td>1914.000000</td>
+<td>45.000000</td>
+<td>0.000000e+00</td>
+<td>1.600000e+01</td>
+<td>2.520000e+02</td>
+<td>1.300000</td>
+<td>1.001000e+03</td>
+<td>1.000000</td>
+<td>1.000000</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">25%</th>
+<td>1973.000000</td>
+<td>89.000000</td>
+<td>1.500000e+06</td>
+<td>5.030680e+05</td>
+<td>1.007583e+06</td>
+<td>5.500000</td>
+<td>1.877000e+03</td>
+<td>31.000000</td>
+<td>17.000000</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">50%</th>
+<td>1997.000000</td>
+<td>97.000000</td>
+<td>6.500000e+06</td>
+<td>9.521381e+06</td>
+<td>1.067257e+07</td>
+<td>6.300000</td>
+<td>4.736500e+03</td>
+<td>55.000000</td>
+<td>35.000000</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">75%</th>
+<td>2011.000000</td>
+<td>108.000000</td>
+<td>2.200000e+07</td>
+<td>4.309351e+07</td>
+<td>3.600150e+07</td>
+<td>6.900000</td>
+<td>2.106250e+04</td>
+<td>127.000000</td>
+<td>78.000000</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">max</th>
+<td>2020.000000</td>
+<td>271.000000</td>
+<td>3.560000e+08</td>
+<td>2.797801e+09</td>
+<td>9.366622e+08</td>
+<td>9.300000</td>
+<td>2.278845e+06</td>
+<td>8869.000000</td>
+<td>909.000000</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="6a608a1c" class="cell" data-execution_count="6">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>imdb_filmes.sample(<span class="dv">8</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="6">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">id_filme</th>
+<th data-quarto-table-cell-role="th">titulo</th>
+<th data-quarto-table-cell-role="th">ano</th>
+<th data-quarto-table-cell-role="th">data_lancamento</th>
+<th data-quarto-table-cell-role="th">generos</th>
+<th data-quarto-table-cell-role="th">duracao</th>
+<th data-quarto-table-cell-role="th">pais</th>
+<th data-quarto-table-cell-role="th">idioma</th>
+<th data-quarto-table-cell-role="th">orcamento</th>
+<th data-quarto-table-cell-role="th">receita</th>
+<th data-quarto-table-cell-role="th">receita_eua</th>
+<th data-quarto-table-cell-role="th">nota_imdb</th>
+<th data-quarto-table-cell-role="th">num_avaliacoes</th>
+<th data-quarto-table-cell-role="th">direcao</th>
+<th data-quarto-table-cell-role="th">roteiro</th>
+<th data-quarto-table-cell-role="th">producao</th>
+<th data-quarto-table-cell-role="th">elenco</th>
+<th data-quarto-table-cell-role="th">descricao</th>
+<th data-quarto-table-cell-role="th">num_criticas_publico</th>
+<th data-quarto-table-cell-role="th">num_criticas_critica</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">8449</th>
+<td>tt0075686</td>
+<td>Annie Hall</td>
+<td>1977.0</td>
+<td>1977-09-02</td>
+<td>Comedy, Romance</td>
+<td>93.0</td>
+<td>USA</td>
+<td>English, German</td>
+<td>4000000.0</td>
+<td>38287178.0</td>
+<td>38251425.0</td>
+<td>8.0</td>
+<td>248254.0</td>
+<td>Woody Allen</td>
+<td>Woody Allen, Marshall Brickman</td>
+<td>Jack Rollins &amp; Charles H. Joffe Productions</td>
+<td>Woody Allen, Diane Keaton, Tony Roberts, Carol...</td>
+<td>Neurotic New York comedian Alvy Singer falls i...</td>
+<td>538.0</td>
+<td>150.0</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">10048</th>
+<td>tt0377091</td>
+<td>Mean Creek</td>
+<td>2004.0</td>
+<td>2005-08-19</td>
+<td>Crime, Drama</td>
+<td>90.0</td>
+<td>USA</td>
+<td>English</td>
+<td>500000.0</td>
+<td>802948.0</td>
+<td>603951.0</td>
+<td>7.2</td>
+<td>30259.0</td>
+<td>Jacob Estes</td>
+<td>Jacob Estes</td>
+<td>Whitewater Films</td>
+<td>Rory Culkin, Ryan Kelley, Scott Mechlowicz, Tr...</td>
+<td>When a teen is bullied, his brother and friend...</td>
+<td>164.0</td>
+<td>124.0</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">6413</th>
+<td>tt0083959</td>
+<td>Forbidden World</td>
+<td>1982.0</td>
+<td>1982-05-07</td>
+<td>Horror, Sci-Fi</td>
+<td>77.0</td>
+<td>USA</td>
+<td>English</td>
+<td>1000000.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>5.2</td>
+<td>4143.0</td>
+<td>Allan Holzman</td>
+<td>Tim Curnen, Jim Wynorski</td>
+<td>Jupiter Film Productions</td>
+<td>Jesse Vint, Dawn Dunlap, June Chadwick, Linden...</td>
+<td>In the distant future, a federation marshal ar...</td>
+<td>53.0</td>
+<td>76.0</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">1321</th>
+<td>tt0404030</td>
+<td>Everything Is Illuminated</td>
+<td>2005.0</td>
+<td>2005-11-11</td>
+<td>Comedy, Drama</td>
+<td>106.0</td>
+<td>USA</td>
+<td>English, Russian, Ukrainian</td>
+<td>7000000.0</td>
+<td>3601974.0</td>
+<td>1712337.0</td>
+<td>7.4</td>
+<td>56278.0</td>
+<td>Liev Schreiber</td>
+<td>Jonathan Safran Foer, Liev Schreiber</td>
+<td>Warner Independent Pictures (WIP)</td>
+<td>Eugene Hutz, Elijah Wood, Jonathan Safran Foer...</td>
+<td>A young Jewish American man endeavors to find ...</td>
+<td>184.0</td>
+<td>98.0</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">3779</th>
+<td>tt0407304</td>
+<td>War of the Worlds</td>
+<td>2005.0</td>
+<td>2005-06-29</td>
+<td>Adventure, Sci-Fi, Thriller</td>
+<td>116.0</td>
+<td>USA</td>
+<td>English</td>
+<td>132000000.0</td>
+<td>603873119.0</td>
+<td>234280354.0</td>
+<td>6.5</td>
+<td>409066.0</td>
+<td>Steven Spielberg</td>
+<td>Josh Friedman, David Koepp</td>
+<td>Paramount Pictures</td>
+<td>Tom Cruise, Dakota Fanning, Miranda Otto, Just...</td>
+<td>As Earth is invaded by alien tripod fighting m...</td>
+<td>2847.0</td>
+<td>402.0</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">5953</th>
+<td>tt6857040</td>
+<td>The Appearance</td>
+<td>2018.0</td>
+<td>2018-06-27</td>
+<td>Horror, Thriller</td>
+<td>111.0</td>
+<td>USA</td>
+<td>English</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>4.7</td>
+<td>1010.0</td>
+<td>Kurt Knight</td>
+<td>Kurt Knight</td>
+<td>Hive Entertainment</td>
+<td>Jake Stormoen, Kristian Nairn, Adam Johnson, M...</td>
+<td>When a medieval monk unexpectedly dies in a ho...</td>
+<td>23.0</td>
+<td>5.0</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">3735</th>
+<td>tt0034272</td>
+<td>That Hamilton Woman</td>
+<td>1941.0</td>
+<td>1947-01-31</td>
+<td>Drama, History, Romance</td>
+<td>125.0</td>
+<td>USA</td>
+<td>English, French, Italian</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>7.2</td>
+<td>3917.0</td>
+<td>Alexander Korda</td>
+<td>Walter Reisch, R.C. Sherriff</td>
+<td>Alexander Korda Films</td>
+<td>Vivien Leigh, Laurence Olivier, Alan Mowbray, ...</td>
+<td>The story of courtesan and dance-hall girl Emm...</td>
+<td>66.0</td>
+<td>36.0</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">3350</th>
+<td>tt0039029</td>
+<td>Three Strangers</td>
+<td>1946.0</td>
+<td>1946-01-28</td>
+<td>Crime, Drama, Film-Noir</td>
+<td>92.0</td>
+<td>USA</td>
+<td>English</td>
+<td>457000.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>7.0</td>
+<td>1784.0</td>
+<td>Jean Negulesco</td>
+<td>John Huston, Howard Koch</td>
+<td>Warner Bros.</td>
+<td>Sydney Greenstreet, Geraldine Fitzgerald, Pete...</td>
+<td>Three strangers, each with a serious problem i...</td>
+<td>40.0</td>
+<td>23.0</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+<section id="limpeza-dos-dados" class="level2">
+<h2 class="anchored" data-anchor-id="limpeza-dos-dados">Limpeza dos dados</h2>
+<p>Vamos converter a coluna <code>data_lancamento</code> para formato <code>data</code>.</p>
+<div id="6483f02a" class="cell" data-execution_count="7">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get all unique non-date values from `data_lancamento`</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>non_date_values <span class="op">=</span> imdb_filmes[pd.to_datetime(imdb_filmes[<span class="st">'data_lancamento'</span>], errors<span class="op">=</span><span class="st">'coerce'</span>).isna()][<span class="st">'data_lancamento'</span>].unique() </span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="bu">len</span>(non_date_values) <span class="op">&gt;</span> <span class="dv">20</span>):</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Sample 20 of them if there are too many unique values</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="bu">print</span>(<span class="ss">f"Non-date values in `data_lancamento`: </span><span class="sc">{</span>np<span class="sc">.</span>random<span class="sc">.</span>choice(non_date_values, <span class="dv">20</span>, replace<span class="op">=</span><span class="va">False</span>)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Otherwise print all unique non-date values from `data_lancamento`</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="bu">print</span>(<span class="ss">f"Non-date values in `data_lancamento`: </span><span class="sc">{</span>non_date_values<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Non-date values in `data_lancamento`: ['1948' '2001' '2012' '1934' '1966' '1989' '1982' '1935' '1985' '2019'
+ '1999' '2011' '1929' '1987' '1979' '1922' '1967' '1988' '1950' '1970']</code></pre>
+</div>
+</div>
+<div id="e4cf529a" class="cell" data-execution_count="8">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>imdb_filmes[<span class="st">'data_lancamento'</span>]<span class="op">=</span>pd.to_datetime(imdb_filmes[<span class="st">'data_lancamento'</span>], <span class="bu">format</span><span class="op">=</span><span class="st">'%Y-%m-</span><span class="sc">%d</span><span class="st">'</span>,</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>errors<span class="op">=</span><span class="st">'coerce'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="tipos-de-visualizações" class="level1">
+<h1>Tipos de visualizações</h1>
+<p>A visualização de dados é uma ferramenta poderosa que não só simplifica a compreensão de grandes volumes de dados, mas também desempenha um papel crucial na estatística aplicada e no aprendizado de máquina. Imagine o potencial de desbloquear insights valiosos e identificar padrões ocultos em seus conjuntos de dados! Com um conhecimento prévio do assunto, você pode explorar as nuances dos dados e revelar conexões significativas que podem surpreender e iluminar tanto você quanto sua audiência.</p>
+<p><img src="images/Screenshot 2024-03-31 at 4.45.55 PM.png" class="img-fluid"></p>
+<section id="gráfico-de-dispersão" class="level2">
+<h2 class="anchored" data-anchor-id="gráfico-de-dispersão">Gráfico de Dispersão</h2>
+<p>Quando há necessidade de encontrar correlações, são utilizados os gráficos de dispersão. Se existir um conjunto de dados XY, então um gráfico de dispersão é utilizado para encontrar a relação entre as variáveis X e Y.</p>
+<p>As coordenadas <code>x</code> e <code>y</code> devem ser numéricas necessariamente. Vamos usar como exemplo, o dataframe <code>imdb_filmes</code>.</p>
+<p>No exemplo, a posição do ponto no eixo <code>x</code> pode ser dada pela coluna <code>orcamento</code> e a posição do ponto no eixo <code>y</code> pela coluna <code>receita</code>.</p>
+<div id="f59c228e" class="cell" data-execution_count="9">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>sns.scatterplot(data<span class="op">=</span>imdb_filmes, x<span class="op">=</span><span class="st">'orcamento'</span>, y<span class="op">=</span><span class="st">'receita'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pyTutorial4_files/figure-html/cell-10-output-1.png" width="589" height="443" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Deixando o gráfico mais informativo:</p>
+<div id="536c2b5f" class="cell" data-execution_count="10">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>sns.scatterplot(data<span class="op">=</span>imdb_filmes, x<span class="op">=</span><span class="st">'orcamento'</span>, y<span class="op">=</span><span class="st">'receita'</span>, hue<span class="op">=</span><span class="st">'ano'</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Gráfico de Dispersão entre Orçamento x Receita'</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Orçamento (x 100 Mi UDS)'</span>)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Receita (Bi USD)'</span>)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pyTutorial4_files/figure-html/cell-11-output-1.png" width="589" height="450" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="gráfico-de-barras" class="level2">
+<h2 class="anchored" data-anchor-id="gráfico-de-barras">Gráfico de Barras</h2>
+<p>Um gráfico de barras também exibe tendências ao longo do tempo. No caso de múltiplas variáveis, um gráfico de barras pode facilitar a comparação dos dados para cada variável em todos os momentos no tempo. Por exemplo, um gráfico de barras pode ser utilizado para comparar o crescimento da empresa ano a ano.</p>
+<p>Vamos usar o dataframe <code>imdb_filmes</code> para exemplificar, ordenando as linhas por ordem decrescente de <code>nota_imdb</code>. Primeiro vamos gerar o gráfico com as configuração padrão.</p>
+<div id="3ffa5ee9" class="cell" data-execution_count="11">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>imdb_summary <span class="op">=</span> imdb_filmes.sort_values(<span class="st">'nota_imdb'</span>,</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>ascending<span class="op">=</span><span class="va">False</span>).head(<span class="dv">8</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="88d5118d" class="cell" data-execution_count="12">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>sns.barplot(imdb_summary, x<span class="op">=</span><span class="st">'titulo'</span>, y<span class="op">=</span><span class="st">'nota_imdb'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pyTutorial4_files/figure-html/cell-13-output-1.png" width="616" height="429" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Mas os nomes dos filmes estão sobrepostos, então neste caso é recomendável realizar um gráfico de barras horizontais.</p>
+<div id="9d31a36d" class="cell" data-execution_count="13">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>sns.barplot(imdb_summary, x<span class="op">=</span><span class="st">'nota_imdb'</span>, y<span class="op">=</span><span class="st">'titulo'</span>)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Top 10 Filmes por Nota IMDB'</span>)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Nota IMDB'</span>)</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pyTutorial4_files/figure-html/cell-14-output-1.png" width="757" height="449" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="gráfico-de-linha" class="level2">
+<h2 class="anchored" data-anchor-id="gráfico-de-linha">Gráfico de linha</h2>
+<p>Gráficos de linhas são utilizados para exibir tendências ao longo do tempo. O eixo X é geralmente utilizado para representar um período, enquanto o eixo Y é utilizado para representar a quantidade associada ao período de tempo no eixo X. Por exemplo, um gráfico de linhas pode ilustrar o horário de pico de visitas em um shopping durante o dia, dividido por dias da semana e horas.</p>
+<p>Vamos fazer um gráfico utilizando a coluna <code>data_lancamento</code></p>
+<div id="49346412" class="cell" data-execution_count="14">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>imdb_lancamento <span class="op">=</span> imdb_filmes.groupby(<span class="st">'data_lancamento'</span>).agg({<span class="st">'titulo'</span>:<span class="st">"count"</span>,<span class="st">'nota_imdb'</span>:<span class="st">'mean'</span>,<span class="st">'duracao'</span>:<span class="st">'mean'</span>})</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>imdb_lancamento.head(<span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="14">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">titulo</th>
+<th data-quarto-table-cell-role="th">nota_imdb</th>
+<th data-quarto-table-cell-role="th">duracao</th>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">data_lancamento</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">1914-03-08</th>
+<td>1</td>
+<td>6.1</td>
+<td>61.0</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">1914-08-24</th>
+<td>1</td>
+<td>6.4</td>
+<td>78.0</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">1914-12-21</th>
+<td>1</td>
+<td>6.3</td>
+<td>82.0</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>Vamos agrupar os filmes por ano.</p>
+<div id="c5b70408" class="cell" data-execution_count="15">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>imdb_anual <span class="op">=</span> imdb_filmes.groupby(pd.Grouper(key<span class="op">=</span><span class="st">'data_lancamento'</span>, freq<span class="op">=</span><span class="st">'YE'</span>))[<span class="st">'nota_imdb'</span>].mean()</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>imdb_anual.head(<span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="15">
+<pre><code>data_lancamento
+1914-12-31    6.266667
+1915-12-31    6.566667
+1916-12-31    6.200000
+Name: nota_imdb, dtype: float64</code></pre>
+</div>
+</div>
+<div id="48beaf0b" class="cell" data-execution_count="16">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>imdb_anual_df <span class="op">=</span> pd.DataFrame(imdb_anual).reset_index()</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>imdb_anual_df[<span class="st">'data_lancamento'</span>] <span class="op">=</span> pd.to_datetime(imdb_anual_df[<span class="st">'data_lancamento'</span>], <span class="bu">format</span><span class="op">=</span><span class="st">'%Y-%m-</span><span class="sc">%d</span><span class="st">'</span>)</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>sns.lineplot(x<span class="op">=</span><span class="st">'data_lancamento'</span>, y<span class="op">=</span><span class="st">'nota_imdb'</span>, data<span class="op">=</span>imdb_anual_df)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pyTutorial4_files/figure-html/cell-17-output-1.png" width="597" height="429" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Também podemos plotar duas ou mais linhas. Vamos calcular intervalo interquartil e inclui-la no gráfico anterior.</p>
+</section>
+<section id="gráfico-de-boxplot" class="level2">
+<h2 class="anchored" data-anchor-id="gráfico-de-boxplot">Gráfico de Boxplot</h2>
+<p>Um gráfico de boxplot, também conhecido como diagrama de caixa, é uma ferramenta de visualização estatística que fornece uma representação compacta e informativa da distribuição de um conjunto de dados. Consiste em um retângulo (“caixa”) que se estende de um quartil ao outro, com uma linha vertical (ou “whisker”) estendendo-se de cada extremidade da caixa para representar a amplitude dos dados fora do intervalo interquartil.</p>
+<div id="960a4516" class="cell" data-execution_count="17">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>imdb_filmes[<span class="st">'ano'</span>] <span class="op">=</span> imdb_filmes[<span class="st">'data_lancamento'</span>].dt.year</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>imdb_filmes[<span class="st">'decada'</span>] <span class="op">=</span> imdb_filmes[<span class="st">'ano'</span>] <span class="op">//</span> <span class="dv">10</span> <span class="op">*</span> <span class="dv">10</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>imdb_filmes[<span class="st">'decada'</span>].astype(<span class="st">'category'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="17">
+<pre><code>0        1980.0
+1        1940.0
+2        2000.0
+3        1940.0
+4        2000.0
+          ...  
+11335       NaN
+11336    2010.0
+11337    1950.0
+11338    2010.0
+11339    2000.0
+Name: decada, Length: 11340, dtype: category
+Categories (12, float64): [1910.0, 1920.0, 1930.0, 1940.0, ..., 1990.0, 2000.0, 2010.0, 2020.0]</code></pre>
+</div>
+</div>
+<div id="26337654" class="cell" data-execution_count="18">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>sns.boxplot(x<span class="op">=</span><span class="st">'decada'</span>, y<span class="op">=</span><span class="st">'nota_imdb'</span>, data<span class="op">=</span>imdb_filmes, showmeans<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Distribuição de notas IMDB por Década'</span>)</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'IMDb Rating'</span>)</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pyTutorial4_files/figure-html/cell-19-output-1.png" width="578" height="450" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>O gráfico ficou ruim de visualizar, porém, é possível alterar as dimensões de qualquer gráfico matplotlib, utilizando a opção: <code>plt.figure(figsize=(15, 8))</code>. Também podemos mudar a cor de cada caixa.</p>
+<div id="57f7b600" class="cell" data-execution_count="19">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">15</span>, <span class="dv">8</span>))</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>sns.boxplot(x<span class="op">=</span><span class="st">'decada'</span>, y<span class="op">=</span><span class="st">'nota_imdb'</span>, hue<span class="op">=</span><span class="st">'decada'</span>, data<span class="op">=</span>imdb_filmes, showmeans<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Distribuição de notas IMDB por Década'</span>)</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'IMDb Rating'</span>)</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pyTutorial4_files/figure-html/cell-20-output-1.png" width="1171" height="672" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="gráfico-de-histograma" class="level2">
+<h2 class="anchored" data-anchor-id="gráfico-de-histograma">Gráfico de Histograma</h2>
+<p>Um histograma representa dados usando barras de alturas diferentes. Geralmente, cada barra agrupa números em intervalos em um histograma. Quanto mais alta as barras, mais dados se encaixam nesse intervalo. É usado para exibir a forma e a dispersão de amostras de um conjunto de dados contínuos. Por exemplo, podemos usar um histograma para medir as frequências de resposta da variável <code>nota_imdb</code> .</p>
+<p>O Histograma serve para observar a distribuição dos dados e eventualmente serve para comparar mais de uma distribuição.</p>
+<div id="2018dcea" class="cell" data-execution_count="20">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>sns.histplot(data<span class="op">=</span>imdb_filmes, x<span class="op">=</span><span class="st">'nota_imdb'</span>, </span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>bins<span class="op">=</span><span class="dv">30</span>, color<span class="op">=</span><span class="st">'darkblue'</span>)</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Nota IMDb'</span>)</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pyTutorial4_files/figure-html/cell-21-output-1.png" width="602" height="429" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="mapas" class="level1">
+<h1>Mapas</h1>
+<p>Precisamos instalar alguns pacotes:</p>
+<ul>
+<li><p><code>pip install geobr</code></p></li>
+<li><p><code>pip install geopandas</code></p></li>
+</ul>
+<section id="pacote-geobr-para-mapas-do-brasil" class="level2">
+<h2 class="anchored" data-anchor-id="pacote-geobr-para-mapas-do-brasil"><strong>Pacote <code>geobr</code> para mapas do Brasil</strong></h2>
+<p>Vamos baixar os dados do Brasil por Estados.</p>
+<div id="7cc5ccdf" class="cell" data-cache="true" data-execution_count="21">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> geobr</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> geopandas <span class="im">as</span> gpd</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>states <span class="op">=</span> geobr.read_state(year<span class="op">=</span><span class="dv">2019</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>/opt/homebrew/Caskroom/miniforge/base/envs/ds_aula/lib/python3.12/site-packages/urllib3/connectionpool.py:1097: InsecureRequestWarning: Unverified HTTPS request is being made to host 'github.com'. Adding certificate verification is strongly advised. See: https://urllib3.readthedocs.io/en/latest/advanced-usage.html#tls-warnings
+  warnings.warn(
+/opt/homebrew/Caskroom/miniforge/base/envs/ds_aula/lib/python3.12/site-packages/urllib3/connectionpool.py:1097: InsecureRequestWarning: Unverified HTTPS request is being made to host 'release-assets.githubusercontent.com'. Adding certificate verification is strongly advised. See: https://urllib3.readthedocs.io/en/latest/advanced-usage.html#tls-warnings
+  warnings.warn(</code></pre>
+</div>
+</div>
+<div id="245919e2" class="cell" data-execution_count="22">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">15</span>, <span class="dv">15</span>), dpi<span class="op">=</span><span class="dv">300</span>)</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>states.plot(facecolor<span class="op">=</span><span class="st">"#2D3E50"</span>, edgecolor<span class="op">=</span><span class="st">"#FEBF57"</span>, ax<span class="op">=</span>ax)</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"Estados do Brasil"</span>, fontsize<span class="op">=</span><span class="dv">20</span>)</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pyTutorial4_files/figure-html/cell-23-output-1.png" width="3664" height="3327" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Outra forma de trabalhar manualmente o mapa é utilizando a library geopandas e importando diretamente os dados geográficos.</p>
+<div id="77147a27" class="cell" data-execution_count="23">
+<div class="cell-output cell-output-display" data-execution_count="23">
+<p>Você pode baixar os dados aqui.</p><ul><li><a href="pydata4//.DS_Store" download="">.DS_Store</a></li><li><a href="pydata4//india.zip" download="">india.zip</a></li><li><a href="pydata4//br_states_lifexpect2017.csv" download="">br_states_lifexpect2017.csv</a></li><li><a href="pydata4//importIN.xlsx" download="">importIN.xlsx</a></li><li><a href="pydata4//bcim_2016_21_11_2018.gpkg" download="">bcim_2016_21_11_2018.gpkg</a></li><li><a href="pydata4//india" download="">india</a></li></ul>
+</div>
+</div>
+<p>Vamos baixar os dados do Brasil do seguinte endereço:</p>
+<p><code>www.ibge.gov.br –&gt; geociências –&gt; downloads –&gt; cartas e mapas –&gt; bases cartográficas contínuas –&gt; bcim –&gt; versao 2016 –&gt; geopackage</code></p>
+<div id="0d6adba0" class="cell" data-execution_count="24">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co">#mapa = gpd.read_file('pydata4/bcim_2016_21_11_2018.gpkg', layer='lim_unidade_federacao_a')</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="66a54d95" class="cell" data-execution_count="25">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co">#mapa.head()</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Vamos a plotar o mapa do Brasil</p>
+<div id="4c98f890" class="cell" data-execution_count="26">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co">#mapa.plot()</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Agora queremos mapear alguma informação. Como exemplo, vamos pegar dados da expectativa de vida para os estados brasileiros:</p>
+<div id="2787d4eb" class="cell" data-execution_count="27">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>vida <span class="op">=</span> pd.read_csv(<span class="st">'pydata4/br_states_lifexpect2017.csv'</span>)</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>vida.info()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;class 'pandas.DataFrame'&gt;
+RangeIndex: 27 entries, 0 to 26
+Data columns (total 3 columns):
+ #   Column       Non-Null Count  Dtype  
+---  ------       --------------  -----  
+ 0   X            27 non-null     int64  
+ 1   uf           27 non-null     str    
+ 2   ESPVIDA2017  27 non-null     float64
+dtypes: float64(1), int64(1), str(1)
+memory usage: 1.0 KB</code></pre>
+</div>
+</div>
+<div id="67cffec4" class="cell" data-execution_count="28">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>states.info()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;class 'geopandas.geodataframe.GeoDataFrame'&gt;
+RangeIndex: 27 entries, 0 to 26
+Data columns (total 7 columns):
+ #   Column        Non-Null Count  Dtype   
+---  ------        --------------  -----   
+ 0   code_state    27 non-null     float64 
+ 1   name_state    27 non-null     str     
+ 2   abbrev_state  27 non-null     str     
+ 3   code_region   27 non-null     float64 
+ 4   name_region   27 non-null     str     
+ 5   year          27 non-null     float64 
+ 6   geometry      27 non-null     geometry
+dtypes: float64(3), geometry(1), str(3)
+memory usage: 2.1 KB</code></pre>
+</div>
+</div>
+<p>Vamos unir as informações dos dois dataframes.</p>
+<div id="558b3901" class="cell" data-execution_count="29">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>br <span class="op">=</span> pd.merge(</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>    states, </span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>    vida, </span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>    left_on<span class="op">=</span>states[<span class="st">'name_state'</span>].<span class="bu">str</span>.lower(), </span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>    right_on<span class="op">=</span>vida[<span class="st">'uf'</span>].<span class="bu">str</span>.lower(), </span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>    how<span class="op">=</span><span class="st">'left'</span></span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>).drop(columns<span class="op">=</span>[<span class="st">'key_0'</span>, <span class="st">'key_1'</span>], errors<span class="op">=</span><span class="st">'ignore'</span>)</span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>br<span class="op">=</span> br.fillna(<span class="dv">73</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Finalmente, vamos plotar o mapa:</p>
+<div id="cee96f9e" class="cell" data-execution_count="30">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>vmax <span class="op">=</span> np.<span class="bu">max</span>(br[<span class="st">'ESPVIDA2017'</span>])</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>vmin<span class="op">=</span>np.<span class="bu">min</span>(br[<span class="st">'ESPVIDA2017'</span>])</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>br.plot(column<span class="op">=</span><span class="st">'ESPVIDA2017'</span>,</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>        legend<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>        cmap<span class="op">=</span><span class="st">'Reds'</span>,</span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>        vmax<span class="op">=</span>vmax,</span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>        vmin<span class="op">=</span><span class="dv">70</span>)</span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pyTutorial4_files/figure-html/cell-31-output-1.png" width="542" height="411" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="exemplo-com-dados-de-outro-pais" class="level2">
+<h2 class="anchored" data-anchor-id="exemplo-com-dados-de-outro-pais">Exemplo com dados de outro pais</h2>
+<div id="bf674bba" class="cell" data-execution_count="31">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>mapa_india <span class="op">=</span> gpd.read_file(<span class="st">'pydata4/india/india-polygon.shp'</span>)</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>mapa_india.head(<span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="31">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">id</th>
+<th data-quarto-table-cell-role="th">st_nm</th>
+<th data-quarto-table-cell-role="th">geometry</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">0</th>
+<td>None</td>
+<td>Andaman and Nicobar Islands</td>
+<td>MULTIPOLYGON (((93.84831 7.24028, 93.92705 7.0...</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">1</th>
+<td>None</td>
+<td>Arunachal Pradesh</td>
+<td>POLYGON ((95.23643 26.68105, 95.19594 27.03612...</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">2</th>
+<td>None</td>
+<td>Assam</td>
+<td>POLYGON ((95.19594 27.03612, 95.08795 26.94578...</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="cb429f3e" class="cell" data-execution_count="32">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>mapa_india.plot()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pyTutorial4_files/figure-html/cell-33-output-1.png" width="376" height="411" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Vamos mapear os dados provenientes de:</p>
+<div id="c682d225" class="cell" data-execution_count="33">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>dados_india <span class="op">=</span> pd.read_excel(<span class="st">'pydata4/importIN.xlsx'</span>)</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>dados_india.head(<span class="dv">3</span>)</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>dados_india2023 <span class="op">=</span> dados_india[[<span class="st">'Year'</span>,<span class="dv">2023</span>]]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Juntando os dados</p>
+<div id="a6bb2f7c" class="cell" data-execution_count="34">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>mapa_india_2023 <span class="op">=</span> pd.merge(mapa_india, dados_india2023,</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>left_on <span class="op">=</span> <span class="st">'st_nm'</span>, right_on<span class="op">=</span><span class="st">'Year'</span>, how<span class="op">=</span><span class="st">'left'</span>)</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>mapa_india_2023.head(<span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="34">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">id</th>
+<th data-quarto-table-cell-role="th">st_nm</th>
+<th data-quarto-table-cell-role="th">geometry</th>
+<th data-quarto-table-cell-role="th">Year</th>
+<th data-quarto-table-cell-role="th">2023</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">0</th>
+<td>None</td>
+<td>Andaman and Nicobar Islands</td>
+<td>MULTIPOLYGON (((93.84831 7.24028, 93.92705 7.0...</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">1</th>
+<td>None</td>
+<td>Arunachal Pradesh</td>
+<td>POLYGON ((95.23643 26.68105, 95.19594 27.03612...</td>
+<td>Arunachal Pradesh</td>
+<td>11.64</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">2</th>
+<td>None</td>
+<td>Assam</td>
+<td>POLYGON ((95.19594 27.03612, 95.08795 26.94578...</td>
+<td>Assam</td>
+<td>147.92</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>Agora vamos plotar:</p>
+<div id="c0478411" class="cell" data-execution_count="35">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>np.<span class="bu">min</span>(mapa_india_2023[<span class="dv">2023</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="35">
+<pre><code>np.float64(3.04)</code></pre>
+</div>
+</div>
+<div id="2e45f1bc" class="cell" data-execution_count="36">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>np.<span class="bu">min</span>(mapa_india_2023[<span class="dv">2023</span>])</span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>mapa_india_2023.plot(column<span class="op">=</span><span class="dv">2023</span>,</span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>        missing_kwds<span class="op">=</span>{<span class="st">'color'</span>:<span class="st">'lightgrey'</span>},</span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>        legend<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>        cmap<span class="op">=</span><span class="st">'YlOrRd'</span>,</span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>        linewidth<span class="op">=</span><span class="fl">0.2</span>,</span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a>        edgecolor<span class="op">=</span><span class="st">'0'</span>,</span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>        vmin<span class="op">=</span><span class="dv">0</span>).set_axis_off()</span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Capacidade Instalada Solar na India em 2023 (em MW)'</span>)</span>
+<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pyTutorial4_files/figure-html/cell-37-output-1.png" width="501" height="417" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
