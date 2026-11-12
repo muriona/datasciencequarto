@@ -254,7 +254,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#instalar-os-pacotes-adicionais" id="toc-instalar-os-pacotes-adicionais" class="nav-link" data-scroll-target="#instalar-os-pacotes-adicionais"><span class="header-section-number">2.2</span> Instalar os pacotes adicionais</a></li>
   <li><a href="#conferir-a-instalação" id="toc-conferir-a-instalação" class="nav-link" data-scroll-target="#conferir-a-instalação"><span class="header-section-number">2.3</span> Conferir a instalação</a></li>
   <li><a href="#configurar-o-editor" id="toc-configurar-o-editor" class="nav-link" data-scroll-target="#configurar-o-editor"><span class="header-section-number">2.4</span> Configurar o editor</a></li>
-  <li><a href="#baixar-os-arquivos-do-tutorial" id="toc-baixar-os-arquivos-do-tutorial" class="nav-link" data-scroll-target="#baixar-os-arquivos-do-tutorial"><span class="header-section-number">2.5</span> Baixar os arquivos do tutorial</a></li>
   </ul></li>
   <li><a href="#conhecendo-os-dados" id="toc-conhecendo-os-dados" class="nav-link" data-scroll-target="#conhecendo-os-dados"><span class="header-section-number">3</span> Conhecendo os dados</a></li>
   <li><a href="#conceitos-básicos" id="toc-conceitos-básicos" class="nav-link" data-scroll-target="#conceitos-básicos"><span class="header-section-number">4</span> Conceitos básicos</a></li>
@@ -424,26 +423,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>O ambiente <code>ds_aula</code> precisa estar selecionado no editor <strong>e</strong> ativo no terminal. Se você abrir um terminal novo e a linha não começar com <code>(ds_aula)</code>, rode <code>conda activate ds_aula</code> antes de qualquer <code>quarto preview</code>.</p>
 </div>
 </div>
-</section>
-<section id="baixar-os-arquivos-do-tutorial" class="level2" data-number="2.5">
-<h2 data-number="2.5" class="anchored" data-anchor-id="baixar-os-arquivos-do-tutorial"><span class="header-section-number">2.5</span> Baixar os arquivos do tutorial</h2>
-<div id="4dc647a2" class="cell" data-execution_count="1">
-<div class="cell-output cell-output-display" data-execution_count="1">
-<p>Você pode baixar os arquivos aqui:</p><ul><li><a href="pydata5/.DS_Store" download="">.DS_Store</a></li><li><a href="pydata5/card_transdata.csv" download="">card_transdata.csv</a></li><li><a href="pydata5/penguins.csv" download="">penguins.csv</a></li><li><a href="pydata5/pythonQMD.zip" download="">pythonQMD.zip</a></li></ul>
-</div>
-</div>
-<p>Crie uma pasta só para este tutorial (por exemplo, <code>tutorial5c/</code>). É nela que você vai salvar os dashboards criados nas próximas seções e a ilustração <code>penguins.png</code>.</p>
+<p>Crie uma pasta só para este tutorial (por exemplo, <code>tutorial5c/</code>). É nela que você vai salvar os dashboards criados nas próximas seções.</p>
 </section>
 </section>
 <section id="conhecendo-os-dados" class="level1" data-number="3">
 <h1 data-number="3"><span class="header-section-number">3</span> Conhecendo os dados</h1>
 <p>Os dashboards usam o conjunto <strong>Palmer Penguins</strong>: medidas de 344 pinguins de três espécies, coletadas em três ilhas da Antártida. Vamos olhar os dados antes de construir qualquer coisa.</p>
-<div id="5cf74010" class="cell" data-execution_count="2">
+<div id="1dc643b7" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>penguins <span class="op">=</span> sns.load_dataset(<span class="st">"penguins"</span>)</span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>penguins.head()</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-display" data-execution_count="2">
+<div class="cell-output cell-output-display" data-execution_count="1">
 <div>
 
 
@@ -517,7 +508,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<div id="35790448" class="cell" data-execution_count="3">
+<div id="c62f8bb9" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>penguins.info()</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>&lt;class 'pandas.DataFrame'&gt;
