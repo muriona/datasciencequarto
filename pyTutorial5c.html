@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="pt-BR" xml:lang="pt-BR"><head>
 
 <meta charset="utf-8">
 <meta name="generator" content="quarto-1.9.37">
@@ -77,7 +77,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-6033a600180109c3731f6a886c29932c.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-1b006c303c309e85543ae3632a2f9124.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -92,19 +92,22 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   ],
   "show-item-context": false,
   "language": {
-    "search-no-results-text": "No results",
-    "search-matching-documents-text": "matching documents",
-    "search-copy-link-title": "Copy link to search",
-    "search-hide-matches-text": "Hide additional matches",
-    "search-more-match-text": "more match in this document",
-    "search-more-matches-text": "more matches in this document",
-    "search-clear-button-title": "Clear",
+    "search-no-results-text": "Nenhum resultado",
+    "search-matching-documents-text": "documentos correspondentes",
+    "search-copy-link-title": "Copiar link para a busca",
+    "search-hide-matches-text": "Esconder correspondências adicionais",
+    "search-more-match-text": "mais correspondência neste documento",
+    "search-more-matches-text": "mais correspondências neste documento",
+    "search-clear-button-title": "Limpar",
     "search-text-placeholder": "",
-    "search-detached-cancel-button-title": "Cancel",
-    "search-submit-button-title": "Submit",
-    "search-label": "Search"
+    "search-detached-cancel-button-title": "Cancelar",
+    "search-submit-button-title": "Enviar",
+    "search-label": "Procurar"
   }
 }</script>
+<script src="site_libs/quarto-diagram/mermaid.min.js"></script>
+<script src="site_libs/quarto-diagram/mermaid-init.js"></script>
+<link href="site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
 
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
@@ -124,8 +127,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <span class="navbar-title">EPS-UFSC</span>
     </a>
   </div>
-            <div id="quarto-search" class="" title="Search"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+            <div id="quarto-search" class="" title="Procurar"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Alternar de navegação" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <span class="navbar-toggler-icon"></span>
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
@@ -241,13 +244,34 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">On this page</h2>
+    <h2 id="toc-title">Nesta página</h2>
    
-  <ul>
-  <li><a href="#carregando-os-pacotes" id="toc-carregando-os-pacotes" class="nav-link active" data-scroll-target="#carregando-os-pacotes">Carregando os pacotes</a></li>
-  <li><a href="#instalar-pacotes" id="toc-instalar-pacotes" class="nav-link" data-scroll-target="#instalar-pacotes">Instalar pacotes</a></li>
-  <li><a href="#hello-shiny" id="toc-hello-shiny" class="nav-link" data-scroll-target="#hello-shiny">Hello Shiny</a></li>
-  <li><a href="#hello-shiny-2" id="toc-hello-shiny-2" class="nav-link" data-scroll-target="#hello-shiny-2">Hello Shiny 2</a></li>
+  <ul class="collapse">
+  <li><a href="#antes-de-começar" id="toc-antes-de-começar" class="nav-link active" data-scroll-target="#antes-de-começar"><span class="header-section-number">1</span> Antes de começar</a></li>
+  <li><a href="#preparando-o-ambiente" id="toc-preparando-o-ambiente" class="nav-link" data-scroll-target="#preparando-o-ambiente"><span class="header-section-number">2</span> Preparando o ambiente</a>
+  <ul class="collapse">
+  <li><a href="#abrir-o-terminal-e-ativar-o-ambiente" id="toc-abrir-o-terminal-e-ativar-o-ambiente" class="nav-link" data-scroll-target="#abrir-o-terminal-e-ativar-o-ambiente"><span class="header-section-number">2.1</span> Abrir o terminal e ativar o ambiente</a></li>
+  <li><a href="#instalar-os-pacotes-adicionais" id="toc-instalar-os-pacotes-adicionais" class="nav-link" data-scroll-target="#instalar-os-pacotes-adicionais"><span class="header-section-number">2.2</span> Instalar os pacotes adicionais</a></li>
+  <li><a href="#conferir-a-instalação" id="toc-conferir-a-instalação" class="nav-link" data-scroll-target="#conferir-a-instalação"><span class="header-section-number">2.3</span> Conferir a instalação</a></li>
+  <li><a href="#configurar-o-editor" id="toc-configurar-o-editor" class="nav-link" data-scroll-target="#configurar-o-editor"><span class="header-section-number">2.4</span> Configurar o editor</a></li>
+  <li><a href="#baixar-os-arquivos-do-tutorial" id="toc-baixar-os-arquivos-do-tutorial" class="nav-link" data-scroll-target="#baixar-os-arquivos-do-tutorial"><span class="header-section-number">2.5</span> Baixar os arquivos do tutorial</a></li>
+  </ul></li>
+  <li><a href="#conhecendo-os-dados" id="toc-conhecendo-os-dados" class="nav-link" data-scroll-target="#conhecendo-os-dados"><span class="header-section-number">3</span> Conhecendo os dados</a></li>
+  <li><a href="#conceitos-básicos" id="toc-conceitos-básicos" class="nav-link" data-scroll-target="#conceitos-básicos"><span class="header-section-number">4</span> Conceitos básicos</a></li>
+  <li><a href="#hello-shiny-o-primeiro-dashboard" id="toc-hello-shiny-o-primeiro-dashboard" class="nav-link" data-scroll-target="#hello-shiny-o-primeiro-dashboard"><span class="header-section-number">5</span> Hello Shiny: o primeiro dashboard</a>
+  <ul class="collapse">
+  <li><a href="#o-código" id="toc-o-código" class="nav-link" data-scroll-target="#o-código"><span class="header-section-number">5.1</span> O código</a></li>
+  <li><a href="#entendendo-cada-parte" id="toc-entendendo-cada-parte" class="nav-link" data-scroll-target="#entendendo-cada-parte"><span class="header-section-number">5.2</span> Entendendo cada parte</a></li>
+  <li><a href="#executando-o-dashboard" id="toc-executando-o-dashboard" class="nav-link" data-scroll-target="#executando-o-dashboard"><span class="header-section-number">5.3</span> Executando o dashboard</a></li>
+  </ul></li>
+  <li><a href="#hello-shiny-2-um-dashboard-mais-completo" id="toc-hello-shiny-2-um-dashboard-mais-completo" class="nav-link" data-scroll-target="#hello-shiny-2-um-dashboard-mais-completo"><span class="header-section-number">6</span> Hello Shiny 2: um dashboard mais completo</a>
+  <ul class="collapse">
+  <li><a href="#o-código-1" id="toc-o-código-1" class="nav-link" data-scroll-target="#o-código-1"><span class="header-section-number">6.1</span> O código</a></li>
+  <li><a href="#o-que-mudou-em-relação-ao-primeiro-dashboard" id="toc-o-que-mudou-em-relação-ao-primeiro-dashboard" class="nav-link" data-scroll-target="#o-que-mudou-em-relação-ao-primeiro-dashboard"><span class="header-section-number">6.2</span> O que mudou em relação ao primeiro dashboard</a></li>
+  <li><a href="#como-a-reatividade-flui" id="toc-como-a-reatividade-flui" class="nav-link" data-scroll-target="#como-a-reatividade-flui"><span class="header-section-number">6.3</span> Como a reatividade flui</a></li>
+  </ul></li>
+  <li><a href="#problemas-comuns" id="toc-problemas-comuns" class="nav-link" data-scroll-target="#problemas-comuns"><span class="header-section-number">7</span> Problemas comuns</a></li>
+  <li><a href="#para-saber-mais" id="toc-para-saber-mais" class="nav-link" data-scroll-target="#para-saber-mais"><span class="header-section-number">8</span> Para saber mais</a></li>
   </ul>
 </nav>
     </div>
@@ -273,44 +297,732 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<section id="carregando-os-pacotes" class="level1">
-<h1>Carregando os pacotes</h1>
-<div id="938f9e62" class="cell" data-execution_count="1">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<section id="antes-de-começar" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Antes de começar</h1>
+<p><strong>O que você vai construir:</strong> dois dashboards interativos com os dados de pinguins de Palmer. No primeiro, o usuário escolhe uma variável e o gráfico muda na hora. No segundo, há filtros, várias páginas e uma tabela de dados.</p>
+<p><strong>Ao final, você será capaz de:</strong></p>
+<ul>
+<li>explicar a diferença entre um dashboard estático e um interativo;</li>
+<li>criar controles de entrada (<code>input</code>) e saídas dinâmicas (<code>render</code>);</li>
+<li>usar <code>@reactive.calc</code> para reaproveitar um cálculo em vários gráficos;</li>
+<li>executar e encerrar um dashboard Shiny no seu computador.</li>
+</ul>
+<p><strong>Pré-requisitos:</strong> Miniforge com o ambiente <code>ds_aula</code> (o mesmo dos tutoriais anteriores), <a href="https://quarto.org/docs/get-started/">Quarto</a> instalado e noções de <code>pandas</code> e <code>seaborn</code>.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Nota</span>Como usar este tutorial
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Siga as seções na ordem. Cada uma termina com um <strong>✅ Checkpoint</strong>: só avance quando o resultado descrito aparecer na sua tela. Se algo der errado, consulte a seção <a href="#problemas-comuns">Problemas comuns</a>.</p>
+</div>
 </div>
 </section>
-<section id="instalar-pacotes" class="level1">
-<h1>Instalar pacotes</h1>
-<p>Primeiro precisamos instalar o <code>shiny</code> e suas dependências:</p>
-<div id="7f2577ba" class="cell" data-execution_count="2">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>pip install <span class="op">--</span>upgrade shiny shinywidgets</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<section id="preparando-o-ambiente" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Preparando o ambiente</h1>
+<section id="abrir-o-terminal-e-ativar-o-ambiente" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="abrir-o-terminal-e-ativar-o-ambiente"><span class="header-section-number">2.1</span> Abrir o terminal e ativar o ambiente</h2>
+<p>Todos os comandos desta seção são digitados no <strong>terminal</strong>, e <strong>não</strong> dentro de uma célula de código Python.</p>
+<ul>
+<li><strong>Windows:</strong> abra o <strong>Miniforge Prompt</strong> pelo menu Iniciar;</li>
+<li><strong>macOS e Linux:</strong> abra o Terminal.</li>
+</ul>
+<p>Em seguida, ative o ambiente da disciplina:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> activate ds_aula</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+<p>O início da linha do terminal deve passar a mostrar <code>(ds_aula)</code>. Se aparecer <code>(base)</code> ou nada, o ambiente não foi ativado e os pacotes serão instalados no lugar errado.</p>
+</section>
+<section id="instalar-os-pacotes-adicionais" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="instalar-os-pacotes-adicionais"><span class="header-section-number">2.2</span> Instalar os pacotes adicionais</h2>
+<p>O ambiente <code>ds_aula</code> já tem o <code>pandas</code>. Faltam os pacotes do Shiny e os que o Quarto usa para executar Python. Com o ambiente ativo, rode:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> install shiny shinywidgets seaborn jupyter</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Quando o conda mostrar a lista de pacotes e perguntar <code>Proceed ([y]/n)?</code>, digite <code>y</code> e pressione Enter.</p>
+<ul>
+<li><code>shiny</code>: biblioteca que cria a interatividade;</li>
+<li><code>shinywidgets</code>: permite usar gráficos interativos (como Plotly) dentro do Shiny;</li>
+<li><code>seaborn</code>: gráficos e conjunto de dados de exemplo (se já estiver instalado, o conda apenas confere a versão);</li>
+<li><code>jupyter</code>: usado pelo Quarto para executar código Python.</li>
+</ul>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Dica</span>Por que <code>conda install</code> e não <code>pip install</code>
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>No Miniforge, os pacotes vêm do canal <code>conda-forge</code>, onde <code>shiny</code> e <code>shinywidgets</code> estão disponíveis. Instalar tudo com o <code>conda</code>, num único comando, permite que ele resolva as dependências em conjunto. Misturar <code>pip</code> e <code>conda</code> no mesmo ambiente costuma causar conflitos de versão difíceis de diagnosticar. Use <code>pip</code> só se o <code>conda</code> não encontrar algum pacote.</p>
+</div>
 </div>
 </section>
-<section id="hello-shiny" class="level1">
-<h1>Hello Shiny</h1>
-<p>Vamos começar com um dashboard <strong>reativo</strong> simples.</p>
-<div id="15695059" class="cell" data-execution_count="3">
+<section id="conferir-a-instalação" class="level2" data-number="2.3">
+<h2 data-number="2.3" class="anchored" data-anchor-id="conferir-a-instalação"><span class="header-section-number">2.3</span> Conferir a instalação</h2>
+<p>Com o ambiente <code>ds_aula</code> ainda ativo, rode:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">quarto</span> <span class="at">--version</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-c</span> <span class="st">"import shiny, seaborn; print(shiny.__version__, seaborn.__version__)"</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="ex">quarto</span> check jupyter</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+<p>O último comando mostra qual Python o Quarto vai usar. O caminho exibido deve conter <code>ds_aula</code> (por exemplo, <code>.../miniforge3/envs/ds_aula/...</code>).</p>
+<p>Este tutorial foi testado com <strong>Quarto 1.11</strong>, <strong>shiny 1.9</strong> e <strong>seaborn 0.13</strong>. Versões mais novas devem funcionar; o mínimo exigido pelo Quarto é <code>shiny</code> 0.9.</p>
+<p><strong>✅ Checkpoint:</strong> os comandos mostram números de versão, sem mensagens de erro, e o caminho do Python contém <code>ds_aula</code>.</p>
+</section>
+<section id="configurar-o-editor" class="level2" data-number="2.4">
+<h2 data-number="2.4" class="anchored" data-anchor-id="configurar-o-editor"><span class="header-section-number">2.4</span> Configurar o editor</h2>
+<p>Você pode trabalhar no <strong>Positron</strong> ou no <strong>VS Code</strong>. Escolha a aba do seu editor e siga os passos uma única vez. Os atalhos estão no formato do Windows e Linux; no macOS, troque <strong>Ctrl</strong> por <strong>Cmd</strong>.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" href="">Positron</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false" href="">VS Code</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<ol type="1">
+<li><strong>Quarto já vem incluído.</strong> O Positron traz o Quarto e a extensão do Quarto; não é preciso instalar extensões.</li>
+<li><strong>Abra a pasta do tutorial:</strong> menu <em>File → Open Folder…</em> e escolha a pasta <code>tutorial5c/</code>. Assim, os arquivos e o terminal ficam na pasta certa.</li>
+<li><strong>Selecione o ambiente <code>ds_aula</code>:</strong> clique no seletor de interpretador, no canto superior direito da janela (mostra algo como <em>Python 3.12</em>), e escolha a opção que contém <code>ds_aula</code>. Se ela não aparecer, feche e abra o Positron de novo.</li>
+<li><strong>Confira o terminal:</strong> menu <em>Terminal → New Terminal</em>. A linha deve começar com <code>(ds_aula)</code>. Se não começar, digite <code>conda activate ds_aula</code>.</li>
+</ol>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<ol type="1">
+<li><strong>Instale as extensões:</strong> abra o painel de extensões (<strong>Ctrl + Shift + X</strong>), procure e instale:
+<ul>
+<li><strong>Python</strong>, da Microsoft;</li>
+<li><strong>Quarto</strong>, da Quarto (<code>quarto.quarto</code>).</li>
+</ul></li>
+<li><strong>Abra a pasta do tutorial:</strong> menu <em>File → Open Folder…</em> e escolha a pasta <code>tutorial5c/</code>.</li>
+<li><strong>Selecione o ambiente <code>ds_aula</code>:</strong> pressione <strong>Ctrl + Shift + P</strong>, digite <em>Python: Select Interpreter</em> e escolha a opção que contém <code>ds_aula</code>. O nome do ambiente passa a aparecer na barra inferior da janela.</li>
+<li><strong>Confira o terminal:</strong> menu <em>Terminal → New Terminal</em>. A linha deve começar com <code>(ds_aula)</code>. Se não começar, digite <code>conda activate ds_aula</code>.</li>
+</ol>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Nota</span>Windows: conda não reconhecido no terminal do VS Code
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>O terminal padrão do VS Code no Windows é o PowerShell, que nem sempre conhece o conda. Para resolver de uma vez, abra o <strong>Miniforge Prompt</strong>, rode <code>conda init powershell</code>, feche tudo e abra o VS Code de novo.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Importante</span>Ative o ambiente sempre
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>O ambiente <code>ds_aula</code> precisa estar selecionado no editor <strong>e</strong> ativo no terminal. Se você abrir um terminal novo e a linha não começar com <code>(ds_aula)</code>, rode <code>conda activate ds_aula</code> antes de qualquer <code>quarto preview</code>.</p>
+</div>
+</div>
+</section>
+<section id="baixar-os-arquivos-do-tutorial" class="level2" data-number="2.5">
+<h2 data-number="2.5" class="anchored" data-anchor-id="baixar-os-arquivos-do-tutorial"><span class="header-section-number">2.5</span> Baixar os arquivos do tutorial</h2>
+<div id="4dc647a2" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<p>Você pode baixar os arquivos aqui:</p><ul><li><a href="pydata5/.DS_Store" download="">.DS_Store</a></li><li><a href="pydata5/card_transdata.csv" download="">card_transdata.csv</a></li><li><a href="pydata5/penguins.csv" download="">penguins.csv</a></li><li><a href="pydata5/pythonQMD.zip" download="">pythonQMD.zip</a></li></ul>
+</div>
+</div>
+<p>Crie uma pasta só para este tutorial (por exemplo, <code>tutorial5c/</code>). É nela que você vai salvar os dashboards criados nas próximas seções e a ilustração <code>penguins.png</code>.</p>
+</section>
+</section>
+<section id="conhecendo-os-dados" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Conhecendo os dados</h1>
+<p>Os dashboards usam o conjunto <strong>Palmer Penguins</strong>: medidas de 344 pinguins de três espécies, coletadas em três ilhas da Antártida. Vamos olhar os dados antes de construir qualquer coisa.</p>
+<div id="5cf74010" class="cell" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>penguins <span class="op">=</span> sns.load_dataset(<span class="st">"penguins"</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>penguins.head()</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="2">
-<p>Você pode baixar os dados aqui.</p><ul><li><a href="pydata5//pythonQMD.zip" download="">pythonQMD.zip</a></li><li><a href="pydata5//.DS_Store" download="">.DS_Store</a></li><li><a href="pydata5//card_transdata.csv" download="">card_transdata.csv</a></li><li><a href="pydata5//penguins.csv" download="">penguins.csv</a></li></ul>
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">species</th>
+<th data-quarto-table-cell-role="th">island</th>
+<th data-quarto-table-cell-role="th">bill_length_mm</th>
+<th data-quarto-table-cell-role="th">bill_depth_mm</th>
+<th data-quarto-table-cell-role="th">flipper_length_mm</th>
+<th data-quarto-table-cell-role="th">body_mass_g</th>
+<th data-quarto-table-cell-role="th">sex</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">0</th>
+<td>Adelie</td>
+<td>Torgersen</td>
+<td>39.1</td>
+<td>18.7</td>
+<td>181.0</td>
+<td>3750.0</td>
+<td>Male</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">1</th>
+<td>Adelie</td>
+<td>Torgersen</td>
+<td>39.5</td>
+<td>17.4</td>
+<td>186.0</td>
+<td>3800.0</td>
+<td>Female</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">2</th>
+<td>Adelie</td>
+<td>Torgersen</td>
+<td>40.3</td>
+<td>18.0</td>
+<td>195.0</td>
+<td>3250.0</td>
+<td>Female</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">3</th>
+<td>Adelie</td>
+<td>Torgersen</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">4</th>
+<td>Adelie</td>
+<td>Torgersen</td>
+<td>36.7</td>
+<td>19.3</td>
+<td>193.0</td>
+<td>3450.0</td>
+<td>Female</td>
+</tr>
+</tbody>
+</table>
+
 </div>
 </div>
-<p><img src="images/shiny.png" class="img-fluid"></p>
-<p>Usaremos como base este <a href="https://quarto.org/docs/dashboards/interactivity/shiny-python/index.html">código</a> (que também está disponível nos arquivos da pasta.</p>
-<p><img src="images/penguins.png" class="img-fluid"></p>
-<p>Para poder renderizar o <code>.qmd</code> o procedimento é similar aos arquivos <code>ipynb</code>, pois é necessário digitar os comandos no <code>Terminal</code>:</p>
-<div id="4ca6fa0b" class="cell" data-execution_count="4">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>quarto preview <span class="op">&lt;</span>filename<span class="op">&gt;</span>.qmd</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>Alternativamente, sugere-se utilizar um IDE como o <a href="https://posit.co/download/rstudio-desktop/"><code>RStudio</code></a>, o <a href="https://code.visualstudio.com/download"><code>VSCode</code></a> ou o <a href="https://positron.posit.co/download.html"><code>Positron</code></a>.</p>
+<div id="35790448" class="cell" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>penguins.info()</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;class 'pandas.DataFrame'&gt;
+RangeIndex: 344 entries, 0 to 343
+Data columns (total 7 columns):
+ #   Column             Non-Null Count  Dtype  
+---  ------             --------------  -----  
+ 0   species            344 non-null    str    
+ 1   island             344 non-null    str    
+ 2   bill_length_mm     342 non-null    float64
+ 3   bill_depth_mm      342 non-null    float64
+ 4   flipper_length_mm  342 non-null    float64
+ 5   body_mass_g        342 non-null    float64
+ 6   sex                333 non-null    str    
+dtypes: float64(4), str(3)
+memory usage: 24.9 KB</code></pre>
+</div>
+</div>
+<p>Colunas que vamos usar:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Coluna</th>
+<th>Significado</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>species</code></td>
+<td>espécie (Adelie, Chinstrap, Gentoo)</td>
+</tr>
+<tr class="even">
+<td><code>island</code></td>
+<td>ilha (Biscoe, Dream, Torgersen)</td>
+</tr>
+<tr class="odd">
+<td><code>bill_length_mm</code></td>
+<td>comprimento do bico, em mm</td>
+</tr>
+<tr class="even">
+<td><code>bill_depth_mm</code></td>
+<td>profundidade (altura) do bico, em mm</td>
+</tr>
+</tbody>
+</table>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Aviso
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><code>sns.load_dataset()</code> baixa os dados da internet na primeira execução. Sem conexão, o comando falha.</p>
+</div>
+</div>
 </section>
-<section id="hello-shiny-2" class="level1">
-<h1>Hello Shiny 2</h1>
-<p>Agora vamos criar um <code>dashboard</code> mais complexo:</p>
-<p><img src="images/penguins2.png" class="img-fluid"></p>
-<p>Existem vários elementos que podemos incluir no dashboard para obter reatividade e podem ser encontrados <a href="https://jcheng.shinyapps.io/shiny-component-browser/">aqui</a>.</p>
+<section id="conceitos-básicos" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Conceitos básicos</h1>
+<p>Um dashboard <strong>estático</strong> é gerado uma vez: o Quarto executa o código, cria o HTML e pronto. Um dashboard <strong>interativo</strong> (com Shiny) mantém um processo Python rodando por trás da página. Quando o usuário muda um controle, o Python recalcula só o que depende daquele controle e atualiza a tela.</p>
+<p>Três ideias resumem o Shiny:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Conceito</th>
+<th>O que é</th>
+<th>Como aparece no código</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Entrada</strong> (<em>input</em>)</td>
+<td>controle que o usuário manipula: caixa de seleção, <em>checkbox</em>, <em>slider</em></td>
+<td><code>ui.input_select("x", ...)</code> e, depois, <code>input.x()</code> para ler o valor</td>
+</tr>
+<tr class="even">
+<td><strong>Saída</strong> (<em>output</em>)</td>
+<td>elemento que é redesenhado: gráfico, texto, tabela</td>
+<td>função com <code>@render.plot</code>, <code>@render.text</code>, <code>@render.data_frame</code></td>
+</tr>
+<tr class="odd">
+<td><strong>Reatividade</strong></td>
+<td>o Shiny registra quais saídas leem quais entradas e as atualiza sozinho</td>
+<td>você <strong>não</strong> chama as funções de saída; basta defini-las</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="hello-shiny-o-primeiro-dashboard" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> Hello Shiny: o primeiro dashboard</h1>
+<p>Usaremos como base o exemplo da <a href="https://quarto.org/docs/dashboards/interactivity/shiny-python/index.html">documentação oficial do Quarto</a>, com rótulos traduzidos.</p>
+<section id="o-código" class="level2" data-number="5.1">
+<h2 data-number="5.1" class="anchored" data-anchor-id="o-código"><span class="header-section-number">5.1</span> O código</h2>
+<p>O bloco abaixo é o arquivo inteiro. Para usá-lo:</p>
+<ol type="1">
+<li>Clique no ícone de copiar, no canto superior direito do bloco.</li>
+<li>No seu editor, crie um arquivo novo e cole o conteúdo.</li>
+<li>Salve como <code>penguin-bills.qmd</code>, na pasta do tutorial.</li>
+</ol>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>penguin-bills.qmd</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7" data-filename="penguin-bills.qmd"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Penguin Bills"</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span><span class="co"> dashboard</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="an">server:</span><span class="co"> shiny</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>penguins <span class="op">=</span> sns.load_dataset(<span class="st">"penguins"</span>)</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="fu">## {.sidebar}</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> shiny.express <span class="im">import</span> render, ui</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>ui.input_select(</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">"x"</span>, <span class="st">"Variável:"</span>,</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>    choices<span class="op">=</span>[<span class="st">"bill_length_mm"</span>, <span class="st">"bill_depth_mm"</span>]</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>ui.input_select(<span class="st">"dist"</span>, <span class="st">"Distribuição:"</span>, choices<span class="op">=</span>[<span class="st">"hist"</span>, <span class="st">"kde"</span>])</span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>ui.input_checkbox(<span class="st">"rug"</span>, <span class="st">"Mostrar marcas (rug)"</span>, value<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a><span class="fu">## Column</span></span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a><span class="at">@render.plot</span></span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> displot():</span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>    sns.displot(</span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>        data<span class="op">=</span>penguins, hue<span class="op">=</span><span class="st">"species"</span>, multiple<span class="op">=</span><span class="st">"stack"</span>,</span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>        x<span class="op">=</span><span class="bu">input</span>.x(), rug<span class="op">=</span><span class="bu">input</span>.rug(), kind<span class="op">=</span><span class="bu">input</span>.dist()</span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="entendendo-cada-parte" class="level2" data-number="5.2">
+<h2 data-number="5.2" class="anchored" data-anchor-id="entendendo-cada-parte"><span class="header-section-number">5.2</span> Entendendo cada parte</h2>
+<p><strong>Cabeçalho (YAML).</strong> <code>format: dashboard</code> organiza a página em painéis. <code>server: shiny</code> avisa o Quarto que este documento precisa de um processo Python ativo enquanto alguém o visualiza. Sem essa linha, nada seria interativo.</p>
+<p><strong>Primeira célula.</strong> Carrega os dados. Nada de especial aqui.</p>
+<p><strong><code>## {.sidebar}</code>.</strong> Um título de nível 2 com a classe <code>.sidebar</code> cria a barra lateral. Tudo que vier abaixo dele, até o próximo título, vai para essa barra.</p>
+<p><strong>Os controles de entrada.</strong> Cada função <code>ui.input_*</code> cria um controle:</p>
+<ul>
+<li>o <strong>1º argumento</strong> é o <em>ID</em> (<code>"x"</code>, <code>"dist"</code>, <code>"rug"</code>). É por ele que o resto do código lê o valor. Precisa ser único e seguir as regras de nome de variável do Python;</li>
+<li>o <strong>2º argumento</strong> é o rótulo mostrado na tela;</li>
+<li><code>choices</code> define as opções; <code>value</code> define o valor inicial.</li>
+</ul>
+<p><strong><code>## Column</code>.</strong> Abre a área principal, onde fica o gráfico.</p>
+<p><strong>A saída.</strong> O decorador <code>@render.plot</code> transforma a função <code>displot()</code> em um gráfico do dashboard. Dentro dela, <code>input.x()</code>, <code>input.rug()</code> e <code>input.dist()</code> leem o valor <strong>atual</strong> de cada controle. Repare nos parênteses: <code>input.x</code> sem <code>()</code> não funciona.</p>
+<p>Note que o código nunca chama <code>displot()</code>. O Shiny faz isso sozinho: na abertura da página e toda vez que um dos três controles muda.</p>
+</section>
+<section id="executando-o-dashboard" class="level2" data-number="5.3">
+<h2 data-number="5.3" class="anchored" data-anchor-id="executando-o-dashboard"><span class="header-section-number">5.3</span> Executando o dashboard</h2>
+<p>Escolha a aba de acordo com onde você está trabalhando.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true" href="">Positron</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false" href="">VS Code</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-3" role="tab" aria-controls="tabset-2-3" aria-selected="false" href="">Terminal</a></li></ul>
+<div class="tab-content">
+<div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
+<ol type="1">
+<li>Abra o arquivo <code>penguin-bills.qmd</code>.</li>
+<li>Clique no botão <strong>Preview</strong>, na barra no topo do editor, ou pressione <strong>Ctrl + Shift + K</strong>.</li>
+<li>Aguarde. O dashboard abre no painel <strong>Viewer</strong>, ao lado do código. Para vê-lo maior, use o botão do Viewer que abre a página no navegador.</li>
+<li>Para encerrar, vá ao painel de terminais, selecione o terminal <strong>Quarto Preview</strong> e pressione <strong>Ctrl + C</strong> (ou feche esse terminal pelo ícone da lixeira).</li>
+</ol>
+</div>
+<div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
+<ol type="1">
+<li>Abra o arquivo <code>penguin-bills.qmd</code>.</li>
+<li>Clique no ícone <strong>Preview</strong>, no canto superior direito do editor, ou pressione <strong>Ctrl + Shift + K</strong>.</li>
+<li>Aguarde. O dashboard abre num painel <strong>Quarto Preview</strong>, ao lado do código.</li>
+<li>Para encerrar, vá ao painel de terminais, selecione o terminal <strong>Quarto Preview</strong> e pressione <strong>Ctrl + C</strong> (ou feche esse terminal pelo ícone da lixeira).</li>
+</ol>
+</div>
+<div id="tabset-2-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-3-tab">
+<ol type="1">
+<li><p>Abra o terminal (Miniforge Prompt no Windows) e ative o ambiente com <code>conda activate ds_aula</code>.</p></li>
+<li><p>Vá até a pasta onde salvou o arquivo com <code>cd</code>, por exemplo <code>cd Documentos/tutorial5c</code>. Para conferir, <code>ls</code> (macOS/Linux) ou <code>dir</code> (Windows) deve listar <code>penguin-bills.qmd</code>.</p></li>
+<li><p>Rode:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">quarto</span> preview penguin-bills.qmd</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div></li>
+<li><p>Aguarde. O terminal mostra mensagens de renderização e, ao final, um endereço parecido com <code>http://localhost:XXXX</code>. O navegador deve abrir sozinho; se não abrir, copie esse endereço.</p></li>
+<li><p>Para encerrar, volte ao terminal e pressione <strong>Ctrl + C</strong>.</p></li>
+</ol>
+<p>O terminal integrado do Positron e do VS Code também serve: os passos são os mesmos, e ele já abre na pasta do tutorial.</p>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Importante</span>Não feche o terminal enquanto usa o dashboard
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Nos três casos, o dashboard depende de um processo Python rodando num terminal (no editor, ele se chama <strong>Quarto Preview</strong>). Se esse terminal for fechado ou interrompido, a página fica cinza e os controles param de responder.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Dica</span>O botão Preview deu erro de módulo não encontrado?
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>O editor provavelmente está usando outro Python. Confira se <code>ds_aula</code> está selecionado (seção <a href="#configurar-o-editor">Configurar o editor</a>). Se o erro continuar, use a aba <strong>Terminal</strong>: rodar <code>quarto preview</code> num terminal com <code>(ds_aula)</code> ativo sempre usa o ambiente certo.</p>
+</div>
+</div>
+<p><strong>✅ Checkpoint:</strong> o navegador mostra uma barra lateral com dois menus e uma caixa de seleção, e um histograma empilhado por espécie à direita. Troque a variável para <code>bill_depth_mm</code> e a distribuição para <code>kde</code>: o gráfico deve mudar em um ou dois segundos.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/shiny.png" class="img-fluid figure-img"></p>
+<figcaption>Resultado esperado do dashboard <em>Penguin Bills</em>.</figcaption>
+</figure>
+</div>
+</section>
+</section>
+<section id="hello-shiny-2-um-dashboard-mais-completo" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> Hello Shiny 2: um dashboard mais completo</h1>
+<p>Agora vamos acrescentar filtros, páginas e uma tabela. O dashboard final terá:</p>
+<ul>
+<li>barra lateral com filtros de <strong>espécie</strong> e <strong>ilha</strong>, tipo de distribuição e marcas <em>rug</em>;</li>
+<li>página <strong>Gráficos</strong>, com as distribuições da profundidade e do comprimento do bico;</li>
+<li>página <strong>Dados</strong>, com a tabela filtrada.</li>
+</ul>
+<section id="o-código-1" class="level2" data-number="6.1">
+<h2 data-number="6.1" class="anchored" data-anchor-id="o-código-1"><span class="header-section-number">6.1</span> O código</h2>
+<p>Copie o bloco abaixo para um arquivo novo chamado <code>palmer-penguins.qmd</code>, como no exemplo anterior:</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/penguins2.png" class="img-fluid figure-img"></p>
+<figcaption>Resultado esperado do dashboard <em>Palmer Penguins</em>.</figcaption>
+</figure>
+</div>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>palmer-penguins.qmd</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9" data-filename="palmer-penguins.qmd"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Palmer Penguins"</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="an">author:</span><span class="co"> "Cobblepot Analytics"</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span><span class="co"> dashboard</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="an">server:</span><span class="co"> shiny</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="co">#| context: setup</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> shiny <span class="im">import</span> reactive, req</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> shiny.express <span class="im">import</span> render, ui</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>penguins <span class="op">=</span> sns.load_dataset(<span class="st">"penguins"</span>)</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a><span class="fu"># {.sidebar}</span></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a><span class="al">![](penguins.png)</span>{width="80%"}</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>species <span class="op">=</span> <span class="bu">list</span>(penguins[<span class="st">"species"</span>].value_counts().index)</span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>ui.input_checkbox_group(</span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>    <span class="st">"species"</span>, <span class="st">"Espécies:"</span>,</span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>    species, selected<span class="op">=</span>species</span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>islands <span class="op">=</span> <span class="bu">list</span>(penguins[<span class="st">"island"</span>].value_counts().index)</span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>ui.input_checkbox_group(</span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>    <span class="st">"islands"</span>, <span class="st">"Ilhas:"</span>,</span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>    islands, selected<span class="op">=</span>islands</span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a><span class="at">@reactive.calc</span></span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> filtered_penguins():</span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a>    req(<span class="bu">input</span>.species(), <span class="bu">input</span>.islands())</span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a>    data <span class="op">=</span> penguins[penguins[<span class="st">"species"</span>].isin(<span class="bu">input</span>.species())]</span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a>    data <span class="op">=</span> data[data[<span class="st">"island"</span>].isin(<span class="bu">input</span>.islands())]</span>
+<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> data</span>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a>ui.input_select(<span class="st">"dist"</span>, <span class="st">"Distribuição:"</span>, choices<span class="op">=</span>[<span class="st">"kde"</span>, <span class="st">"hist"</span>])</span>
+<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a>ui.input_checkbox(<span class="st">"rug"</span>, <span class="st">"Mostrar marcas (rug)"</span>, value<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">Saiba mais</span><span class="co">](https://pypi.org/project/palmerpenguins/)</span> sobre o conjunto</span>
+<span id="cb9-48"><a href="#cb9-48" aria-hidden="true" tabindex="-1"></a>de dados Palmer Penguins.</span>
+<span id="cb9-49"><a href="#cb9-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-50"><a href="#cb9-50" aria-hidden="true" tabindex="-1"></a><span class="fu"># Gráficos</span></span>
+<span id="cb9-51"><a href="#cb9-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-52"><a href="#cb9-52" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb9-53"><a href="#cb9-53" aria-hidden="true" tabindex="-1"></a><span class="at">@render.plot</span></span>
+<span id="cb9-54"><a href="#cb9-54" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> depth():</span>
+<span id="cb9-55"><a href="#cb9-55" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> sns.displot(</span>
+<span id="cb9-56"><a href="#cb9-56" aria-hidden="true" tabindex="-1"></a>        filtered_penguins(), x<span class="op">=</span><span class="st">"bill_depth_mm"</span>,</span>
+<span id="cb9-57"><a href="#cb9-57" aria-hidden="true" tabindex="-1"></a>        hue<span class="op">=</span><span class="st">"species"</span>, kind<span class="op">=</span><span class="bu">input</span>.dist(),</span>
+<span id="cb9-58"><a href="#cb9-58" aria-hidden="true" tabindex="-1"></a>        fill<span class="op">=</span><span class="va">True</span>, rug<span class="op">=</span><span class="bu">input</span>.rug()</span>
+<span id="cb9-59"><a href="#cb9-59" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb9-60"><a href="#cb9-60" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb9-61"><a href="#cb9-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-62"><a href="#cb9-62" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb9-63"><a href="#cb9-63" aria-hidden="true" tabindex="-1"></a><span class="at">@render.plot</span></span>
+<span id="cb9-64"><a href="#cb9-64" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> length():</span>
+<span id="cb9-65"><a href="#cb9-65" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> sns.displot(</span>
+<span id="cb9-66"><a href="#cb9-66" aria-hidden="true" tabindex="-1"></a>        filtered_penguins(), x<span class="op">=</span><span class="st">"bill_length_mm"</span>,</span>
+<span id="cb9-67"><a href="#cb9-67" aria-hidden="true" tabindex="-1"></a>        hue<span class="op">=</span><span class="st">"species"</span>, kind<span class="op">=</span><span class="bu">input</span>.dist(),</span>
+<span id="cb9-68"><a href="#cb9-68" aria-hidden="true" tabindex="-1"></a>        fill<span class="op">=</span><span class="va">True</span>, rug<span class="op">=</span><span class="bu">input</span>.rug()</span>
+<span id="cb9-69"><a href="#cb9-69" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb9-70"><a href="#cb9-70" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb9-71"><a href="#cb9-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-72"><a href="#cb9-72" aria-hidden="true" tabindex="-1"></a><span class="fu"># Dados</span></span>
+<span id="cb9-73"><a href="#cb9-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-74"><a href="#cb9-74" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb9-75"><a href="#cb9-75" aria-hidden="true" tabindex="-1"></a><span class="at">@render.data_frame</span></span>
+<span id="cb9-76"><a href="#cb9-76" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> dataview():</span>
+<span id="cb9-77"><a href="#cb9-77" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> render.DataGrid(filtered_penguins())</span>
+<span id="cb9-78"><a href="#cb9-78" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Execute da mesma forma: botão <strong>Preview</strong> (ou <strong>Ctrl + Shift + K</strong>) no Positron ou no VS Code, ou <code>quarto preview palmer-penguins.qmd</code> no terminal. Se o <em>Penguin Bills</em> ainda estiver rodando, encerre-o antes.</p>
+</section>
+<section id="o-que-mudou-em-relação-ao-primeiro-dashboard" class="level2" data-number="6.2">
+<h2 data-number="6.2" class="anchored" data-anchor-id="o-que-mudou-em-relação-ao-primeiro-dashboard"><span class="header-section-number">6.2</span> O que mudou em relação ao primeiro dashboard</h2>
+<p><strong><code>author:</code> no cabeçalho.</strong> O texto aparece ao lado do título, na barra superior.</p>
+<p><strong><code>#| context: setup</code>.</strong> Em documentos com <code>server: shiny</code>, as células comuns rodam de novo <strong>para cada pessoa</strong> que abre a página. A célula marcada com <code>context: setup</code> roda <strong>uma única vez</strong>, quando o servidor inicia. Por isso, importações e leitura de dados ficam nela: não faz sentido baixar a mesma tabela a cada visita.</p>
+<p><strong><code># {.sidebar}</code> com título de nível 1.</strong> No primeiro exemplo a barra lateral usava <code>##</code>. Aqui ela usa <code>#</code>, o que a torna <strong>global</strong>: ela aparece em todas as páginas.</p>
+<p><strong>Imagem na barra lateral.</strong> A barra aceita Markdown comum, não só código. <code>![](penguins.png){width="80%"}</code> insere a ilustração com 80% da largura da barra. O caminho é relativo ao arquivo <code>.qmd</code>; se a imagem não estiver na mesma pasta, aparece um ícone de imagem quebrada. A ilustração é de Allison Horst e tem licença livre (CC0).</p>
+<p><strong>Opções geradas a partir dos dados.</strong> As listas <code>species</code> e <code>islands</code> são criadas com <code>value_counts().index</code>. Se os dados mudarem, as caixas de seleção acompanham sem você editar o código. <code>selected=</code> faz todas começarem marcadas.</p>
+<p><strong><code>@reactive.calc</code>.</strong> Os três elementos de saída (dois gráficos e a tabela) usam os <strong>mesmos</strong> dados filtrados. Em vez de repetir o filtro três vezes, ele fica em uma só função decorada com <code>@reactive.calc</code>. Ela funciona assim:</p>
+<ul>
+<li>é recalculada apenas quando <code>input.species()</code> ou <code>input.islands()</code> mudam;</li>
+<li>guarda o resultado; quem chama <code>filtered_penguins()</code> recebe o valor já pronto;</li>
+<li>deve ser chamada <strong>com parênteses</strong>, como uma função.</li>
+</ul>
+<p><strong><code>req(...)</code>.</strong> Se o usuário desmarcar todas as espécies, <code>input.species()</code> fica vazio e o gráfico mostraria um erro. <code>req()</code> interrompe o cálculo em silêncio quando algum valor está vazio, e as saídas simplesmente ficam em branco.</p>
+<p><strong>Páginas com <code># Gráficos</code> e <code># Dados</code>.</strong> Cada título de nível 1 vira uma aba na barra superior.</p>
+<p><strong><code>@render.data_frame</code>.</strong> Mostra uma tabela interativa (ordenável). <code>render.DataGrid</code> dá aparência de planilha; <code>render.DataTable</code> dá aparência de tabela tradicional.</p>
+</section>
+<section id="como-a-reatividade-flui" class="level2" data-number="6.3">
+<h2 data-number="6.3" class="anchored" data-anchor-id="como-a-reatividade-flui"><span class="header-section-number">6.3</span> Como a reatividade flui</h2>
+<p>O diagrama mostra quem depende de quem. Quando um controle muda, o Shiny segue as setas e recalcula só o necessário.</p>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart LR
+    S[input.species] --&gt; F["filtered_penguins()&lt;br/&gt;@reactive.calc"]
+    I[input.islands] --&gt; F
+    F --&gt; D[depth&lt;br/&gt;gráfico]
+    F --&gt; L[length&lt;br/&gt;gráfico]
+    F --&gt; T[dataview&lt;br/&gt;tabela]
+    K[input.dist] --&gt; D
+    K --&gt; L
+    R[input.rug] --&gt; D
+    R --&gt; L
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>Mudar <code>dist</code> ou <code>rug</code>, por exemplo, redesenha os dois gráficos, mas <strong>não</strong> refaz o filtro nem a tabela.</p>
+<p><strong>✅ Checkpoint:</strong></p>
+<ol type="1">
+<li>Desmarque a espécie <em>Gentoo</em>: as curvas verdes somem dos dois gráficos.</li>
+<li>Vá para a aba <strong>Dados</strong>: a tabela não tem mais linhas de <em>Gentoo</em>.</li>
+<li>Desmarque todas as espécies: os gráficos ficam vazios, sem mensagem de erro.</li>
+</ol>
+</section>
+</section>
+<section id="problemas-comuns" class="level1" data-number="7">
+<h1 data-number="7"><span class="header-section-number">7</span> Problemas comuns</h1>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Sintoma</th>
+<th>Causa provável</th>
+<th>Solução</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>SyntaxError</code> ao rodar <code>conda install ...</code></td>
+<td>comando digitado numa célula Python</td>
+<td>rode no terminal (Miniforge Prompt no Windows)</td>
+</tr>
+<tr class="even">
+<td><code>conda: command not found</code> ou comando não reconhecido</td>
+<td>terminal comum, sem o conda carregado</td>
+<td>no Windows, use o <strong>Miniforge Prompt</strong>; no macOS/Linux, rode <code>conda init</code> uma vez e reabra o terminal</td>
+</tr>
+<tr class="odd">
+<td><code>EnvironmentNameNotFound: ds_aula</code></td>
+<td>ambiente com outro nome ou não criado</td>
+<td>liste os ambientes com <code>conda env list</code></td>
+</tr>
+<tr class="even">
+<td><code>ModuleNotFoundError: No module named 'shiny'</code></td>
+<td>ambiente <code>ds_aula</code> não ativado, ou pacotes instalados em outro ambiente</td>
+<td><code>conda activate ds_aula</code> e rode <code>conda install shiny shinywidgets</code> de novo; no IDE, selecione o interpretador <code>ds_aula</code></td>
+</tr>
+<tr class="odd">
+<td><code>quarto check jupyter</code> mostra um Python fora de <code>ds_aula</code></td>
+<td>Quarto rodando com outro Python</td>
+<td>ative o ambiente no mesmo terminal em que roda o <code>quarto</code>; se persistir, defina a variável <code>QUARTO_PYTHON</code> com o caminho do Python do <code>ds_aula</code></td>
+</tr>
+<tr class="even">
+<td><code>quarto: command not found</code></td>
+<td>Quarto não instalado ou fora do PATH</td>
+<td>instale pelo site do Quarto e reabra o terminal; no Positron, o Quarto embutido funciona pelo botão Preview mesmo sem esse comando</td>
+</tr>
+<tr class="odd">
+<td>VS Code sem botão <strong>Preview</strong> em arquivos <code>.qmd</code></td>
+<td>extensão Quarto não instalada</td>
+<td>instale a extensão <strong>Quarto</strong> (<code>quarto.quarto</code>)</td>
+</tr>
+<tr class="even">
+<td>Positron ou VS Code não lista o <code>ds_aula</code></td>
+<td>editor aberto antes de o ambiente existir</td>
+<td>feche e abra o editor; no VS Code, tente <em>Python: Select Interpreter</em> de novo</td>
+</tr>
+<tr class="odd">
+<td><code>ModuleNotFoundError</code> ao clicar em <strong>Preview</strong></td>
+<td>editor usando outro Python</td>
+<td>selecione o <code>ds_aula</code> ou rode <code>quarto preview</code> no terminal com o ambiente ativo</td>
+</tr>
+<tr class="even">
+<td><code>File not found</code> no <code>quarto preview</code></td>
+<td>terminal aberto em outra pasta</td>
+<td>navegue com <code>cd</code> até a pasta do arquivo</td>
+</tr>
+<tr class="odd">
+<td>Página abre, mas fica cinza ou não responde</td>
+<td>servidor interrompido (terminal <strong>Quarto Preview</strong> fechado ou Ctrl + C)</td>
+<td>rode <code>quarto preview</code> de novo</td>
+</tr>
+<tr class="even">
+<td>Página estática, controles sem efeito</td>
+<td>falta <code>server: shiny</code> no cabeçalho</td>
+<td>inclua a linha e rode de novo</td>
+</tr>
+<tr class="odd">
+<td><code>NameError: name 'input' is not defined</code></td>
+<td>arquivo executado como script Python comum, fora do Quarto</td>
+<td>rode com <code>quarto preview arquivo.qmd</code></td>
+</tr>
+<tr class="even">
+<td>Erro de conexão em <code>load_dataset</code></td>
+<td>sem internet</td>
+<td>conecte-se ou carregue um CSV local com <code>pd.read_csv()</code></td>
+</tr>
+<tr class="odd">
+<td>Ícone de imagem quebrada na barra lateral</td>
+<td><code>penguins.png</code> fora da pasta do <code>.qmd</code></td>
+<td>salve a imagem junto do arquivo</td>
+</tr>
+<tr class="even">
+<td>Gráfico com erro ao desmarcar todos os filtros</td>
+<td>dados filtrados vazios</td>
+<td>use <code>req()</code> no <code>@reactive.calc</code></td>
+</tr>
+</tbody>
+</table>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Nota</span>Sobre o arquivo <code>app.py</code>
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Ao renderizar um documento com <code>server: shiny</code>, o Quarto gera um arquivo <code>app.py</code> na mesma pasta. <strong>Não edite esse arquivo</strong>: ele é recriado a cada renderização. Se houver vários dashboards Shiny na mesma pasta, cada renderização sobrescreve o <code>app.py</code> do anterior. Para o <code>quarto preview</code> isso não é problema, mas, para publicar, mantenha cada dashboard em sua própria pasta.</p>
+</div>
+</div>
+</section>
+<section id="para-saber-mais" class="level1" data-number="8">
+<h1 data-number="8"><span class="header-section-number">8</span> Para saber mais</h1>
+<ul>
+<li><a href="https://quarto.org/docs/dashboards/interactivity/shiny-python/index.html">Dashboards com Shiny para Python</a>: documentação base deste tutorial;</li>
+<li><a href="https://jcheng.shinyapps.io/shiny-component-browser/">Shiny Component Browser</a>: catálogo de entradas e saídas;</li>
+<li><a href="https://quarto.org/docs/dashboards/inputs.html">Layout de controles</a>: barras de ferramentas, controles dentro de cartões etc.;</li>
+<li><a href="https://quarto.org/docs/dashboards/interactivity/shiny-python/running.html">Executando dashboards</a>: uso em editores e publicação;</li>
+<li><a href="https://quarto.org/docs/tools/positron/index.html">Quarto no Positron</a> e <a href="https://quarto.org/docs/tools/vscode/index.html">Quarto no VS Code</a>: recursos do Quarto em cada editor;</li>
+<li><a href="https://shiny.posit.co/py/">Shiny para Python</a>: documentação completa da biblioteca.</li>
+</ul>
 
 
 </section>
@@ -341,12 +1053,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       // flash "checked"
       button.classList.add('code-copy-button-checked');
       var currentTitle = button.getAttribute("title");
-      button.setAttribute("title", "Copied!");
+      button.setAttribute("title", "Copiada");
       let tooltip;
       if (window.bootstrap) {
         button.setAttribute("data-bs-toggle", "tooltip");
         button.setAttribute("data-bs-placement", "left");
-        button.setAttribute("data-bs-title", "Copied!");
+        button.setAttribute("data-bs-title", "Copiada");
         tooltip = new bootstrap.Tooltip(button, 
           { trigger: "manual", 
             customClass: "code-copy-button-tooltip",
